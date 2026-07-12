@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="备份存档 · 角色档案（数据异常）" />
+<title>角色档案 · ？？？</title>
+<script type="text/javascript">
+    localStorage.setItem("visited_backup_hero", "true");
+</script>
+<style type="text/css">
+  body { margin:0; padding:0; font-family:"宋体",SimSun,Arial; font-size:12px; color:#ffb3b3; background:#3a0000; overflow-x:hidden; }
+  #wrapper { width:960px; margin:0 auto; background:#1a0000; border:1px solid #5a0000; box-shadow:0 0 30px rgba(255,0,0,.4); }
+  #header { height:90px; background:#5a0000; text-align:center; line-height:90px; font-size:24px; font-weight:bold; color:#ff4d4d; border-bottom:3px solid #ff0000; text-shadow:0 0 10px #ff0000; letter-spacing:4px; }
+  #nav { height:35px; background:#7a0000; }
+  #nav a { display:inline-block; line-height:35px; padding:0 25px; color:#ffb3b3; font-weight:bold; text-decoration:none; }
+  .content { padding:30px; overflow:hidden; }
+  .char-left { width:280px; float:left; text-align:center; }
+  .portrait { width:260px; height:360px; border:2px dashed #ff0000; background:#2a0000; display:block; object-fit:cover; object-position:center top; filter:grayscale(.5); }
+  .char-right { width:600px; float:right; }
+  .char-name { font-size:28px; font-weight:bold; color:#ff4d4d; text-shadow:0 0 8px #ff0000; letter-spacing:2px; }
+  .garble { color:#ff6666; font-family:Consolas,monospace; word-break:break-all; line-height:1.7; }
+  .status { display:inline-block; background:#ff0000; color:#1a0000; padding:3px 14px; border-radius:3px; margin:14px 0; font-weight:bold; letter-spacing:2px; }
+  .info-table { width:100%; border-collapse:collapse; margin:16px 0; }
+  .info-table th,.info-table td { border:1px solid #7a0000; padding:8px 10px; }
+  .info-table th { background:#2a0000; color:#ff9999; width:110px; text-align:right; }
+  .sec { line-height:2; color:#ffb3b3; margin-top:14px; text-indent:2em; }
+  .btn-back { display:inline-block; margin-top:24px; padding:8px 22px; background:#7a0000; color:#ffb3b3; border:1px solid #ff0000; border-radius:3px; cursor:pointer; text-decoration:none; }
+  #footer { background:#2a0000; border-top:2px solid #ff0000; text-align:center; padding:16px 0; color:#ff6666; }
+  .clear { clear:both; }
+  #oo-toast {
+    display: none;
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-left: 4px solid #1a73e8;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    padding: 14px 18px;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+    color: #202124;
+    cursor: pointer;
+    max-width: 280px;
+    animation: oo-toast-in .35s ease;
+  }
+  #oo-toast strong { color: #1a73e8; }
+  @keyframes oo-toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div id="wrapper">
+  <div id="header">辉&#x200B;光&#xFEFF;传&#x200C;说 · 备&#x200D;份&#x2060;存&#x200B;档</div>
+  <div id="nav">
+    <a href="backup_guanwang.html">官网首页</a>
+    <a href="backup_404.html">新闻公告</a>
+    <a href="backup_404.html">官方论坛</a>
+  </div>
+  <div class="content">
+    <div class="char-left">
+      <img class="portrait" src="images/char_ag.png" alt="勇者阿光" />
+      <p style="color:#ff6666;margin-top:8px;" class="garble">勇&#x200B;者 · 阿&#xFEFF;光</p>
+    </div>
+    <div class="char-right">
+      <span class="char-name garble">勇&#x200C;者 &#x2060;阿&#x200D;光</span><br/>
+      <span class="status">状态：已死亡</span>
+      <table class="info-table">
+        <tr><th>身份</th><td class="garble">辉&#xFEFF;光&#x200B;勇&#x200C;者 · 队&#x2060;伍&#x200D;的&#x200B;核&#xFEFF;心</td></tr>
+        <tr><th>在场时间</th><td style="color:#ff4d4d;font-weight:bold;">2007 — 2009</td></tr>
+        <tr><th>武器</th><td class="garble">辉&#x200B;光&#xFEFF;之&#x200C;剑（已&#x2060;断&#x200D;裂）</td></tr>
+        <tr><th>数据校验</th><td class="garble" style="color:#ff4d4d;">ERR_0x0715 · CHECKSUM_FAIL · SECTOR_CORRUPT</td></tr>
+      </table>
+      <div class="sec garble" style="text-indent:0;line-height:2.4;font-size:14px;">
+        囗㗊嘂嚞囓囍囅氍毹毵毶毷毸毹毺毻毼毽毾毿氀氁氂氃氄氅氆氇氈氉氊氋氌氍氎氐氒氓氕氖氘氙氚氛氜氝氞氟氠氡氢氣氥氦氧氨氩氪氫氬氮氯氰氱氲氳氵氶氷氹氺氻氼氽氾氿汀汁求汆汇汊汋汌汍汎汏汐汑汒汓汔汕汗汙汚汛汜汝汞江池污汢汣汤汥汦汧汨汩汪汫汬汭汰汲汱汶汳汴汵汶汹汷汸汹汽汾沁沂沃沄沅沆沇沈沉沊沋沌沍沏沐沑沒沓沔沕沖沗沘沙沚沛沜沝沞沟沠没沢沣沤沥沦沧沨沩沪沫沬沭沮沯沰沱沲沴沵沶沷沸油沺治沼沽沾沿泀況泂泃泄泅泆泇泈泉泊泋泌泍泎泏泐泑泒泓泔泖泗泘泙泚泛泜泝泞泟泠泡波泣泥注泩泪泫泬泭泮泯泰泱泲泳泴泵泶泷泸泹泺泻泼泽泾泿洀洁洄洅洆洇洈洉洊洋洌洎洏洐洑洒洓洔洕洖洗洘洙洚洛洞洢洣洤津洦洧洨洪洫洬洭洮洯洱洲洳洴洵洶洷洸洹洺活洼洽派洿浀流浃浂浄浅浆浇浈浉浊测浌浍济浏浐浑浒浓浔浕浖浗浘浙浚浛浜浝浞浟浠浡浢浣浤浥浦浩浪浫浬浭浮浯浰浱浲浳浴浵浶海浸浹浺浻浼浽浾浿涀涂涁涃涄涆涇消涉涊涋涌涍涎涏涐涑涒涓涔涕涖涗涘涙涚涛涜涝涞涟涠涡涢涣涤涥润涧涪涫涬涮涯涰涱液涳涴涵涸涶涷涿淀淁淄淂淃淄淅淆淇淈淉淊淌淍淎淏淐淑淒淓淔淕淖淗淘淙淚淛淜淝淞淟淠淡淢淣淤淥淦淧淨淩淪淫淬淭淮淯淰深淳淴淵淶混淸淹淺添淼淽淾淿渀清渂渃渄渆渇済渉渊渋渌渍渎渏渐渑渒渓渔渕渖渗渚渝減渜渠渡渣渤渥渦渧渨温渪渫測渭港渰渲渵渴渷游渺渻渼渽渾渿湀湁湂湃湄湅湆湇湈湉湊湋湌湍湎湏湐湑湒湓湔湖湘湛湜湝湞湟湠湡湢湣湤湥湦湧湨湩湪湫湬湭湮湯湰湱湲湳湴湵湶湷湸湹湺湻湼湿満溁溂溃溄溅溆溇溈溉溊溋溌溍溎溏源溑溒溓溔溕準溗溘溙溚溛溜溝溞溟溠溡溢溣溤溥溦溧溨溩溪溫溬溭溮溯溰溱溲溳溴溵溷溸溹溺溻溼溽溾溿滀滁滂滃滄滅滆滇滈滉滊滋滌滍滎滏滐滑滒滓滔滕滖滗滘滙滚滛滜滝滞滟滠满滢滤滥滦滧滨滩滪滫滬滭滮滯滰滱滲
+      </div>
+      <a class="btn-back" href="backup_guanwang.html" id="btn-back">&lt;&lt; 返回</a>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div id="footer">Backup Archive &copy; Glow Legend — 数据完整性校验失败</div>
+</div>
+
+<div id="oo-toast" onclick="window.open('youxiang.html','_blank')">
+  <strong>✉ oo邮箱</strong><br/>您收到 1 条新消息
+</div>
+
+<script type="text/javascript">
+  setTimeout(function () {
+    if (localStorage.getItem("oo_hero_notify_shown") === "true") return;
+    localStorage.setItem("oo_hero_notify_shown", "true");
+    localStorage.setItem("oo_inbox_notify", String(Date.now()));
+    var toast = document.getElementById("oo-toast");
+    if (toast) toast.style.display = "block";
+  }, 5000);
+  window.addEventListener('storage', function(){ location.reload(); });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

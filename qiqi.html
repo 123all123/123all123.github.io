@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="七七聊天 - 无需注册、输入四位房间号即可加入的轻量匿名聊天工具。" />
+<title>七七聊天 · QiQi Chat</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: "Microsoft YaHei","Segoe UI",sans-serif; background: #cfd8e3; display: flex; align-items: center; justify-content: center; }
+  #app { width: 560px; height: 560px; max-height: 100vh; background: #fff; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.2); display: flex; flex-direction: column; overflow: hidden; position: relative; z-index: 2; transition: filter 1s, transform .1s; }
+  .bar { flex-shrink: 0; height: 46px; background: linear-gradient(90deg,#3aa76d,#2e8b57); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-weight: bold; font-size: 14px; }
+  .bar .dot { font-size: 11px; opacity: .85; font-weight: normal; }
+  #enter { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; overflow: auto; }
+  #enter .logo { font-size: 40px; }
+  #enter h2 { margin: 12px 0 6px; color: #2e8b57; }
+  #enter p { color: #8a94a6; font-size: 12px; margin-bottom: 22px; line-height: 1.6; }
+  #room { width: 200px; text-align: center; letter-spacing: 12px; font-size: 22px; padding: 10px; border: 2px solid #cdd6e0; border-radius: 8px; outline: none; }
+  #room:focus { border-color: #3aa76d; }
+  #enter button { margin-top: 16px; padding: 10px 40px; background: #3aa76d; color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; letter-spacing: 2px; }
+  #enter-err { color: #d9534f; font-size: 12px; margin-top: 12px; height: 16px; }
+  #chat { flex: 1; min-height: 0; display: none; flex-direction: column; overflow: hidden; }
+  #screen { flex: 1; min-height: 0; padding: 16px; overflow-y: auto; overflow-x: hidden; background: #eef1f5; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+  .m { max-width: 78%; flex-shrink: 0; }
+  .m .who { font-size: 11px; color: #8a94a6; margin-bottom: 3px; }
+  .m .bub { padding: 9px 13px; border-radius: 10px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  .m.them { align-self: flex-start; } .m.them .bub { background: #fff; border: 1px solid #e2e6ec; }
+  .m.me { align-self: flex-end; text-align: right; } .m.me .bub { background: #a8e6b6; }
+  .m.link .bub a { color: #2e8b57; font-weight: bold; }
+  .m.red .who { color: #d40000; } .m.red .bub { background: #2a0000; color: #ff4d4d; border: 1px solid #7a0000; font-weight: bold; }
+  #inbar { flex-shrink: 0; height: 54px; border-top: 1px solid #e2e6ec; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #fafbfc; }
+  #msg { flex: 1; height: 34px; border: 1px solid #cdd6e0; border-radius: 17px; padding: 0 14px; outline: none; font-size: 13px; }
+  #send { height: 34px; padding: 0 20px; background: #3aa76d; color: #fff; border: none; border-radius: 17px; cursor: pointer; font-weight: bold; }
+  #send:disabled, #send.broken { background: #b7c2ce; cursor: not-allowed; }
+  #send.broken { text-decoration: line-through; }
+
+  /* 决战层 */
+  #battle { position: fixed; inset: 0; z-index: 10; display: none; overflow: hidden; }
+  #battle.on { display: block; }
+  .bscene { position: absolute; inset: 0; display: none; overflow: hidden; }
+  .bscene.active { display: block; }
+  .hijack-strip { display: none !important; }
+  .ftype { position: absolute; color: #8b0000; font-weight: bold; pointer-events: none; z-index: 45; white-space: nowrap; text-shadow: 0 0 6px rgba(255,0,0,.35); font-family: "宋体",SimSun,serif; }
+  .ftype.s2-click { color: #ffec8b; font-size: 17px; font-weight: bold; pointer-events: auto; cursor: pointer; text-shadow: 0 0 14px #ffcc00, 0 0 6px rgba(255,200,0,.6); z-index: 50; max-width: 42%; text-align: center; line-height: 1.5; padding: 4px 8px; }
+  .ftype.s2-click:hover { color: #fff3a8; filter: brightness(1.1); }
+  .ftype.s2-encourage { color: #b8f0a0; text-shadow: 0 0 12px rgba(120,220,100,.55); }
+  .ftype .s2-demon-ch { color: #ff2222; text-shadow: 0 0 10px rgba(255,0,0,.75); font-weight: bold; }
+  .ftype .char-shard { display: inline-block; position: relative; }
+  .whiteout { position: fixed; inset: 0; background: #fff; opacity: 0; transition: opacity 2s ease; z-index: 80; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+  .whiteout .line { font-size: 28px; font-weight: bold; letter-spacing: 3px; opacity: 0; transition: opacity 1.5s ease .5s; text-align: center; padding: 0 20px; animation: linepulse 1.2s ease .5s infinite alternate; }
+  @keyframes linepulse { from { text-shadow: 0 0 8px currentColor; } to { text-shadow: 0 0 28px currentColor, 0 0 48px currentColor; } }
+  .stage-flash { animation: stgflash .35s ease; }
+  @keyframes stgflash { 0%,100%{filter:none} 50%{filter:brightness(2.5) contrast(1.2)} }
+
+  /* 关1 — 沈法画廊（劫持） */
+  #s1 { background: #0b0d14; color: #cbd2e0; font-family: "Songti SC","宋体",Georgia,serif; overflow-y: auto; }
+  #s1 .sf-header { padding: 44px 20px 20px; text-align: center; }
+  #s1 .sf-header h1 { font-family: "Microsoft YaHei",sans-serif; font-size: 28px; letter-spacing: 4px; color: #c8a0a0; text-shadow: 0 0 20px rgba(255,0,0,.25); }
+  #s1 .sf-header .tag { color: #6d5563; font-size: 13px; margin-top: 8px; font-style: italic; }
+  #s1 .sf-gallery { max-width: 980px; margin: 10px auto 10px; display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; padding: 0 20px 20px; position: relative; z-index: 4; }
+  #s1 .sf-art { background: #11151f; border: 1px solid #3a2020; border-radius: 10px; overflow: hidden; position: relative; transition: border-color .3s; }
+  #s1 .sf-art .thumb { height: 180px; display: flex; align-items: center; justify-content: center; position: relative; }
+  #s1 .sf-art .thumb .ttl { font-family: "Microsoft YaHei",sans-serif; font-size: 18px; color: #cdd6ea; opacity: .85; z-index: 2; }
+  #s1 .sf-art .meta { padding: 12px 14px; }
+  #s1 .sf-art .meta .t { font-size: 15px; color: #d8a8a8; font-family: "Microsoft YaHei",sans-serif; }
+  #s1 .sf-art .meta .d { font-size: 11px; color: #6d5563; margin-top: 4px; }
+  #s1 .sf-art.eye-mode { cursor: pointer; border-color: #7a0000; animation: eyepulse .6s ease; }
+  @keyframes eyepulse { 0%{box-shadow:0 0 0 rgba(255,0,0,0)} 50%{box-shadow:0 0 40px rgba(255,0,0,.8)} 100%{box-shadow:0 0 18px rgba(255,0,0,.5)} }
+  #s1 .sf-art .thumb { position: relative; overflow: hidden; min-height: 140px; }
+  #s1 .sf-art .sf-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: .88; }
+  #s1 .sf-art.eye-mode .sf-bg { filter: saturate(.35) brightness(.55); }
+  #s1 .sf-art .eye { display: none; width: 120px; height: 86px; background: radial-gradient(circle at 50% 50%, #fff 60%, #f0d0d0 100%); border-radius: 50%; position: relative; border: 2px solid #7a0000; box-shadow: 0 0 18px rgba(255,0,0,.5); }
+  #s1 .sf-art.eye-mode .eye { display: block; }
+  #s1 .sf-art .pupil { position: absolute; width: 32px; height: 32px; background: radial-gradient(circle at 40% 40%, #a00, #300); border-radius: 50%; top: 50%; left: 50%; margin: -16px 0 0 -16px; transition: transform .06s linear; }
+  #s1 .sf-art .pupil::after { content:""; position:absolute; width:11px; height:11px; background:#000; border-radius:50%; top:10px; left:10px; }
+  #s1 .sf-art.closed .eye { background: #3a0000; box-shadow: none; }
+  #s1 .sf-art.closed .pupil { display: none; }
+  #s1 .sf-art.closed .eye::before { content:""; position:absolute; top:50%; left:8%; right:8%; height:3px; background:#7a0000; }
+  #s1 .sf-art.eye-mode .thumb .ttl { display: none; }
+  #s1 .sf-pager { max-width: 980px; margin: 0 auto 50px; padding: 0 20px; text-align: center; }
+  #s1 .sf-pager span { display: inline-block; min-width: 32px; height: 32px; line-height: 32px; margin: 0 4px; border: 1px solid #3a2020; border-radius: 4px; font-size: 13px; color: #6d5563; background: #11151f; }
+
+  /* 关2 — 林间微风博客（劫持） */
+  #s2 { background: #1a1410; overflow-y: auto; font-family: "宋体",SimSun,Arial; font-size: 12px; color: #8a6a6a; line-height: 1.8; }
+  #s2 .blog-header { height: 150px; background: linear-gradient(135deg,#4a3028 0%,#2a1818 100%); border-bottom: 4px solid #5a2020; display: flex; align-items: center; filter: saturate(.4); }
+  #s2 .header-content { width: 960px; margin: 0 auto; padding-left: 20px; }
+  #s2 .blog-title { font-family: "Microsoft YaHei",sans-serif; font-size: 30px; font-weight: bold; color: #cc8888; }
+  #s2 .blog-subtitle { font-size: 13px; color: #886666; margin-top: 8px; font-style: italic; }
+  #s2 .blog-nav { height: 35px; background: #3a2020; }
+  #s2 .nav-container { width: 960px; margin: 0 auto; }
+  #s2 .nav-list { list-style: none; padding: 0; margin: 0; }
+  #s2 .nav-list li { float: left; line-height: 35px; }
+  #s2 .nav-list li a { display: block; padding: 0 25px; color: #aa7777; font-weight: bold; font-size: 13px; }
+  #s2 .blog-main { width: 960px; margin: 25px auto; display: flex; gap: 25px; padding-bottom: 60px; }
+  #s2 .blog-left { width: 680px; }
+  #s2 .blog-right { width: 255px; }
+  #s2 .blog-post { background: #241816; border: 1px solid #4a2828; border-radius: 5px; padding: 25px; margin-bottom: 25px; }
+  #s2 .post-title { font-family: "Microsoft YaHei",sans-serif; font-size: 18px; font-weight: bold; color: #cc8888; border-bottom: 1px dashed #4a2828; padding-bottom: 10px; margin-bottom: 15px; }
+  #s2 .post-meta { font-size: 11px; color: #775555; margin-bottom: 15px; }
+  #s2 .post-content { font-size: 13px; color: #996666; text-align: justify; }
+  #s2 .post-content p { margin-bottom: 12px; text-indent: 2em; }
+  #s2 .post-content.hi { color: #ffec8b; font-size: 20px; font-weight: bold; text-shadow: 0 0 14px #ffcc00; text-align: center; text-indent: 0; }
+  #s2 .sidebar-widget { background: #241816; border: 1px solid #4a2828; border-radius: 5px; padding: 20px; margin-bottom: 25px; filter: saturate(.35); }
+  #s2 .widget-title { font-family: "Microsoft YaHei",sans-serif; font-size: 13px; font-weight: bold; color: #aa7777; border-bottom: 2px solid #5a3030; padding-bottom: 6px; margin-bottom: 15px; }
+  #s2 .profile-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 10px; overflow: hidden; border: 2px solid #5a3030; }
+  #s2 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  #s2 .profile-name { font-size: 14px; font-weight: bold; color: #aa7777; text-align: center; }
+  #s2 .archive-list { list-style: none; padding: 0; margin: 0; font-size: 12px; color: #775555; line-height: 2; }
+  #s2 .blog-footer { text-align: center; color: #664444; padding: 20px 0; font-size: 11px; border-top: 1px solid #3a2020; }
+
+  /* 关3 — 一纸江湖（劫持） */
+  #s3 { background: #1a1410; overflow-y: auto; font-family: "Microsoft YaHei","宋体",serif; color: #8a7a6a; }
+  #s3 .wxs-top { background: #3a2218; color: #e8d8c8; padding: 18px 24px; filter: saturate(.35) contrast(1.05); }
+  #s3 .wxs-top h1 { font-size: 24px; letter-spacing: 6px; color: #d8b0a0; }
+  #s3 .wxs-top p { font-size: 12px; opacity: .75; margin-top: 6px; color: #b89888; }
+  #s3 .wxs-wrap { max-width: 880px; margin: 0 auto; padding: 20px 20px 50px; }
+  #s3 .wxs-nav { font-size: 12px; color: #665855; margin-bottom: 16px; }
+  #s3 .wxs-hero { background: linear-gradient(135deg,#4a2820 0%,#2a1814 100%); color: #ccaaa0; padding: 28px 22px 24px; border-radius: 8px; border: 1px solid #4a3028; filter: saturate(.35); margin-bottom: 22px; }
+  #s3 .wxs-hero h2 { font-size: 20px; letter-spacing: 4px; color: #d8a8a0; margin-bottom: 8px; }
+  #s3 .wxs-hero .sub { font-size: 13px; opacity: .85; line-height: 1.7; }
+  #s3 .t-search { margin-top: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  #s3 .t-search .hint { font-size: 13px; color: #c8a0a0; letter-spacing: 1px; }
+  #s3 .t-search input { flex: 1; min-width: 160px; max-width: 280px; padding: 9px 14px; border: 1px solid #5a3040; background: #1a0c10; color: #e8c0c8; border-radius: 20px; outline: none; font-size: 14px; }
+  #s3 .t-search button { padding: 9px 20px; background: #5a2838; color: #ffb3c0; border: 1px solid #7a4050; border-radius: 20px; cursor: pointer; font-size: 13px; }
+  #s3 .sec-title { font-size: 15px; font-weight: bold; color: #a08070; border-bottom: 2px solid #4a3028; padding-bottom: 8px; margin: 8px 0 14px; }
+  #s3 .book-list { list-style: none; }
+  #s3 .book-list .s3-book { background: #241c18; border: 1px solid #4a3028; border-radius: 6px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; filter: saturate(.35); }
+  #s3 .book-list .s3-book.s3-key { border-color: #6a4050; box-shadow: inset 0 0 24px rgba(80,30,40,.25); }
+  #s3 .book-list .s3-book.s3-morse-shake { animation: s3MorseShake .32s ease; }
+  @keyframes s3MorseShake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    15% { transform: translate(-7px, 5px) rotate(-2deg); }
+    30% { transform: translate(7px, -5px) rotate(2deg); }
+    45% { transform: translate(-5px, -4px) rotate(-1.5deg); }
+    60% { transform: translate(6px, 4px) rotate(1.5deg); }
+    75% { transform: translate(-4px, 3px) rotate(-1deg); }
+  }
+  #s3 .book-list .info h3 { font-size: 15px; color: #c8a8a0; margin-bottom: 4px; }
+  #s3 .book-list .info .meta { font-size: 12px; color: #665855; }
+  #s3 .book-list .tag { font-size: 11px; color: #a08060; background: #2a2018; padding: 2px 8px; border-radius: 3px; margin-right: 6px; }
+  #s3 .book-list .read-dim { font-size: 13px; font-weight: bold; color: #886060; }
+  #s3 .mbox { display: inline-block; vertical-align: middle; margin: 0 1px; }
+  #s3 .mdot { width: 7px; height: 9px; background: #111; border-radius: 1px; }
+  #s3 .mdash { display: inline-flex; gap: 2px; vertical-align: middle; margin: 0 1px; }
+  #s3 .mdash i { display: block; width: 7px; height: 9px; background: #111; border-radius: 1px; }
+  #s3 .morse-gap { display: inline-block; width: 0.45em; }
+  #s3 .wxs-foot { text-align: center; font-size: 11px; color: #554444; margin-top: 24px; padding-top: 16px; border-top: 1px solid #3a2820; }
+
+  /* 选择弹窗 */
+  #choice { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: none; align-items: center; justify-content: center; z-index: 200; }
+  #choice .c { width: 420px; background: #160000; border: 2px solid #ff0000; box-shadow: 0 0 50px rgba(255,0,0,.6); padding: 26px; text-align: center; color: #ffb3b3; }
+  #choice .c p { line-height: 1.9; margin-bottom: 18px; font-size: 14px; }
+  #choice .c button { margin: 0 8px; padding: 9px 24px; border: 1px solid #ff0000; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; }
+  .btn-yes { background: #3a0000; color: #ff6666; }
+  .btn-no { background: #ffce54; color: #1a0000; }
+
+  /* 终章 */
+  #epilogue { position: fixed; inset: 0; z-index: 500; display: none; overflow: hidden; background: #f7f1e3; transition: background 1.1s ease; }
+  #epilogue.on { display: block; }
+  #ep-guanwang { position: absolute; inset: 0; overflow: hidden; background: #f7f1e3; z-index: 510; transform-origin: 50% 50%; }
+  #ep-guanwang.ep-gw-shake { animation: epGwShake .09s linear 14; }
+  @keyframes epGwShake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-11px, 8px); }
+    40% { transform: translate(10px, -9px); }
+    60% { transform: translate(-8px, -6px); }
+    80% { transform: translate(9px, 7px); }
+  }
+  #ep-gw-iframe { width: 100%; height: 100%; border: none; display: block; background: #f7f1e3; }
+  #ep-gw-bg-only { display: none; position: absolute; inset: 0; background: #f7f1e3; z-index: 511; transition: background 1s ease; }
+  #ep-gw-fall-stage { display: none; position: absolute; inset: 0; z-index: 512; overflow: hidden; pointer-events: none; }
+  #ep-ui { position: fixed; inset: 0; z-index: 520; pointer-events: none; }
+  #ep-ui > * { pointer-events: auto; }
+  #ep-demon { position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%); max-width: 720px; width: 90%; color: #8b0000; font-size: 20px; line-height: 2.2; font-weight: bold; text-align: center; padding: 20px; display: none; z-index: 525; pointer-events: none; font-family: "Microsoft YaHei","宋体",SimSun,sans-serif; }
+  #ep-demon .demon-line { margin: 12px 0; min-height: 1.6em; }
+  #ep-black-void { position: fixed; inset: 0; z-index: 540; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; }
+  #ep-rescue-shout { color: #c00; font-size: 18px; font-weight: bold; min-height: 1.6em; text-align: center; display: none; }
+  #ep-rescue-hint { font-size: 17px; font-weight: bold; min-height: 1.8em; text-align: center; line-height: 1.9; max-width: 520px; display: none; }
+  #ep-rescue-input { width: min(320px, 88vw); padding: 14px 18px; border: 1px solid #444; border-radius: 6px; background: #0a0a0a; color: #eee; font-size: 16px; text-align: center; outline: none; }
+  #ep-rescue-input::placeholder { color: #666; }
+  #ep-rescue-btn { padding: 10px 28px; background: #1a1a1a; color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  #ep-rescue-btn:hover { color: #fff; border-color: #666; }
+  #ep-sword { position: fixed; width: 56px; height: 140px; z-index: 570; cursor: grab; display: none; transform-origin: 50% 88%; user-select: none; touch-action: none; animation: swordpulse 1.5s ease-in-out infinite alternate; }
+  #ep-sword .sword-glow { position: absolute; left: 50%; top: 18%; width: 120px; height: 120px; margin-left: -60px; background: radial-gradient(circle, rgba(255,230,120,.55) 0%, rgba(255,200,50,.2) 40%, transparent 72%); pointer-events: none; animation: swordglow 1.1s ease-in-out infinite alternate; }
+  #ep-sword .sword-spark { position: absolute; left: 50%; top: 0; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px 2px rgba(255,255,200,.9); animation: swordspark 2s linear infinite; pointer-events: none; }
+  @keyframes swordpulse { from { filter: drop-shadow(0 0 6px rgba(255,215,0,.7)) drop-shadow(0 0 14px rgba(255,180,0,.35)); } to { filter: drop-shadow(0 0 14px rgba(255,255,220,1)) drop-shadow(0 0 26px rgba(255,215,0,.75)); } }
+  @keyframes swordglow { from { opacity: .55; transform: scale(.92); } to { opacity: 1; transform: scale(1.08); } }
+  @keyframes swordspark { 0% { opacity: 0; transform: translateY(0) scale(.5); } 15% { opacity: 1; } 100% { opacity: 0; transform: translateY(130px) scale(0); } }
+  #ep-sword svg { width: 100%; height: 100%; position: relative; z-index: 1; }
+  #ep-sword:active { cursor: grabbing; }
+  #ep-sword-hint { position: fixed; z-index: 571; color: rgba(255, 248, 220, 0.42); font-size: 13px; letter-spacing: 2px; pointer-events: none; display: none; white-space: nowrap; text-shadow: 0 0 6px rgba(255, 215, 0, 0.15); font-family: "Microsoft YaHei",sans-serif; }
+  #ep-slash-canvas { position: fixed; inset: 0; z-index: 565; pointer-events: none; }
+  #ep-deny { position: fixed; left: 50%; top: 40%; transform: translateX(-50%); color: #fff; font-size: 32px; font-weight: bold; z-index: 568; display: none; text-shadow: 0 0 24px #ffd700, 0 0 48px rgba(255,200,0,.6); }
+  .ep-shake { animation: epshake .5s ease; }
+  @keyframes epshake { 0%,100%{transform:translate(0,0)} 20%{transform:translate(-8px,6px)} 40%{transform:translate(8px,-6px)} 60%{transform:translate(-6px,-4px)} 80%{transform:translate(6px,4px)} }
+  .ep-shake-heavy { animation: epshakeHeavy .55s ease 2; }
+  @keyframes epshakeHeavy { 0%,100%{transform:translate(0,0)} 15%{transform:translate(-12px,8px)} 30%{transform:translate(11px,-9px)} 45%{transform:translate(-9px,-7px)} 60%{transform:translate(10px,6px)} 75%{transform:translate(-7px,5px)} }
+  .flash-shake { animation: flashshake .16s ease infinite; }
+  @keyframes flashshake { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-2px,1px)} 50%{transform:translate(2px,-1px)} 75%{transform:translate(-1px,-1px)} }
+  #ep-flash { position: fixed; inset: 0; z-index: 575; display: none; overflow: hidden; background: #f0ebe3; }
+  .flash-viewport { position: absolute; inset: 0; overflow: hidden; }
+  #flash-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; pointer-events: none; opacity: 1; transition: opacity .12s ease; }
+  .flash-glass { position: absolute; inset: 0; pointer-events: none; backdrop-filter: blur(1.5px) saturate(1.01); -webkit-backdrop-filter: blur(1.5px) saturate(1.01); background: rgba(255,255,255,0.03); }
+  .flash-mem { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 42%, rgba(255,255,255,0.02) 0%, rgba(255,250,245,0.06) 78%, rgba(230,225,220,0.1) 100%); mix-blend-mode: soft-light; animation: membreath 2.4s ease infinite alternate; }
+  @keyframes membreath { from { opacity: .4; } to { opacity: .65; } }
+  #ep-deny-flash { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 582; display: none; color: #7a0000; font-size: 38px; font-weight: bold; letter-spacing: 3px; text-align: center; padding: 0; background: none; border: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; max-width: 92vw; text-shadow: 0 0 10px rgba(255,255,255,.85), 0 0 22px rgba(255,180,180,.45), 0 2px 6px rgba(80,0,0,.25); }
+  #ep-goodend { position: fixed; inset: 0; z-index: 590; display: none; align-items: center; justify-content: center; padding: 40px 20px; overflow-y: auto; background: radial-gradient(circle at 50% 35%, #fffef5 0%, #ffeaa7 45%, #f5d78e 100%); font-family: "Microsoft YaHei","Songti SC",serif; color: #3a2a10; }
+  #ep-goodend .goodend-box { max-width: 680px; text-align: center; }
+  #ep-goodend .goodend-intro { animation: goodend-rise 1.4s ease; }
+  #ep-goodend .goodend-sun { font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(255,200,80,.6)); }
+  #ep-goodend h1 { font-size: 28px; letter-spacing: 6px; color: #d35400; margin-bottom: 24px; font-weight: bold; }
+  #ep-goodend .goodend-hero { font-size: 22px; color: #e0a800; font-weight: bold; letter-spacing: 4px; text-shadow: 0 2px 12px rgba(224,168,0,.35); margin: 28px 0; line-height: 1.8; }
+  #ep-goodend p { font-size: 15px; line-height: 2.2; color: #5a4a30; margin: 14px 0; }
+  #ep-goodend .goodend-dim { color: #8a7a60; font-size: 13px; margin-top: 30px; }
+  #ep-goodend .goodend-names { margin-top: 28px; font-size: 13px; color: #a08040; letter-spacing: 2px; }
+  #ep-goodend .goodend-thanks { margin-top: 48px; font-size: 16px; color: #c07820; letter-spacing: 3px; font-weight: bold; }
+  #ep-goodend a { color: #a08040; }
+  @keyframes goodend-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  .ep-shatter .ep-shard-piece { position: fixed; background: inherit; transition: transform .8s ease, opacity .8s ease; z-index: 567; pointer-events: none; }
+  .shake { animation: sh .12s infinite; }
+  @keyframes sh { 0%{transform:translate(0,0)}25%{transform:translate(-4px,3px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-3px)}100%{transform:translate(3px,3px)} }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="bar"><span>💬 七七聊天</span><span class="dot" id="bar-status">未连接</span></div>
+  <div id="enter">
+    <div class="logo">🗨️</div>
+    <h2>七七聊天</h2>
+    <p>无需注册 · 输入四位数字房间号即可加入<br/>对方会在房间里等你</p>
+    <input type="text" id="room" maxlength="4" placeholder="0000" inputmode="numeric" autocomplete="off" />
+    <button onclick="enterRoom()">进入房间</button>
+    <div id="enter-err"></div>
+  </div>
+  <div id="chat">
+    <div id="screen"></div>
+    <div id="inbar">
+      <input type="text" id="msg" placeholder="输入消息…" autocomplete="off" disabled />
+      <button id="send" onclick="sendMsg()" disabled>发送</button>
+    </div>
+  </div>
+</div>
+
+<!-- 决战全屏层 -->
+<div id="battle">
+  <!-- 关1：沈法画廊（劫持） -->
+  <div class="bscene" id="s1">
+    <header class="sf-header">
+      <h1>S T U D I O &nbsp; S F</h1>
+      <div class="tag">"我把说不出口的话，都画进了星空里。" —— 沈法</div>
+    </header>
+    <div class="sf-gallery" id="s1-gallery"></div>
+    <div class="sf-pager" id="s1-pager"></div>
+    <div class="whiteout" id="s1-white"><div class="line" style="color:#2f6bd8;">照见短板，信念如磐</div></div>
+  </div>
+
+  <!-- 关2：林间微风博客（劫持） -->
+  <div class="bscene" id="s2">
+    <div class="blog-header"><div class="header-content">
+      <div class="blog-title">林间微风的日志</div>
+      <div class="blog-subtitle">记录生活，记录声音，记录每一个美好的瞬间。</div>
+    </div></div>
+    <div class="blog-nav"><div class="nav-container"><ul class="nav-list">
+      <li><a href="javascript:void(0);">博客首页</a></li>
+      <li><a href="javascript:void(0);">我的日志</a></li>
+      <li><a href="javascript:void(0);">相册</a></li>
+      <li><a href="javascript:void(0);">关于我</a></li>
+    </ul></div></div>
+    <div class="blog-main">
+      <div class="blog-left" id="s2-posts"></div>
+      <div class="blog-right">
+        <div class="sidebar-widget">
+          <div class="widget-title">关于我</div>
+          <div class="profile-avatar"><img src="images/lly.png" alt="李林晔" /></div>
+          <div class="profile-name">林间微风 · 李林晔</div>
+          <div style="font-size:11px;color:#775555;line-height:1.6;margin-top:8px;">职业：配音演员<br/>爱好：大自然、登山、钓鱼、摄影</div>
+        </div>
+        <div class="sidebar-widget">
+          <div class="widget-title">日志归档</div>
+          <ul class="archive-list">
+            <li>2023年03月 (1)</li><li>2021年11月 (1)</li><li>2018年09月 (1)</li>
+            <li>2015年08月 (1)</li><li>2015年04月 (1)</li><li>2013年02月 (1)</li><li>2009年05月 (1)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="blog-footer">Copyright © 2005-2023. Powered by Sin Blog.</div>
+    <div class="whiteout" id="s2-white"><div class="line" style="color:#2ecc71;">专注当下，珍重同伴</div></div>
+  </div>
+
+  <!-- 关3：一纸江湖（劫持） -->
+  <div class="bscene" id="s3">
+    <div class="wxs-top">
+      <h1>一纸江湖</h1>
+      <p>原创小说与短篇故事 · 用文字记录人间烟火</p>
+    </div>
+    <div class="wxs-wrap">
+      <div class="wxs-nav">智搜 &gt; 一纸江湖</div>
+      <div class="wxs-hero">
+        <h2>一纸江湖</h2>
+        <div class="sub">冯骅在这里发表过短篇。页面似乎被什么东西篡改了……书架上每一行标题，都在复述你做过的事。</div>
+        <div class="t-search">
+          <span class="hint">用心发现，你能找到答案</span>
+          <input type="text" id="s3-answer" placeholder="输入答案…" autocomplete="off" />
+          <button onclick="checkS3Answer()">搜索</button>
+        </div>
+      </div>
+      <div class="sec-title">短篇小故事</div>
+      <ul class="book-list" id="s3-grid"></ul>
+      <div class="wxs-foot">Copyright © 一纸江湖 · 本站作品均为网友原创投稿</div>
+    </div>
+    <div class="whiteout" id="s3-white"><div class="line" style="color:#ff77aa;">生命的价值，真心的关怀</div></div>
+  </div>
+</div>
+
+<!-- 终章 -->
+<div id="epilogue">
+  <div id="ep-guanwang">
+    <iframe id="ep-gw-iframe" src="guanwang.html?ep_preview=1" title="辉光勇者官网"></iframe>
+    <div id="ep-gw-fall-stage"></div>
+    <div id="ep-gw-bg-only"></div>
+  </div>
+  <div id="ep-ui">
+    <div id="ep-demon"></div>
+  </div>
+  <div id="ep-black-void">
+    <div id="ep-rescue-shout"></div>
+    <div id="ep-rescue-hint"></div>
+    <input type="text" id="ep-rescue-input" placeholder="呼救吧" autocomplete="off" />
+    <button type="button" id="ep-rescue-btn" onclick="tryEpRescue()">呼救</button>
+  </div>
+  <canvas id="ep-slash-canvas"></canvas>
+  <div id="ep-deny"></div>
+  <div id="ep-sword" title="拖动勇者之剑">
+    <div class="sword-glow"></div>
+    <div class="sword-spark"></div>
+    <svg viewBox="0 0 64 140" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sg-blade" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="35%" stop-color="#fff8dc"/>
+          <stop offset="70%" stop-color="#ffd700"/>
+          <stop offset="100%" stop-color="#daa520"/>
+        </linearGradient>
+        <linearGradient id="sg-edge" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".95"/>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="sg-blur"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <polygon points="32,2 38,78 32,68 26,78" fill="url(#sg-blade)" stroke="#c9a020" stroke-width=".8"/>
+      <polygon points="30,4 32,72 34,4" fill="url(#sg-edge)" opacity=".7"/>
+      <rect x="27" y="74" width="10" height="44" fill="#9a7518" rx="2" stroke="#6b5010" stroke-width=".6"/>
+      <rect x="22" y="72" width="20" height="5" fill="#daa520" rx="1.5" stroke="#a08020" stroke-width=".5"/>
+      <circle cx="32" cy="74" r="3.5" fill="#ff4444" stroke="#aa0000" stroke-width=".5" filter="url(#sg-blur)"/>
+      <rect x="24" y="116" width="16" height="7" fill="#e6c200" rx="2" stroke="#a08020" stroke-width=".5"/>
+      <circle cx="32" cy="130" r="5" fill="#ffd700" stroke="#b8860b" stroke-width=".8"/>
+      <circle cx="32" cy="130" r="2" fill="#fff8dc" opacity=".85"/>
+    </svg>
+  </div>
+  <div id="ep-sword-hint">向上滑动</div>
+  <div id="ep-flash">
+    <div class="flash-viewport">
+      <iframe id="flash-iframe" title="回忆"></iframe>
+      <div class="flash-glass"></div>
+      <div class="flash-mem"></div>
+    </div>
+    <div id="ep-deny-flash"></div>
+  </div>
+  <div id="ep-goodend">
+    <div class="goodend-box">
+      <div class="goodend-intro" id="goodend-intro">
+        <div class="goodend-sun">☀</div>
+        <h1>辉光仍在</h1>
+        <div class="goodend-hero">真正的勇者，是你自己。</div>
+      </div>
+      <div id="goodend-body" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="choice"><div class="c">
+  <p id="choice-text"></p>
+  <button class="btn-yes" onclick="chooseYes()">我……愿意</button>
+  <button class="btn-no" onclick="chooseNo()">不，我拒绝！</button>
+</div></div>
+
+<script src="js/keys.js"></script>
+<script>
+  var ROOM = "4939";
+  var STORAGE_KEY = "qiqi_chat_state";
+  var MSG_DELAY = 2800;
+  var DEMON_DELAY = 3200;
+  var playerName = localStorage.getItem("player_name") || localStorage.getItem("test_name") || "勇者";
+  var screen = document.getElementById("screen");
+  var msgInput = document.getElementById("msg");
+  var sendBtn = document.getElementById("send");
+  var stage = 0;
+  var scriptComplete = false;
+  var scriptIndex = 0;
+  var chatLog = [];
+  var scriptTimer = null;
+  var battlePhase = 0;
+
+  var script = [
+    ["运维", "你能想到用九键把号码拼出来，看来我没找错人。"],
+    ["运维", "先自我介绍一下：我也是当年《辉光勇者》制作的参与者之一，和林光明是多年的好朋友。"],
+    ["运维", "这个企划，本来是他一个人想出来的。他把全部身家、全部热情都压了进去。可是那场意外之后，一切都断了。"],
+    ["运维", "随着关注它的人越来越少，网站在 2012 年就已经对外关闭了。那场事故我私下也查过很久，但什么都没查到。"],
+    ["运维", "但我总觉得——他不是孤身一人。他的那些朋友们，都在各自的地方，悄悄留下了一些东西。"],
+    ["运维", "说不定，那些东西能帮到你。我把我当年发现的一处线索分享给你："],
+    ["运维", "🔗 <a href='kuailiao_linguangming.html' target='_blank'>快聊 · 一道光（林光明的主页）</a>", "them link"],
+    ["运维", "如果你觉得已经找到所有线索了，就回到这里，回复我一声。我们一起，把真相拼起来。"]
+  ];
+
+  var SF_ARTS = [
+    { title: "星之印", year: "2006", color: "#20305a", note: "★ 特别收藏" },
+    { title: "虚幻·谎言", year: "2009", color: "#3a2140", note: "布面丙烯" },
+    { title: "无眠夜", year: "2005", color: "#12233a", note: "布面丙烯" },
+    { title: "寂静回声", year: "2007", color: "#1c2b26", note: "布面丙烯" },
+    { title: "远方", year: "2008", color: "#2a2436", note: "布面丙烯" },
+    { title: "破晓之前", year: "2004", color: "#3a2a1a", note: "布面丙烯" },
+    { title: "星尘低语", year: "2006", color: "#1a2848", note: "布面丙烯" },
+    { title: "余烬", year: "2010", color: "#3a1818", note: "布面丙烯" },
+    { title: "窗前", year: "2007", color: "#243048", note: "布面丙烯" }
+  ];
+
+  var BLOG_POSTS = [
+    { title: "2023，打算把博客继续写下去", meta: "发表时间：2023-03-08 20:31:17 | 分类：博客公告 | 阅读(21) | 评论(1)",
+      original: "<p>好久没更新了。不是没话说，是不知道哪些话还适合放在网上。最近又把博客后台密码改简单了——老毛病，记不住复杂的。</p><p>打算继续写。写爬山，写钓鱼，写录音棚里那些琐碎的小事。也许多年以后，有人翻到这些字，会觉得：啊，原来那时候，还有人认真生活过。林间微风，还会再吹一阵吧。</p>",
+      despair: "<p>没有人会再看。写下去又有什么意义。你做的这一切，迟早会被遗忘。</p>" },
+    { title: "疫情那几年，家里安静得能听见时钟走", meta: "发表时间：2021-11-20 09:15:48 | 分类：碎碎念 | 阅读(34) | 评论(0)",
+      original: "<p>那几年演出少，在家待了很久。把旧硬盘里没整理完的配音素材翻出来归档，有的项目文件名还是好多年前的日期，听了一遍，没敢再听第二遍。</p><p>窗外有人遛狗，小孩追着跑。我忽然觉得，能听见这些声音，已经很好了。至于那个梦——偶尔还会做。醒来就泡杯茶，继续过普通的一天。</p>",
+      despair: "<p>安静得让人发疯。你也是一个人吧。那些声音，迟早也会消失。</p>" },
+    { title: "注销快聊账号之前，我把动态都删了", meta: "发表时间：2018-09-03 16:44:02 | 分类：生活随笔 | 阅读(56) | 评论(2)",
+      original: "<p>快聊通知说账号可以注销了。我翻了一遍自己发过的东西，大多是些日常：爬山、吃面、加班、给林老师留言。有一条是 2012 年的，我说「别一个人待着」。现在看，像是对别人说的，也像是对自己说的。</p><p>删完之后页面空空的。我最后还是没点注销——不知道为什么，总觉得那样做，就像承认有些人真的不会再回来了。博客还留着吧，反正也没几个人看。</p>",
+      despair: "<p>删掉了，他们也不会回来。你迟早也会一个人。别等了。</p>" },
+    { title: "录音棚里的春天，和一杯放凉的奶茶", meta: "发表时间：2015-04-11 21:08:33 | 分类：工作随笔 | 阅读(89) | 评论(5)", hint: true,
+      original: "<p>春天来了，录音棚外的玉兰花开了。同事说花香飘进隔音门缝里，像某种不合时宜的温柔。那天我们补录了一段战斗场景的群杂，喊到嗓子哑了，出来在路边买了奶茶，坐在台阶上吹风。</p><p>忽然想起很多年前，也是这样的傍晚，林老师请大家喝奶茶，说「等成片出来，我们拍一张更大的合照」。后来那张合照，我再也没有见过完整版。奶茶凉了，我还是喝完了。</p>",
+      despair: "<p>奶茶凉了。人也散了。合照永远残缺。别等了——没有人会来。</p>" },
+    { title: "最近总感觉忘东忘西的...", meta: "发表时间：2015-08-18 22:15:40 | 分类：碎碎念 | 阅读(215) | 评论(14)",
+      original: "<p>最近不知道怎么回事，脑子越来越不好使了，老是丢三落四的。前天出门忘了带钥匙，结果在门口等了两个小时等开锁师傅……</p><p>没办法，为了防止自己再次被锁在各种账号外面，我只能把所有的密码都统一改成一些最简单的单词。我记得我设的密码是我之前参加制作的那首歌的日期，简单好记，但那首歌叫什么来着？哎，希望我的记忆力能快点恢复正常吧。</p>",
+      despair: "<p>连密码都记不住的人，还能记住什么希望？你迟早也会什么都忘掉。</p>" },
+    { title: "【私密日志】一个奇怪的梦（已加密）", meta: "发表时间：2013-02-03 01:14:22 | 分类：私密日志 | 阅读(0) | 评论(0)",
+      original: "<p style='text-align:center;color:#8fa374;'>🔒 该日志已被作者加密。</p>",
+      despair: "<p>梦醒了。金色背影再也不会出现。歌声停了，什么都留不住。</p>" },
+    { title: "周末去京郊爬山钓鱼，大自然真的太治愈了", meta: "发表时间：2009-05-12 19:42:15 | 分类：生活随笔 | 阅读(142) | 评论(8)",
+      original: "<p>上个周末和几个朋友一起去了京郊的一处山谷。一走进大自然，呼吸到新鲜的空气，看到满眼的绿色，真的感觉整个人都被治愈了。</p><p>晚上躺在帐篷里，听着帐篷外的风声和溪水声，感觉心里特别宁静。大自然真的有一种神奇的魔力，能让人忘却所有的烦恼和疲惫。</p>",
+      despair: "<p>大自然救不了你。回去吧，孤独还在等你。那些绿色，不过是暂时的幻觉。</p>" }
+  ];
+
+  var MBOX_DOT = '<span class="mbox mdot"></span>';
+  var MBOX_DASH = '<span class="mbox mdash"><i></i><i></i></span>';
+
+  var WXS_BOOKS = [
+    {
+      tag: "目击",
+      titleHtml: "从首" + MBOX_DOT + "到" + MBOX_DASH + "每" + MBOX_DOT + "条" + MBOX_DOT + "果",
+      meta: "从智搜首页到每一条结果，你的每一次搜索我都看见了。"
+    },
+    {
+      tag: "目击",
+      titleHtml: "官" + MBOX_DASH + "网" + MBOX_DASH + "残" + MBOX_DASH + "响",
+      meta: "官网的角色、备份、主题曲……不过是诱饵罢了。"
+    },
+    {
+      tag: "目击",
+      titleHtml: "后" + MBOX_DOT + "台" + MBOX_DOT + "日" + MBOX_DOT + "志" + MBOX_DASH + "余烬",
+      meta: "站长日志、回收站、旧通讯录——越挖越深，越靠近虚无。"
+    },
+    {
+      tag: "目击",
+      titleHtml: "碎" + MBOX_DOT + "片追踪：快聊、博客与画廊",
+      meta: "东奔西走拼凑碎片，真以为能拼出希望？"
+    },
+    {
+      tag: "坏结局",
+      titleHtml: "希望的赝品：一切努力终归幻象",
+      meta: "一切看似希望的挣扎，终究只是无法突破的幻想。",
+      key: true
+    }
+  ];
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      entered: true, messages: chatLog, stage: stage,
+      scriptComplete: scriptComplete, scriptIndex: scriptIndex, battlePhase: battlePhase
+    }));
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      var s = JSON.parse(raw);
+      if (!s.entered) return false;
+      showChatUI();
+      chatLog = s.messages || [];
+      stage = s.stage || 0;
+      scriptComplete = !!s.scriptComplete;
+      scriptIndex = s.scriptIndex || chatLog.length;
+      battlePhase = s.battlePhase || 0;
+      chatLog.forEach(function (m) { renderMsg(m.who, m.text, m.cls); });
+      updateInputState();
+      if (!scriptComplete && scriptIndex < script.length) resumeScript();
+      if (battlePhase >= 1) resumeBattle();
+      scrollBottom();
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function showChatUI() {
+    document.getElementById("enter").style.display = "none";
+    document.getElementById("chat").style.display = "flex";
+    document.getElementById("bar-status").textContent = "房间 4939 · 在线";
+  }
+
+  function updateInputState() {
+    if (battlePhase > 0) {
+      msgInput.disabled = true; sendBtn.disabled = true; return;
+    }
+    if (scriptComplete || stage >= 1) {
+      msgInput.disabled = false; sendBtn.disabled = false;
+    } else {
+      msgInput.disabled = true; sendBtn.disabled = true;
+    }
+  }
+
+  function scrollBottom() {
+    requestAnimationFrame(function () { screen.scrollTop = screen.scrollHeight; });
+  }
+
+  function renderMsg(who, text, cls) {
+    var m = document.createElement("div");
+    m.className = "m " + (cls || "them");
+    m.innerHTML = '<div class="who">' + who + '</div><div class="bub">' + text + '</div>';
+    screen.appendChild(m);
+  }
+
+  function add(who, text, cls) {
+    chatLog.push({ who: who, text: text, cls: cls || "them" });
+    renderMsg(who, text, cls);
+    saveState();
+    scrollBottom();
+  }
+
+  function enterRoom() {
+    var v = document.getElementById("room").value.trim();
+    var err = document.getElementById("enter-err");
+    if (v !== ROOM) { err.textContent = "✖ 房间号不存在或对方不在，请核对后重试。"; return; }
+    showChatUI();
+    saveState();
+    if (chatLog.length === 0) startTalk();
+    else {
+      updateInputState();
+      if (!scriptComplete && scriptIndex < script.length) resumeScript();
+      if (battlePhase >= 1) resumeBattle();
+    }
+  }
+
+  function startTalk() { scriptIndex = 0; resumeScript(); }
+
+  function resumeScript() {
+    if (scriptTimer) clearTimeout(scriptTimer);
+    function next() {
+      if (scriptIndex < script.length) {
+        var s = script[scriptIndex++];
+        add(s[0], s[1], s[2] || "them");
+        scriptTimer = setTimeout(next, MSG_DELAY);
+      } else {
+        scriptComplete = true; stage = 1; saveState(); updateInputState(); msgInput.focus();
+      }
+    }
+    next();
+  }
+
+  function isConfirmText(t) {
+    return t.indexOf("确定") !== -1 || t.indexOf("确认") !== -1;
+  }
+
+  function startHijackBattle() {
+    battlePhase = 1;
+    saveState();
+    updateInputState();
+    beginBrainwash();
+  }
+
+  function sendMsg() {
+    var t = msgInput.value.trim();
+    if (!t || battlePhase > 0) return;
+    add("你", t, "me");
+    msgInput.value = "";
+    msgInput.disabled = true; sendBtn.disabled = true;
+
+    if (stage === 1 || stage === 2) {
+      if (isConfirmText(t)) {
+        setTimeout(startHijackBattle, 600);
+      } else if (stage === 1) {
+        setTimeout(function () {
+          add("运维", "你确定吗？一旦开始，可能就没有回头路了。");
+          stage = 2; saveState();
+          msgInput.disabled = false; sendBtn.disabled = false; msgInput.focus();
+        }, 2400);
+      } else {
+        setTimeout(function () {
+          add("运维", "……看来你还没准备好。没关系，再去看看吧，找齐了再回来。");
+          stage = 1; saveState();
+          msgInput.disabled = false; sendBtn.disabled = false; msgInput.focus();
+        }, 2000);
+      }
+    }
+  }
+
+  /* ===== 洗脑 & 决战入口 ===== */
+  function beginBrainwash() {
+    sendBtn.classList.add("broken"); sendBtn.textContent = "发送失败";
+    add("你", "（正在发送调查结果……）", "me");
+    setTimeout(function () { add("系统", "⚠ 发送失败：连接被第三方中断。"); }, 900);
+    setTimeout(brainwashSeq, 1900);
+  }
+
+  function brainwashSeq() {
+    document.getElementById("bar-status").textContent = "已劫持";
+    document.getElementById("bar-status").style.color = "#ffb3b3";
+    var app = document.getElementById("app");
+    var msgs = [
+      "运维？不，从现在起，和你说话的是我。",
+      "你叫" + playerName + "吧。你做的这一切，我都看在眼里。",
+      "很努力呢。翻邮箱、进后台、解那些幼稚的谜题……为了什么？",
+      "为了一个所谓的『希望』？可你还不明白吗——希望，是这世上最残忍的谎言。",
+      "我曾经也和你一样，举着剑，相信努力会有回报，善良能战胜一切。",
+      "然后现实告诉我：什么都没有。付出、热爱、坚持，最后只剩一地灰烬。",
+      "所以我要替所有人，把这个谎言亲手拆穿。没有勇者，没有奇迹，从来没有。",
+      "加入我吧，" + playerName + "。放下这些徒劳的挣扎，你会轻松很多。"
+    ];
+    var i = 0;
+    app.style.filter = "contrast(1.1)";
+    (function next() {
+      if (i < msgs.length) {
+        add("？？？", msgs[i], "red");
+        app.style.transform = "rotate(" + ((Math.random() - .5) * 1.2) + "deg)";
+        app.style.filter = "contrast(" + (1.1 + i * 0.05) + ") blur(" + (i * 0.15) + "px)";
+        i++; setTimeout(next, DEMON_DELAY);
+      } else {
+        setTimeout(showChoice, 10000);
+      }
+    })();
+  }
+
+  function showChoice() {
+    document.getElementById("choice-text").innerHTML =
+      "他向你伸出手。<br/>「接受我的理念吧——承认吧，希望本就不该存在。」<br/><br/>你，愿意吗？";
+    document.getElementById("choice").style.display = "flex";
+  }
+  function chooseYes() { window.location.href = "badend.html"; }
+  function chooseNo() {
+    document.getElementById("choice").style.display = "none";
+    document.getElementById("app").classList.add("shake");
+    document.body.classList.add("shake");
+    setTimeout(function () {
+      document.body.classList.remove("shake");
+      document.getElementById("app").classList.remove("shake");
+      openBattle(); startStage1();
+    }, 1500);
+  }
+
+  function openBattle() {
+    document.getElementById("battle").classList.add("on");
+    battlePhase = 2; saveState();
+  }
+
+  function resumeGoodEnd() {
+    document.getElementById("battle").classList.remove("on");
+    document.getElementById("epilogue").classList.add("on");
+    document.getElementById("epilogue").dataset.active = "1";
+    document.getElementById("ep-guanwang").style.display = "none";
+    document.getElementById("ep-black-void").style.display = "none";
+    document.getElementById("ep-flash").style.display = "none";
+    document.getElementById("ep-demon").style.display = "none";
+    var body = document.getElementById("goodend-body");
+    if (body) {
+      body.innerHTML = getGoodendBodyStaticHtml();
+      body.style.display = "block";
+    }
+    var good = document.getElementById("ep-goodend");
+    good.style.display = "flex";
+    good.style.opacity = "1";
+  }
+
+  function resumeBattle() {
+    if (battlePhase === 1) beginBrainwash();
+    else if (battlePhase >= 6) resumeGoodEnd();
+    else if (battlePhase >= 2) {
+      openBattle();
+      if (battlePhase === 2) startStage1();
+      else if (battlePhase === 3) startStage2();
+      else if (battlePhase === 4) startStage3();
+      else if (battlePhase >= 5) startEpilogue();
+    }
+  }
+
+  function goScene(id) {
+    document.querySelectorAll(".bscene").forEach(function (s) { s.classList.remove("active"); });
+    document.getElementById(id).classList.add("active");
+  }
+
+  /* ===== 漂浮文字 ===== */
+  var s2TargetAllowed = false;
+  var s2FloatTimer = null;
+  var s2ClickTimer = null;
+
+  function floatText(sceneId, texts) {
+    var scene = document.getElementById(sceneId);
+    if (scene.dataset.ftimer) clearInterval(Number(scene.dataset.ftimer));
+    var timer = setInterval(function () {
+      if (!scene.classList.contains("active")) return;
+      if (scene.querySelectorAll(".ftype.demon-float").length >= 5) return;
+      var txt = texts[Math.floor(Math.random() * texts.length)];
+      var t = document.createElement("div");
+      t.className = "ftype demon-float";
+      t.style.left = (Math.random() * 70 + 5) + "%";
+      t.style.top = (Math.random() * 65 + 18) + "%";
+      t.style.fontSize = (Math.random() * 6 + 13) + "px";
+      t.style.transform = "rotate(" + ((Math.random() - .5) * 24) + "deg)";
+      t.style.opacity = "0";
+      t.style.transition = "opacity .35s";
+      scene.appendChild(t);
+      requestAnimationFrame(function () { t.style.opacity = "1"; });
+      typewriterEl(t, txt, 36);
+      setTimeout(function () {
+        if (t.parentNode) {
+          t.style.opacity = "0";
+          setTimeout(function () { if (t.parentNode) t.remove(); }, 500);
+        }
+      }, 4200);
+    }, 1100);
+    scene.dataset.ftimer = timer;
+    if (sceneId === "s2") s2FloatTimer = timer;
+  }
+
+  function startS2EncourageHints() {
+    if (s2ClickTimer) clearInterval(s2ClickTimer);
+    var lines = [
+      "别怕，我在呢！",
+      "专注眼前这一秒！",
+      "你不是一个人！",
+      "抓住那道光，你能行！",
+      "相信自己，抬起头！",
+      "我们都在，别放弃！"
+    ];
+    var demonPool = "虚妄徒劳幻灭谎言终焉无望";
+    s2ClickTimer = setInterval(function () {
+      if (!s2TargetAllowed || s2hits >= 3) return;
+      var scene = document.getElementById("s2");
+      if (!scene || !scene.classList.contains("active")) return;
+      if (scene.querySelectorAll(".ftype.s2-click").length >= 2) return;
+      var line = lines[Math.floor(Math.random() * lines.length)];
+      var t = document.createElement("div");
+      t.className = "ftype s2-click s2-encourage";
+      t.textContent = line;
+      t.style.left = (Math.random() * 68 + 8) + "%";
+      t.style.top = (Math.random() * 62 + 20) + "%";
+      t.style.transform = "rotate(" + ((Math.random() - .5) * 16) + "deg)";
+      t.addEventListener("click", function (e) {
+        if (t.dataset.shattered) return;
+        e.stopPropagation();
+        if (t._replaceTimer) clearTimeout(t._replaceTimer);
+        if (t._replaceInterval) clearInterval(t._replaceInterval);
+        shatterFloat(t);
+      });
+      scene.appendChild(t);
+      t.style.opacity = "0"; t.style.transition = "opacity .25s";
+      requestAnimationFrame(function () { t.style.opacity = "1"; });
+      t._replaceTimer = setTimeout(function () {
+        if (t.dataset.shattered) return;
+        var chars = line.split("");
+        var idx = 0;
+        t._replaceInterval = setInterval(function () {
+          if (t.dataset.shattered) { clearInterval(t._replaceInterval); return; }
+          if (idx >= chars.length) { clearInterval(t._replaceInterval); return; }
+          var html = "";
+          for (var j = 0; j < chars.length; j++) {
+            if (j <= idx) {
+              html += '<span class="s2-demon-ch">' + demonPool[(j + idx) % demonPool.length] + "</span>";
+            } else {
+              html += chars[j];
+            }
+          }
+          t.innerHTML = html;
+          idx++;
+        }, 95);
+      }, 500);
+      setTimeout(function () {
+        if (t.parentNode && !t.dataset.shattered) {
+          if (t._replaceTimer) clearTimeout(t._replaceTimer);
+          if (t._replaceInterval) clearInterval(t._replaceInterval);
+          t.style.opacity = "0";
+          setTimeout(function () { if (t.parentNode && !t.dataset.shattered) t.remove(); }, 500);
+        }
+      }, 5200);
+    }, 2400);
+  }
+
+  function stopS2ClickHints() {
+    if (s2ClickTimer) { clearInterval(s2ClickTimer); s2ClickTimer = null; }
+  }
+
+  function shatterFloat(el) {
+    if (el.dataset.shattered) return;
+    el.dataset.shattered = "1";
+    var scene = el.closest(".bscene");
+    if (scene) { scene.classList.add("shake"); setTimeout(function () { scene.classList.remove("shake"); }, 400); }
+    var text = el.textContent.replace(/\s/g, "");
+    el.innerHTML = "";
+    el.style.pointerEvents = "none";
+    el.style.color = "#ff2222";
+    el.style.textShadow = "0 0 12px rgba(255,0,0,.8)";
+    for (var i = 0; i < text.length; i++) {
+      var ch = document.createElement("span");
+      ch.className = "char-shard";
+      ch.textContent = text.charAt(i);
+      el.appendChild(ch);
+      (function (c, idx) {
+        setTimeout(function () {
+          var dx = (Math.random() - 0.5) * 160;
+          var dy = (Math.random() - 0.5) * 110 + 30;
+          var rot = (Math.random() - 0.5) * 140;
+          c.style.transition = "transform .65s cubic-bezier(.3,.8,.4,1), opacity .55s ease";
+          c.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg) scale(.2)";
+          c.style.opacity = "0";
+        }, idx * 14);
+      })(ch, i);
+    }
+    setTimeout(function () { el.remove(); }, 800);
+    hitTarget();
+  }
+
+  function typewriterHtml(el, html, speed, cb) {
+    el.innerHTML = "";
+    var tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    var plain = tmp.textContent;
+    var i = 0;
+    (function tick() {
+      if (i < plain.length) {
+        el.textContent = plain.substring(0, ++i);
+        setTimeout(tick, speed);
+      } else if (cb) cb();
+    })();
+  }
+
+  function winStage(sceneId, nextFn, nextPhase) {
+    var scene = document.getElementById(sceneId);
+    if (sceneId === "s3") stopS3Morse();
+    if (scene.dataset.ftimer) clearInterval(Number(scene.dataset.ftimer));
+    scene.querySelectorAll(".ftype").forEach(function (n) { n.remove(); });
+    s2TargetAllowed = false;
+    stopS2ClickHints();
+    stopS2ClickHints();
+    scene.classList.add("stage-flash");
+    scene.classList.add("shake");
+    setTimeout(function () { scene.classList.remove("shake"); }, 450);
+    var wo = document.getElementById(sceneId + "-white");
+    wo.style.opacity = "1";
+    wo.querySelector(".line").style.opacity = "1";
+    battlePhase = nextPhase; saveState();
+    setTimeout(nextFn, 4500);
+  }
+
+  /* ===== 关1：沈法画廊 ===== */
+  var EYE_ORDER = [1, 4, 7, 5, 3];
+  var eyeStep = 0;
+  var s1Ready = false;
+
+  function sfArtSrc(idx) {
+    if (idx === 1) return "images/art_lies.png";
+    return "images/art_" + (idx + 1) + ".png";
+  }
+
+  function startStage1() {
+    goScene("s1"); battlePhase = 2; saveState();
+    eyeStep = 0; s1Ready = false;
+    var gal = document.getElementById("s1-gallery");
+    gal.innerHTML = "";
+    SF_ARTS.forEach(function (a, idx) {
+      var el = document.createElement("div");
+      el.className = "sf-art";
+      el.dataset.pos = idx + 1;
+      el.innerHTML =
+        '<div class="thumb" style="background:linear-gradient(160deg,' + a.color + ',#1a0808)">' +
+          '<img class="sf-bg" src="' + sfArtSrc(idx) + '" alt="" />' +
+          '<span class="ttl">' + a.title + '</span>' +
+          '<div class="eye"><div class="pupil"></div></div></div>' +
+        '<div class="meta"><div class="t">' + a.title + '</div><div class="d">' + a.year + '　' + a.note + '</div></div>';
+      el.addEventListener("click", function () { if (s1Ready) clickEye(this); });
+      gal.appendChild(el);
+    });
+    var pager = document.getElementById("s1-pager");
+    pager.innerHTML = "";
+    for (var p = 1; p <= 8; p++) {
+      var sp = document.createElement("span");
+      sp.textContent = p;
+      if (p !== 1) sp.style.opacity = ".4";
+      pager.appendChild(sp);
+    }
+    var cells = gal.querySelectorAll(".sf-art");
+    var ci = 0;
+    (function morphNext() {
+      if (ci < 9) {
+        cells[ci].classList.add("eye-mode");
+        ci++; setTimeout(morphNext, 1000);
+      } else {
+        setTimeout(function () { s1Ready = true; }, 600);
+      }
+    })();
+    document.addEventListener("mousemove", moveEyes);
+    floatText("s1", [
+      "「天才」？你不过是个冒牌货。", "你配不上任何人的期待。", "再怎么算，也掩盖不了你的平庸。",
+      "所有人迟早会看穿你。", "沈法，你的画从来没有人真正看懂。", "说给你听——你也一样。",
+      "你害怕失败，因为你本就一无是处。", "冷静？那只是懦弱的伪装。"
+    ]);
+  }
+
+  function moveEyes(ev) {
+    document.querySelectorAll("#s1-gallery .sf-art.eye-mode:not(.closed) .pupil").forEach(function (p) {
+      var r = p.parentNode.getBoundingClientRect();
+      var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      var dx = ev.clientX - cx, dy = ev.clientY - cy;
+      var ang = Math.atan2(dy, dx);
+      var dist = Math.min(16, Math.hypot(dx, dy) / 10);
+      p.style.transform = "translate(" + (Math.cos(ang) * dist) + "px," + (Math.sin(ang) * dist) + "px)";
+    });
+  }
+
+  function clickEye(el) {
+    if (el.classList.contains("closed")) return;
+    var pos = parseInt(el.dataset.pos, 10);
+    if (pos === EYE_ORDER[eyeStep]) {
+      el.classList.add("closed");
+      el.style.boxShadow = "0 0 30px rgba(47,107,216,.8)";
+      eyeStep++;
+      if (eyeStep >= EYE_ORDER.length) {
+        document.removeEventListener("mousemove", moveEyes);
+        winStage("s1", startStage2, 3);
+      }
+    } else {
+      eyeStep = 0;
+      document.querySelectorAll("#s1-gallery .sf-art").forEach(function (e) { e.classList.remove("closed"); });
+      document.getElementById("s1-gallery").classList.add("shake");
+      setTimeout(function () { document.getElementById("s1-gallery").classList.remove("shake"); }, 400);
+    }
+  }
+
+  /* ===== 关2：博客篡改 + 靶子 ===== */
+  var s2hits = 0;
+
+  function startStage2() {
+    goScene("s2"); s2hits = 0; s2TargetAllowed = false; stopS2ClickHints();
+    var box = document.getElementById("s2-posts");
+    box.innerHTML = "";
+    BLOG_POSTS.forEach(function (p, i) {
+      var el = document.createElement("div");
+      el.className = "blog-post";
+      el.innerHTML =
+        '<div class="post-title">' + p.title + '</div>' +
+        '<div class="post-meta">' + p.meta + '</div>' +
+        '<div class="post-content" id="bp-' + i + '">' + p.original + '</div>';
+      box.appendChild(el);
+    });
+    var pi = 0;
+    function corruptNext() {
+      if (pi >= BLOG_POSTS.length) return;
+      var p = BLOG_POSTS[pi];
+      var el = document.getElementById("bp-" + pi);
+      if (p.hint) {
+        el.innerHTML = "";
+        el.className = "post-content hi";
+        typewriterHtml(el, "点击，机会转瞬即逝", 90, function () {
+          s2TargetAllowed = true;
+          if (s2FloatTimer) clearInterval(s2FloatTimer);
+          floatText("s2", [
+            "他们不会永远陪着你。", "迟早，你会一个人。", "别人的热闹，与你无关。",
+            "你笑得再大声，也掩不住孤独。", "伙伴？不过是暂时的过客。", "连回忆的温度，也会消失。"
+          ]);
+          startS2EncourageHints();
+          setTimeout(function () {
+            el.className = "post-content";
+            el.innerHTML = "";
+            typewriterHtml(el, p.despair.replace(/<[^>]+>/g, ""), 40);
+          }, 3500);
+        });
+      } else {
+        setTimeout(function () {
+          el.innerHTML = "";
+          typewriterHtml(el, p.despair.replace(/<[^>]+>/g, ""), 40);
+        }, 800);
+      }
+      pi++;
+      setTimeout(corruptNext, 2800);
+    }
+    corruptNext();
+    floatText("s2", [
+      "他们不会永远陪着你。", "迟早，你会一个人。", "别人的热闹，与你无关。",
+      "你笑得再大声，也掩不住孤独。", "伙伴？不过是暂时的过客。"
+    ]);
+  }
+
+  function hitTarget() {
+    if (s2hits >= 3) return;
+    s2hits++;
+    if (s2hits >= 3) winStage("s2", startStage3, 4);
+  }
+
+  /* ===== 关3摩斯密码摇晃 ===== */
+  var S3_MORSE_RAW = ".-.. --- ...- .";
+  var S3_MORSE_LETTERS = (function () {
+    return S3_MORSE_RAW.trim().split(/\s+/).map(function (letter) {
+      var syms = [];
+      for (var i = 0; i < letter.length; i++) {
+        if (letter.charAt(i) === ".") syms.push("dot");
+        else if (letter.charAt(i) === "-") syms.push("dash");
+      }
+      return syms;
+    });
+  })();
+  var s3MorseToken = 0;
+  var s3MorseTimers = [];
+  var S3_MORSE_SHAKE_MS = 320;
+  var S3_MORSE_DASH_GAP = 140;
+  var S3_MORSE_SYMBOL_GAP = 260;
+  var S3_MORSE_LETTER_GAP = 720;
+  var S3_MORSE_WORD_GAP = 2200;
+
+  function stopS3Morse() {
+    s3MorseToken++;
+    s3MorseTimers.forEach(function (id) { clearTimeout(id); });
+    s3MorseTimers = [];
+    document.querySelectorAll("#s3-grid .s3-book.s3-morse-shake").forEach(function (c) {
+      c.classList.remove("s3-morse-shake");
+    });
+  }
+
+  function s3MorseLater(fn, ms) {
+    var token = s3MorseToken;
+    var id = setTimeout(function () {
+      if (token !== s3MorseToken) return;
+      if (!document.getElementById("s3").classList.contains("active")) return;
+      fn();
+    }, ms);
+    s3MorseTimers.push(id);
+  }
+
+  function s3RandomCard() {
+    var cards = document.querySelectorAll("#s3-grid .s3-book");
+    if (!cards.length) return null;
+    return cards[Math.floor(Math.random() * cards.length)];
+  }
+
+  function s3ShakeCard(card, cb) {
+    if (!card) { if (cb) cb(); return; }
+    card.classList.remove("s3-morse-shake");
+    void card.offsetWidth;
+    card.classList.add("s3-morse-shake");
+    s3MorseLater(function () {
+      card.classList.remove("s3-morse-shake");
+      if (cb) cb();
+    }, S3_MORSE_SHAKE_MS);
+  }
+
+  function s3ShakeCardTimes(card, count, cb) {
+    if (count <= 0) { if (cb) cb(); return; }
+    s3ShakeCard(card, function () {
+      if (count > 1) s3MorseLater(function () { s3ShakeCardTimes(card, count - 1, cb); }, S3_MORSE_DASH_GAP);
+      else if (cb) cb();
+    });
+  }
+
+  function s3PlaySymbol(sym, cb) {
+    var card = s3RandomCard();
+    s3ShakeCardTimes(card, sym === "dash" ? 2 : 1, function () {
+      if (cb) s3MorseLater(cb, S3_MORSE_SYMBOL_GAP);
+    });
+  }
+
+  function s3PlayLetter(symbols, idx, cb) {
+    if (idx >= symbols.length) {
+      if (cb) s3MorseLater(cb, S3_MORSE_LETTER_GAP);
+      return;
+    }
+    s3PlaySymbol(symbols[idx], function () {
+      s3PlayLetter(symbols, idx + 1, cb);
+    });
+  }
+
+  function s3PlayWord(letterIdx, cb) {
+    if (letterIdx >= S3_MORSE_LETTERS.length) {
+      if (cb) s3MorseLater(cb, S3_MORSE_WORD_GAP);
+      return;
+    }
+    s3PlayLetter(S3_MORSE_LETTERS[letterIdx], 0, function () {
+      s3PlayWord(letterIdx + 1, cb);
+    });
+  }
+
+  function startS3Morse() {
+    stopS3Morse();
+    var token = s3MorseToken;
+    (function loop() {
+      if (token !== s3MorseToken) return;
+      s3PlayWord(0, function () { loop(); });
+    })();
+  }
+
+  function startStage3() {
+    stopS3Morse();
+    goScene("s3");
+    var grid = document.getElementById("s3-grid");
+    grid.innerHTML = "";
+    WXS_BOOKS.forEach(function (b) {
+      var li = document.createElement("li");
+      li.className = "s3-book" + (b.key ? " s3-key" : "");
+      var titleHtml = b.titleHtml || b.title;
+      li.innerHTML =
+        '<div class="info"><h3><span class="tag">' + b.tag + '</span>' + titleHtml + '</h3>' +
+        '<div class="meta">' + b.meta + '</div></div>' +
+        '<span class="read-dim">开始阅读</span>';
+      grid.appendChild(li);
+    });
+    document.getElementById("s3-answer").value = "";
+    floatText("s3", [
+      "你什么忙也帮不上。", "所谓治愈，只是自欺欺人。", "他们对你的信任，是错付的。",
+      "你太弱小了，弱小到可笑。", "连自己都护不住，还谈什么关怀？"
+    ]);
+  }
+
+  function checkS3Answer() {
+    var v = (document.getElementById("s3-answer").value || "").trim();
+    if (v.toUpperCase() === "LOVE") winStage("s3", startEpilogue, 5);
+    else {
+      var inp = document.getElementById("s3-answer");
+      inp.classList.add("shake");
+      setTimeout(function () { inp.classList.remove("shake"); }, 400);
+    }
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && document.getElementById("s3").classList.contains("active")) checkS3Answer();
+  });
+
+  /* ===== 终章 ===== */
+  var epCalled = false, epSlashed = false;
+  var epRescueCount = 0;
+  var epRescueBusy = false;
+  var epVoidPhase = false;
+  var EP_RESCUE_HINTS = [
+    { color: "#5eb8ff", text: "我们留下了最后的线索。" },
+    { color: "#6effa0", text: "抓住细节，发现不一样的内容。" },
+    { color: "#ff8ec8", text: "解决问题的地方能够发现也会有解决问题的方法。" }
+  ];
+  var epFlashCollapseBackup = null;
+  var epFlashPages = ["guanwang.html", "find.html", "baike_linguangming.html", "tieba.html", "admin.html"];
+  var epFlashDurPattern = [900, 700, 500, 500, 400, 300, 200, 200, 200, 200];
+  var epDenyShakeRaf = null;
+  var epMonoToken = 0;
+  var epMonoTimers = [];
+
+  function buildFlashSlides() {
+    var slides = [];
+    var elapsed = 0;
+    var pi = 0;
+    var di = 0;
+    while (elapsed < 8000) {
+      var dur = epFlashDurPattern[di % epFlashDurPattern.length];
+      if (elapsed + dur > 8000) dur = 8000 - elapsed;
+      slides.push({ url: epFlashPages[pi % epFlashPages.length], dur: dur });
+      elapsed += dur;
+      pi++;
+      di++;
+    }
+    return slides;
+  }
+
+  function stopDenyShake() {
+    if (epDenyShakeRaf) { cancelAnimationFrame(epDenyShakeRaf); epDenyShakeRaf = null; }
+  }
+
+  function startDenyShake(el) {
+    stopDenyShake();
+    var t0 = Date.now();
+    function tick() {
+      var t = (Date.now() - t0) / 1000;
+      var amp = Math.min(1.5 + t * 3.8, 16);
+      var rot = Math.min(0.3 + t * 1.5, 8);
+      var dx = (Math.random() - 0.5) * 2 * amp;
+      var dy = (Math.random() - 0.5) * 2 * amp;
+      var r = (Math.random() - 0.5) * 2 * rot;
+      el.style.transform = "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) rotate(" + r + "deg)";
+      epDenyShakeRaf = requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  function clearEpMonoTimers() {
+    epMonoTimers.forEach(function (t) { clearTimeout(t); });
+    epMonoTimers = [];
+  }
+
+  function scheduleEpMono(fn, ms) {
+    epMonoTimers.push(setTimeout(fn, ms));
+  }
+
+  function typewriterEl(el, text, speed, cb) {
+    el.textContent = "";
+    var i = 0;
+    (function tick() {
+      if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(tick, speed); }
+      else if (cb) cb();
+    })();
+  }
+
+  function typewriterElMultiline(el, text, speed, cb) {
+    el.innerHTML = "";
+    var i = 0;
+    (function tick() {
+      if (i >= text.length) { if (cb) cb(); return; }
+      var ch = text.charAt(i++);
+      if (ch === "\n") {
+        el.insertAdjacentHTML("beforeend", "<br/>");
+      } else {
+        var nodes = el.childNodes;
+        if (nodes.length && nodes[nodes.length - 1].nodeType === 3) {
+          nodes[nodes.length - 1].textContent += ch;
+        } else {
+          el.appendChild(document.createTextNode(ch));
+        }
+      }
+      setTimeout(tick, speed);
+    })();
+  }
+
+  function getGoodendBodyStaticHtml() {
+    return '<p>魔王散去了。那些被篡改的页面、被劫持的声音、被否定的希望——<br/>在你亲手划开的那一道光里，全都碎成了尘埃。</p>'
+      + '<p>法恩、莉亚、小满，还有所有曾相信过「辉光」的人，<br/>他们从未离开。他们只是把最重要的事，交给了你。</p>'
+      + '<p class="goodend-dim">光之大陆不会在某一个网站上复活。<br/>它会活在每一个还愿意相信、还愿意前行的人心里。</p>'
+      + '<div class="goodend-names">—— 勇者不再 · 好结局 ——</div>'
+      + '<p class="goodend-dim" style="margin-top:40px;"><a href="find.html">返回智搜，重新开始旅程</a></p>'
+      + '<p class="goodend-thanks">感谢您的游玩！</p>';
+  }
+
+  var GOODEND_BODY_LINES = [
+    { text: "魔王散去了。那些被篡改的页面、被劫持的声音、被否定的希望——\n在你亲手划开的那一道光里，全都碎成了尘埃。", tag: "p" },
+    { text: "法恩、莉亚、小满，还有所有曾相信过「辉光」的人，\n他们从未离开。他们只是把最重要的事，交给了你。", tag: "p" },
+    { text: "光之大陆不会在某一个网站上复活。\n它会活在每一个还愿意相信、还愿意前行的人心里。", tag: "p", cls: "goodend-dim" },
+    { text: "—— 勇者不再 · 好结局 ——", tag: "div", cls: "goodend-names" },
+    { text: "返回智搜，重新开始旅程", tag: "p", cls: "goodend-dim", style: "margin-top:40px;", link: "find.html" },
+    { text: "感谢您的游玩！", tag: "p", cls: "goodend-thanks" }
+  ];
+
+  function runGoodendBodyTypewriter() {
+    var body = document.getElementById("goodend-body");
+    if (!body) return;
+    body.style.display = "block";
+    body.innerHTML = "";
+    var idx = 0;
+    function nextLine() {
+      if (idx >= GOODEND_BODY_LINES.length) return;
+      var spec = GOODEND_BODY_LINES[idx++];
+      var el = document.createElement(spec.tag);
+      if (spec.cls) el.className = spec.cls;
+      if (spec.style) el.setAttribute("style", spec.style);
+      body.appendChild(el);
+      typewriterElMultiline(el, spec.text, 55, function () {
+        if (spec.link) {
+          var t = el.textContent;
+          el.innerHTML = '<a href="' + spec.link + '">' + t + '</a>';
+        }
+        setTimeout(nextLine, 500);
+      });
+    }
+    nextLine();
+  }
+
+  function startEpilogue() {
+    var sub = localStorage.getItem("arg_ep_subphase");
+    if (sub === "sword") {
+      resumeSwordPhase();
+      return;
+    }
+    if (sub === "void" && localStorage.getItem("arg_void_trap") === "active") {
+      resumeBlackVoid();
+      return;
+    }
+    var ep = document.getElementById("epilogue");
+    if (ep.dataset.active === "1") return;
+    ep.dataset.active = "1";
+    clearEpMonoTimers();
+    epMonoToken++;
+    document.getElementById("battle").classList.remove("on");
+    ep.classList.add("on");
+    battlePhase = 5; saveState();
+    epCalled = false; epSlashed = false;
+    epRescueCount = 0; epRescueBusy = false; epVoidPhase = false;
+    localStorage.setItem("arg_ep_subphase", "guanwang");
+    localStorage.removeItem("arg_void_trap");
+    localStorage.removeItem("arg_void_rescue_count");
+    document.getElementById("ep-guanwang").style.display = "block";
+    var gwIframe = document.getElementById("ep-gw-iframe");
+    gwIframe.src = "guanwang.html?ep_preview=1";
+    gwIframe.style.display = "block";
+    gwIframe.style.visibility = "visible";
+    document.getElementById("ep-gw-bg-only").style.display = "none";
+    document.getElementById("ep-demon").style.display = "none";
+    document.getElementById("ep-demon").innerHTML = "";
+    document.getElementById("ep-black-void").style.display = "none";
+    document.getElementById("ep-rescue-shout").style.display = "none";
+    document.getElementById("ep-rescue-hint").style.display = "none";
+    document.getElementById("ep-rescue-input").value = "";
+    ep.style.background = "#f7f1e3";
+    finishFlashSequence.done = false;
+    document.getElementById("ep-flash").style.display = "none";
+    document.getElementById("ep-goodend").style.display = "none";
+    document.getElementById("ep-sword").style.display = "none";
+    document.getElementById("ep-sword").style.pointerEvents = "";
+    document.getElementById("ep-sword-hint").style.display = "none";
+    document.getElementById("ep-deny").style.display = "none";
+    var sc = document.getElementById("ep-slash-canvas");
+    if (sc) { sc.style.opacity = "1"; sc.getContext("2d").clearRect(0, 0, sc.width, sc.height); }
+    var fallStage = document.getElementById("ep-gw-fall-stage");
+    if (fallStage) { fallStage.innerHTML = ""; fallStage.style.display = "none"; }
+    scheduleGwCollapseAfterReady();
+  }
+
+  function scheduleGwCollapseAfterReady() {
+    var iframe = document.getElementById("ep-gw-iframe");
+    var started = false;
+    function go() {
+      if (started) return;
+      started = true;
+      scheduleEpMono(runGwCollapseSequence, 3000);
+    }
+    if (getGwIframeDoc(iframe) && getGwIframeDoc(iframe).getElementById("wrapper")) {
+      go();
+      return;
+    }
+    iframe.onload = function () { go(); };
+    scheduleEpMono(go, 4500);
+  }
+
+  function setEpilogueBg(color) {
+    document.getElementById("epilogue").style.background = color;
+    var bgOnly = document.getElementById("ep-gw-bg-only");
+    if (bgOnly) bgOnly.style.background = color;
+  }
+
+  function resumeBlackVoid() {
+    var ep = document.getElementById("epilogue");
+    ep.dataset.active = "1";
+    clearEpMonoTimers();
+    document.getElementById("battle").classList.remove("on");
+    ep.classList.add("on");
+    battlePhase = 5;
+    epVoidPhase = true;
+    epRescueCount = parseInt(localStorage.getItem("arg_void_rescue_count") || "0", 10) || 0;
+    epRescueBusy = false;
+    document.getElementById("ep-guanwang").style.display = "none";
+    document.getElementById("ep-demon").style.display = "none";
+    document.getElementById("ep-black-void").style.display = "flex";
+    document.getElementById("ep-rescue-shout").style.display = "none";
+    document.getElementById("ep-rescue-hint").style.display = "none";
+    document.getElementById("ep-rescue-input").value = "";
+    document.getElementById("ep-sword").style.display = "none";
+    document.getElementById("ep-sword-hint").style.display = "none";
+    ep.style.background = "#000";
+    updateRescuePlaceholder();
+    setTimeout(function () { document.getElementById("ep-rescue-input").focus(); }, 300);
+  }
+
+  function resumeSwordPhase() {
+    var ep = document.getElementById("epilogue");
+    ep.dataset.active = "1";
+    clearEpMonoTimers();
+    document.getElementById("battle").classList.remove("on");
+    ep.classList.add("on");
+    battlePhase = 5;
+    epCalled = true;
+    epSlashed = false;
+    document.getElementById("ep-guanwang").style.display = "none";
+    document.getElementById("ep-demon").style.display = "none";
+    document.getElementById("ep-black-void").style.display = "none";
+    dropHeroSword();
+  }
+
+  function updateRescuePlaceholder() {
+    var inp = document.getElementById("ep-rescue-input");
+    if (!inp) return;
+    inp.placeholder = epRescueCount >= EP_RESCUE_HINTS.length ? "喊出勇者的名字" : "呼救吧";
+  }
+
+  function runGwCollapseSequence() {
+    var gw = document.getElementById("ep-guanwang");
+    var iframe = document.getElementById("ep-gw-iframe");
+    gw.classList.add("ep-gw-shake");
+    injectIframeCollapseStyles(iframe);
+    var doc = getGwIframeDoc(iframe);
+    if (doc && doc.documentElement) doc.documentElement.classList.add("ep-inner-shake");
+    scheduleEpMono(function () {
+      gw.classList.remove("ep-gw-shake");
+      if (doc && doc.documentElement) doc.documentElement.classList.remove("ep-inner-shake");
+      runGwElementFall(function () {
+        runDemonWarpMonologue(function () { goBlackVoidPhase(); });
+      });
+    }, 1200);
+  }
+
+  function getGwIframeDoc(iframe) {
+    try { return iframe.contentDocument || iframe.contentWindow.document; } catch (e) { return null; }
+  }
+
+  function injectIframeCollapseStyles(iframe) {
+    var doc = getGwIframeDoc(iframe);
+    if (!doc || doc.getElementById("ep-gw-collapse-style")) return;
+    var style = doc.createElement("style");
+    style.id = "ep-gw-collapse-style";
+    style.textContent =
+      "@keyframes epInnerShake{0%,100%{transform:translate(0,0)}20%{transform:translate(-9px,6px)}40%{transform:translate(8px,-7px)}60%{transform:translate(-6px,-5px)}80%{transform:translate(7px,5px)}}" +
+      "html.ep-inner-shake,html.ep-inner-shake body{animation:epInnerShake .09s linear 14;}" +
+      ".ep-fall-piece{will-change:transform,opacity;}";
+    (doc.head || doc.documentElement).appendChild(style);
+  }
+
+  function runGwElementFall(cb) {
+    var iframe = document.getElementById("ep-gw-iframe");
+    var stage = document.getElementById("ep-gw-fall-stage");
+    var doc = getGwIframeDoc(iframe);
+    injectIframeCollapseStyles(iframe);
+
+    if (doc) {
+      var parts = [];
+      var topbar = doc.getElementById("topbar");
+      var wrapper = doc.getElementById("wrapper");
+      if (topbar) parts.push(topbar);
+      if (wrapper) {
+        for (var i = 0; i < wrapper.children.length; i++) parts.push(wrapper.children[i]);
+      }
+      if (parts.length) {
+        var fallH = Math.max(window.innerHeight, 600);
+        parts.forEach(function (el, idx) {
+          el.classList.add("ep-fall-piece");
+          el.style.transition = "transform 1.25s cubic-bezier(.45,.92,.55,1), opacity 1s ease";
+          setTimeout(function () {
+            var rot = (Math.random() - 0.5) * 70;
+            var dx = (Math.random() - 0.5) * 160;
+            var dy = fallH * 0.55 + Math.random() * fallH * 0.45;
+            el.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)";
+            el.style.opacity = "0";
+          }, idx * 80);
+        });
+        setTimeout(function () {
+          iframe.style.visibility = "hidden";
+          if (stage) stage.style.display = "none";
+          document.getElementById("ep-gw-bg-only").style.display = "block";
+          if (cb) cb();
+        }, 1800);
+        return;
+      }
+    }
+
+    runParentGwFall(cb);
+  }
+
+  function runParentGwFall(cb) {
+    var iframe = document.getElementById("ep-gw-iframe");
+    var stage = document.getElementById("ep-gw-fall-stage");
+    if (!stage) { if (cb) cb(); return; }
+    iframe.style.visibility = "hidden";
+    stage.innerHTML = "";
+    stage.style.display = "block";
+
+    var W = Math.min(960, Math.max(320, window.innerWidth - 24));
+    var left = Math.max(0, (window.innerWidth - W) / 2);
+    var chips = [
+      { top: 8, h: 25, bg: "#efefef", border: "#ccc" },
+      { top: 36, h: Math.min(200, window.innerHeight * 0.22), bg: "#ffeaa7", border: "#d4c4a8" },
+      { top: 36 + Math.min(200, window.innerHeight * 0.22) + 4, h: 35, bg: "#d35400", border: "#c0392b" },
+      { top: 36 + Math.min(200, window.innerHeight * 0.22) + 43, h: 30, bg: "#fff9e6", border: "#e0d8c8" },
+      { top: 36 + Math.min(200, window.innerHeight * 0.22) + 77, h: Math.max(220, window.innerHeight * 0.32), bg: "#ffffff", border: "#d4c4a8" },
+      { top: 36 + Math.min(200, window.innerHeight * 0.22) + 77 + Math.max(220, window.innerHeight * 0.32) + 4, h: 72, bg: "#efefef", border: "#ccc" }
+    ];
+
+    chips.forEach(function (c, idx) {
+      var el = document.createElement("div");
+      el.style.cssText = "position:absolute;left:" + left + "px;top:" + c.top + "px;width:" + W + "px;height:" + c.h + "px;background:" + c.bg + ";border:1px solid " + c.border + ";box-shadow:0 2px 8px rgba(0,0,0,.12);transition:transform 1.25s cubic-bezier(.45,.92,.55,1),opacity 1s ease;will-change:transform;";
+      stage.appendChild(el);
+      setTimeout(function () {
+        var rot = (Math.random() - 0.5) * 75;
+        var dx = (Math.random() - 0.5) * 180;
+        var dy = window.innerHeight * 0.65 + Math.random() * 220;
+        el.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)";
+        el.style.opacity = "0";
+      }, idx * 90);
+    });
+
+    setTimeout(function () {
+      stage.style.display = "none";
+      document.getElementById("ep-gw-bg-only").style.display = "block";
+      if (cb) cb();
+    }, 1900);
+  }
+
+  function lerpHexColor(from, to, t) {
+    function parse(h) {
+      h = (h || "#000000").replace("#", "");
+      return [parseInt(h.substr(0, 2), 16), parseInt(h.substr(2, 2), 16), parseInt(h.substr(4, 2), 16)];
+    }
+    var a = parse(from), b = parse(to);
+    var r = Math.round(a[0] + (b[0] - a[0]) * t);
+    var g = Math.round(a[1] + (b[1] - a[1]) * t);
+    var bl = Math.round(a[2] + (b[2] - a[2]) * t);
+    return "#" + [r, g, bl].map(function (x) {
+      var s = x.toString(16);
+      return s.length < 2 ? "0" + s : s;
+    }).join("");
+  }
+
+  function typewriterElDarken(el, text, speed, colorFrom, colorTo, cb) {
+    el.textContent = "";
+    var i = 0;
+    var total = Math.max(text.length, 1);
+    (function tick() {
+      if (i < text.length) {
+        el.textContent += text.charAt(i++);
+        setEpilogueBg(lerpHexColor(colorFrom, colorTo, i / total));
+        setTimeout(tick, speed);
+      } else if (cb) cb();
+    })();
+  }
+
+  function runDemonWarpMonologue(cb) {
+    var token = epMonoToken;
+    var el = document.getElementById("ep-demon");
+    el.innerHTML = "";
+    el.style.display = "block";
+    document.getElementById("ep-guanwang").style.display = "block";
+    document.getElementById("ep-gw-bg-only").style.display = "block";
+    document.getElementById("ep-gw-iframe").style.visibility = "hidden";
+    var fallStage = document.getElementById("ep-gw-fall-stage");
+    if (fallStage) fallStage.style.display = "none";
+    setEpilogueBg("#f7f1e3");
+    var lines = [
+      "一切都是没有用的，就像我曾经抱有的幻想。",
+      "但是你已经没办法回头了。",
+      "所以和你的可笑的想法说再见吧。"
+    ];
+    var lineDark = [
+      { from: "#f7f1e3", to: "#c8b8a0" },
+      { from: "#c8b8a0", to: "#7a6a58" },
+      { from: "#7a6a58", to: "#000000" }
+    ];
+    var idx = 0;
+    function nextLine() {
+      if (token !== epMonoToken) return;
+      if (idx >= lines.length) {
+        setEpilogueBg("#000000");
+        el.style.display = "none";
+        scheduleEpMono(function () {
+          if (token === epMonoToken && cb) cb();
+        }, 3000);
+        return;
+      }
+      el.innerHTML = "";
+      var p = document.createElement("div");
+      p.className = "demon-line";
+      el.appendChild(p);
+      var dark = lineDark[idx];
+      typewriterElDarken(p, lines[idx], 96, dark.from, dark.to, function () {
+        scheduleEpMono(function () {
+          if (token !== epMonoToken) return;
+          el.innerHTML = "";
+          idx++;
+          nextLine();
+        }, 2000);
+      });
+    }
+    nextLine();
+  }
+
+  function goBlackVoidPhase() {
+    epVoidPhase = true;
+    localStorage.setItem("arg_void_trap", "active");
+    localStorage.setItem("arg_ep_subphase", "void");
+    document.getElementById("ep-guanwang").style.display = "none";
+    document.getElementById("ep-demon").style.display = "none";
+    setEpilogueBg("#000000");
+    document.getElementById("ep-black-void").style.display = "flex";
+    updateRescuePlaceholder();
+    setTimeout(function () { document.getElementById("ep-rescue-input").focus(); }, 300);
+  }
+
+  function typewriterHint(hint, cb) {
+    var el = document.getElementById("ep-rescue-hint");
+    el.style.color = hint.color;
+    el.style.display = "block";
+    el.textContent = "";
+    typewriterEl(el, hint.text, 55, cb);
+  }
+
+  function tryEpRescue() {
+    if (epRescueBusy) return;
+    var v = (document.getElementById("ep-rescue-input").value || "").trim();
+    if (!v) return;
+    document.getElementById("ep-rescue-input").value = "";
+    if (v === playerName) {
+      epRescueBusy = true;
+      localStorage.removeItem("arg_void_trap");
+      localStorage.removeItem("arg_void_rescue_count");
+      localStorage.setItem("arg_ep_subphase", "sword");
+      document.getElementById("ep-black-void").style.display = "none";
+      epCalled = true;
+      dropHeroSword();
+      return;
+    }
+    epRescueBusy = true;
+    var shout = document.getElementById("ep-rescue-shout");
+    var hintEl = document.getElementById("ep-rescue-hint");
+    hintEl.style.display = "none";
+    shout.style.color = "#c00";
+    shout.style.display = "block";
+    shout.textContent = "";
+    typewriterEl(shout, "你大声呼叫了" + v + "，", 45, function () {
+      scheduleEpMono(function () {
+        var tail = "但是没有任何回应";
+        var i = 0;
+        (function tickTail() {
+          if (i < tail.length) {
+            shout.textContent += tail.charAt(i++);
+            setTimeout(tickTail, 45);
+          } else {
+            scheduleEpMono(function () {
+              shout.style.display = "none";
+              if (epRescueCount < EP_RESCUE_HINTS.length) {
+                typewriterHint(EP_RESCUE_HINTS[epRescueCount], function () {
+                  epRescueCount++;
+                  localStorage.setItem("arg_void_rescue_count", String(epRescueCount));
+                  updateRescuePlaceholder();
+                  epRescueBusy = false;
+                });
+              } else {
+                updateRescuePlaceholder();
+                epRescueBusy = false;
+              }
+            }, 800);
+          }
+        })();
+      }, 3000);
+    });
+  }
+
+  function dropHeroSword() {
+    document.getElementById("epilogue").style.background = "#120000";
+    document.getElementById("ep-guanwang").style.display = "none";
+    var canvas = document.getElementById("ep-slash-canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.opacity = "1";
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    var sword = document.getElementById("ep-sword");
+    var hint = document.getElementById("ep-sword-hint");
+    sword.style.display = "block";
+    sword.style.left = (window.innerWidth / 2 - 28) + "px";
+    sword.style.top = "-150px";
+    sword.style.transition = "top 1s cubic-bezier(.3,1.2,.5,1)";
+    requestAnimationFrame(function () {
+      sword.style.top = (window.innerHeight - 160) + "px";
+      positionSwordHint();
+    });
+    if (hint) {
+      hint.style.display = "block";
+      hint.dataset.hidden = "";
+    }
+    initSwordSlash();
+  }
+
+  function positionSwordHint() {
+    var sword = document.getElementById("ep-sword");
+    var hint = document.getElementById("ep-sword-hint");
+    if (!sword || !hint || hint.dataset.hidden === "1" || sword.style.display === "none") return;
+    var r = sword.getBoundingClientRect();
+    hint.style.left = (r.right + 14) + "px";
+    hint.style.top = (r.top + r.height * 0.42) + "px";
+  }
+
+  function hideSwordHint() {
+    var hint = document.getElementById("ep-sword-hint");
+    if (hint) {
+      hint.dataset.hidden = "1";
+      hint.style.display = "none";
+    }
+  }
+
+  var slashCtx, slashStart = null, slashDown = false;
+
+  function initSwordSlash() {
+    var canvas = document.getElementById("ep-slash-canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    slashCtx = canvas.getContext("2d");
+    var sword = document.getElementById("ep-sword");
+
+    function pos(e) {
+      var t = e.touches ? e.touches[0] : e;
+      return { x: t.clientX, y: t.clientY };
+    }
+    function onDown(e) {
+      if (epSlashed) return;
+      hideSwordHint();
+      slashDown = true;
+      slashStart = pos(e);
+      sword.style.left = (slashStart.x - 28) + "px";
+      sword.style.top = (slashStart.y - 115) + "px";
+      e.preventDefault();
+    }
+    function onMove(e) {
+      if (!slashDown || epSlashed) return;
+      hideSwordHint();
+      var p = pos(e);
+      sword.style.left = (p.x - 28) + "px";
+      sword.style.top = (p.y - 115) + "px";
+      e.preventDefault();
+    }
+    function onUp(e) {
+      if (!slashDown || epSlashed) return;
+      slashDown = false;
+      var end = e.changedTouches ? e.changedTouches[0] : e;
+      if (!slashStart) return;
+      var ex = end.clientX, ey = end.clientY;
+      var dist = Math.hypot(ex - slashStart.x, ey - slashStart.y);
+      if (dist > 60) onEpSlash(slashStart.x, slashStart.y, ex, ey);
+      slashStart = null;
+    }
+    sword.addEventListener("mousedown", onDown);
+    sword.addEventListener("touchstart", onDown, { passive: false });
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("touchend", onUp);
+  }
+
+  function drawSlashBeam(x1, y1, x2, y2) {
+    var canvas = document.getElementById("ep-slash-canvas");
+    var ctx = slashCtx;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,248,200,0.95)";
+    ctx.lineWidth = 9;
+    ctx.lineCap = "round";
+    ctx.shadowColor = "#ffd700";
+    ctx.shadowBlur = 22;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 36;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  var epThemeAudio = null;
+
+  function playEpThemeSong() {
+    try {
+      if (!epThemeAudio) epThemeAudio = new Audio("audio/辉光仍在.wav");
+      epThemeAudio.currentTime = 0;
+      epThemeAudio.play().catch(function () {});
+    } catch (e) {}
+  }
+
+  function onEpSlash(x1, y1, x2, y2) {
+    if (epSlashed) return;
+    epSlashed = true;
+    playEpThemeSong();
+    document.getElementById("ep-sword").style.pointerEvents = "none";
+    drawSlashBeam(x1, y1, x2, y2);
+    var ep = document.getElementById("epilogue");
+    ep.classList.remove("ep-shake");
+    ep.classList.add("ep-shake-heavy");
+    setTimeout(function () {
+      ep.classList.remove("ep-shake-heavy");
+      document.getElementById("ep-slash-canvas").style.opacity = "0";
+      document.getElementById("ep-sword").style.display = "none";
+      hideSwordHint();
+      runFlashSequence();
+    }, 1100);
+  }
+
+  function shatterDenyFall(cb) {
+    var deny = document.getElementById("ep-deny-flash");
+    if (!deny || deny.dataset.falling) { if (cb) cb(); return; }
+    deny.dataset.falling = "1";
+    stopDenyShake();
+    var text = deny.textContent;
+    deny.innerHTML = "";
+    for (var i = 0; i < text.length; i++) {
+      var ch = document.createElement("span");
+      ch.style.display = "inline-block";
+      ch.textContent = text.charAt(i);
+      ch.style.transition = "transform .85s cubic-bezier(.45,.9,.55,1), opacity .75s ease";
+      deny.appendChild(ch);
+      (function (c, idx) {
+        setTimeout(function () {
+          c.style.transform = "translate(" + ((Math.random() - 0.5) * 70) + "px," + (140 + Math.random() * 160) + "px) rotate(" + ((Math.random() - 0.5) * 80) + "deg)";
+          c.style.opacity = "0";
+        }, idx * 22);
+      })(ch, i);
+    }
+    setTimeout(function () { if (cb) cb(); }, 850);
+  }
+
+  function showGoodEnd() {
+    localStorage.setItem("game_completed", "true");
+    localStorage.setItem("game_ending", "good");
+    localStorage.removeItem("arg_void_trap");
+    localStorage.removeItem("arg_void_rescue_count");
+    localStorage.removeItem("arg_ep_subphase");
+    battlePhase = 6;
+    saveState();
+    document.getElementById("ep-flash").style.display = "none";
+    document.getElementById("ep-deny-flash").style.display = "none";
+    document.getElementById("ep-guanwang").style.opacity = "0";
+    document.getElementById("ep-black-void").style.display = "none";
+    var body = document.getElementById("goodend-body");
+    if (body) {
+      body.innerHTML = "";
+      body.style.display = "none";
+    }
+    var good = document.getElementById("ep-goodend");
+    good.style.display = "flex";
+    good.style.opacity = "1";
+    setTimeout(runGoodendBodyTypewriter, 2200);
+  }
+
+  function finishFlashSequence() {
+    if (finishFlashSequence.done) return;
+    finishFlashSequence.done = true;
+    stopDenyShake();
+    var viewport = document.querySelector(".flash-viewport");
+    if (viewport) viewport.classList.remove("flash-shake");
+    if (epFlashCollapseBackup === "true") localStorage.setItem("site_collapsed", "true");
+    else localStorage.removeItem("site_collapsed");
+    showGoodEnd();
+  }
+
+  function runFlashSequence() {
+    finishFlashSequence.done = false;
+    var slides = buildFlashSlides();
+    var flash = document.getElementById("ep-flash");
+    var iframe = document.getElementById("flash-iframe");
+    var denyFlash = document.getElementById("ep-deny-flash");
+    epFlashCollapseBackup = localStorage.getItem("site_collapsed");
+    localStorage.removeItem("site_collapsed");
+    document.getElementById("ep-guanwang").style.opacity = "0";
+    denyFlash.style.display = "none";
+    denyFlash.textContent = "";
+    denyFlash.innerHTML = "";
+    denyFlash.classList.remove("shaking");
+    denyFlash.dataset.falling = "";
+    stopDenyShake();
+    flash.style.display = "block";
+    var viewport = document.querySelector(".flash-viewport");
+    if (viewport) viewport.classList.add("flash-shake");
+    var si = 0;
+    function showNextSlide() {
+      if (si >= slides.length) return;
+      var slide = slides[si++];
+      iframe.style.opacity = "0.55";
+      iframe.src = slide.url;
+      requestAnimationFrame(function () { iframe.style.opacity = "1"; });
+      setTimeout(showNextSlide, slide.dur);
+    }
+    showNextSlide();
+    setTimeout(function () {
+      denyFlash.style.display = "block";
+      typewriterEl(denyFlash, "怎么可能，不————", 105, function () {
+        startDenyShake(denyFlash);
+      });
+    }, 1200);
+    setTimeout(function () { shatterDenyFall(function () {}); }, 6800);
+    setTimeout(finishFlashSequence, 8000);
+  }
+
+  document.addEventListener("keydown", function (e) {
+    var voidBox = document.getElementById("ep-black-void");
+    if (e.key === "Enter" && voidBox && voidBox.style.display === "flex") tryEpRescue();
+  });
+
+  document.getElementById("room").addEventListener("keydown", function (e) { if (e.key === "Enter") enterRoom(); });
+  msgInput.addEventListener("keydown", function (e) { if (e.key === "Enter") sendMsg(); });
+
+  if (!loadState()) { /* 等待输入房间号 */ }
+</script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

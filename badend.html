@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="《勇者不再》—— 结局。" />
+<title>……勇者不再</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050505; color: #6a6a6a; font-family: "宋体","Microsoft YaHei",serif; height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .box { max-width: 640px; padding: 40px; text-align: center; line-height: 2.4; animation: fadein 3s ease; }
+  .box p { margin: 22px 0; font-size: 16px; }
+  .dim { color: #444; font-size: 14px; }
+  .end { margin-top: 40px; color: #333; letter-spacing: 12px; font-size: 20px; }
+  a { color: #555; font-size: 12px; text-decoration: underline; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+<div class="box">
+  <p>后来啊，你渐渐记不太清了。</p>
+  <p class="dim">好像是有那么一部动画，讲一个举着剑的少年……<br/>可是叫什么名字来着？主角长什么样？<br/>想不起来了。</p>
+  <p>也许它从来就没有播完。<br/>也许，这世上本来就没有什么勇者。</p>
+  <p class="dim">生活还要继续。明天还要上班，还要还贷，还要假装一切都好。<br/>就这样，平平淡淡地过下去吧。</p>
+  <p style="color:#7a2a2a;">——毕竟，希望本来就是一种伪善，不是吗？</p>
+  <div class="end">勇 者 不 再</div>
+  <p style="margin-top:50px;"><a href="find.html">（……真的就这样结束了吗？点此重新开始搜索）</a></p>
+</div>
+<script>
+  // 坏结局标记
+  localStorage.setItem("game_ending", "bad");
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

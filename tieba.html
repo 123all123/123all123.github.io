@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【闲聊】有没有什么好的童年动漫，大家来分享一下_白云吧_百度贴吧</title>
+    <style>
+        body, h1, h2, h3, p, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif, "宋体";
+            background-color: #dee4ed;
+            color: #333;
+            font-size: 12px;
+        }
+        a {
+            color: #2d64b3;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 贴吧顶栏 */
+        .tb-topbar {
+            background-color: #f5f6fa;
+            border-bottom: 1px solid #e4e6eb;
+            height: 40px;
+            line-height: 40px;
+            padding: 0 50px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        .topbar-left span {
+            margin-right: 15px;
+        }
+        .topbar-right a {
+            margin-left: 15px;
+            color: #666;
+        }
+
+        /* 贴吧头部 Banner */
+        .bar-header {
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .bar-banner-bg {
+            background: linear-gradient(135deg, #7abcff 0%, #60abf8 100%);
+            height: 120px;
+            position: relative;
+        }
+        .bar-info-box {
+            width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            height: 70px;
+        }
+        .bar-avatar {
+            width: 150px;
+            height: 150px;
+            background-color: #fff;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            position: absolute;
+            top: -90px;
+            left: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .bar-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+        .bar-avatar-cloud {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 78px;
+            line-height: 1;
+            background: linear-gradient(180deg, #f0f8ff 0%, #b8dcfa 55%, #7ec0f0 100%);
+            color: #fff;
+            text-shadow: 0 3px 10px rgba(96, 171, 248, 0.55);
+        }
+        .bar-detail {
+            margin-left: 190px;
+            padding-top: 10px;
+        }
+        .bar-name-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .bar-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-right: 15px;
+            font-family: "Microsoft YaHei";
+        }
+        .btn-follow {
+            background-color: #3385ff;
+            color: #fff;
+            padding: 3px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .btn-sign {
+            background-color: #ff9d00;
+            color: #fff;
+            padding: 3px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .bar-stats {
+            color: #aaa;
+            font-size: 12px;
+        }
+        .bar-stats span {
+            margin-right: 15px;
+        }
+        .bar-stats strong {
+            color: #ff4500;
+        }
+
+        /* 主体布局 */
+        .main-wrapper {
+            width: 1000px;
+            margin: 0 auto 40px auto;
+            display: flex;
+            background-color: #fff;
+            border: 1px solid #e4e6eb;
+        }
+        
+        /* 左侧帖子正文区 */
+        .left-content {
+            width: 740px;
+            border-right: 1px solid #e4e6eb;
+        }
+        /* 右侧侧边栏 */
+        .right-sidebar {
+            width: 260px;
+            background-color: #fff;
+            padding: 20px 15px;
+            box-sizing: border-box;
+        }
+
+        /* 帖子标题 */
+        .thread-header {
+            padding: 20px;
+            border-bottom: 1px solid #e4e6eb;
+            background-color: #fafbfc;
+        }
+        .thread-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+            font-family: "Microsoft YaHei";
+        }
+
+        /* 楼层基础样式 */
+        .post-floor {
+            display: flex;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        .post-floor:last-child {
+            border-bottom: none;
+        }
+        
+        /* 楼层左侧：用户信息 */
+        .floor-left {
+            width: 130px;
+            background-color: #fafbfc;
+            padding: 20px 10px;
+            text-align: center;
+            box-sizing: border-box;
+            border-right: 1px solid #e4e6eb;
+        }
+        .user-avatar-box {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px auto;
+            border: 1px solid #e4e6eb;
+            padding: 3px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .user-avatar-box img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+        .user-avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        .user-name-link {
+            font-weight: bold;
+            font-size: 13px;
+            word-break: break-all;
+            display: block;
+            margin-bottom: 5px;
+        }
+        /* 贴吧等级牌子 */
+        .user-badge {
+            display: inline-block;
+            font-size: 10px;
+            color: #fff;
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-weight: bold;
+            line-height: 12px;
+        }
+        .badge-low { background: linear-gradient(to right, #93b5dd, #709bc9); }
+        .badge-mid { background: linear-gradient(to right, #f7bfa2, #f39c6b); }
+        .badge-high { background: linear-gradient(to right, #fbc875, #f9a623); }
+
+        /* 楼层右侧：内容及楼中楼 */
+        .floor-right {
+            width: 610px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .post-text-content {
+            font-size: 14px;
+            line-height: 24px;
+            color: #333;
+            word-wrap: break-word;
+            min-height: 60px;
+        }
+        .post-text-content strong {
+            font-weight: bold;
+        }
+        .floor-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            color: #999;
+            font-size: 12px;
+        }
+        .floor-footer span {
+            margin-right: 15px;
+        }
+        .btn-reply-floor {
+            color: #2d64b3;
+            cursor: pointer;
+        }
+
+        /* 楼中楼（Sub-comments Box） */
+        .lzl-container {
+            margin-top: 15px;
+            background-color: #f7f8fa;
+            border: 1px solid #f0f1f2;
+            padding: 4px 15px;
+            position: relative;
+        }
+        /* 楼中楼小尖角 */
+        .lzl-container::before {
+            content: "";
+            position: absolute;
+            top: -11px;
+            left: 30px;
+            border-width: 5px 6px;
+            border-style: solid;
+            border-color: transparent transparent #f7f8fa transparent;
+        }
+        .lzl-container::after {
+            content: "";
+            position: absolute;
+            top: -12px;
+            left: 30px;
+            border-width: 6px 6px;
+            border-style: solid;
+            border-color: transparent transparent #f0f1f2 transparent;
+            z-index: -1;
+        }
+        .lzl-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed #e4e6eb;
+            line-height: 18px;
+        }
+        .lzl-item:last-child {
+            border-bottom: none;
+        }
+        .lzl-user {
+            font-weight: bold;
+            color: #2d64b3;
+        }
+        .lzl-content {
+            color: #333;
+        }
+        .lzl-time-reply {
+            margin-top: 3px;
+            text-align: right;
+            font-size: 11px;
+            color: #999;
+        }
+        .lzl-time-reply a {
+            margin-left: 10px;
+        }
+        .lzl-panel {
+            padding: 8px 0;
+            text-align: right;
+            border-top: 1px solid #edf0f5;
+            margin-top: 5px;
+        }
+        .btn-lzl-say {
+            display: inline-block;
+            background-color: #fff;
+            border: 1px solid #ccdae3;
+            color: #555;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 11px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-lzl-say:hover {
+            background-color: #f3f7fa;
+            border-color: #3385ff;
+            color: #3385ff;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: bold;
+            border-left: 3px solid #3385ff;
+            padding-left: 8px;
+            margin-bottom: 15px;
+            color: #333;
+            font-family: "Microsoft YaHei";
+        }
+        .sidebar-block {
+            margin-bottom: 30px;
+        }
+        .hot-list {
+            list-style: none;
+        }
+        .hot-list li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .hot-num {
+            font-family: Arial;
+            font-weight: bold;
+            font-size: 14px;
+            width: 20px;
+            color: #999;
+        }
+        .hot-num.top3 {
+            color: #ff4500;
+        }
+        .hot-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #555;
+        }
+        .bar-master-box {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .master-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #e4e6eb;
+            border-radius: 50%;
+            margin-right: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .master-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+
+        /* 分页 */
+        .pagination-box {
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e4e6eb;
+        }
+        .page-btn {
+            display: inline-block;
+            border: 1px solid #e4e6eb;
+            padding: 5px 12px;
+            margin: 0 2px;
+            background-color: #fff;
+            color: #333;
+        }
+        .page-btn.active {
+            background-color: #3385ff;
+            color: #fff;
+            border-color: #3385ff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 贴吧顶栏模拟 -->
+    <div class="tb-topbar">
+        <div class="topbar-left">
+            <span>网页</span>
+            <a href="#">贴吧</a>
+            <span style="margin-left:15px;">新闻</span>
+            <span>地图</span>
+            <span>视频</span>
+        </div>
+        <div class="topbar-right">
+            <a href="#" style="font-weight:bold; color:#3385ff;">寂寞的泡面</a>
+            <a href="#">通知</a>
+            <a href="#">私信</a>
+            <a href="#">吧主专区</a>
+            <a href="#">退出</a>
+        </div>
+    </div>
+
+    <!-- 吧头部区域 -->
+    <div class="bar-header">
+        <div class="bar-banner-bg"></div>
+        <div class="bar-info-box">
+            <div class="bar-avatar bar-avatar-cloud" aria-label="白云吧">☁</div>
+            <div class="bar-detail">
+                <div class="bar-name-row">
+                    <span class="bar-name">白云吧</span>
+                    <a class="btn-follow" href="javascript:void(0);" id="btn-follow" onclick="doFollow()">+关注</a>
+                    <a class="btn-sign" href="javascript:void(0);" id="btn-sign" onclick="doSign()">签到</a>
+                </div>
+                <div class="bar-stats">
+                    <span>关注：<strong>125,404</strong></span>
+                    <span>贴子：<strong>892,115</strong></span>
+                    <span style="color:#666;">☁ 探讨虚幻与真实的二次元纯净天空 ☁</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体布局 -->
+    <div class="main-wrapper">
+        
+        <!-- 左侧楼层区 -->
+        <div class="left-content">
+        
+        <!-- ===== 第 1 页楼层 ===== -->
+        <div id="page-1">
+            <div class="thread-header">
+                <h1 class="thread-title">【闲聊】有没有什么好的童年动漫，大家来分享一下</h1>
+            </div>
+
+            <!-- 1楼（楼主） -->
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(1).png" alt="" /></div>
+                    <a class="user-name-link">寂寞的泡面</a>
+                    <span class="user-badge badge-high">Lv.11 吧主</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        有没有什么好的童年动漫，大家来分享一下。最近好无聊，想重温一下童年的感觉，但是那些现实中大家都盘点烂的名作我都看腻了。求推荐一些冷门的、小众的或者当年只在地方台播过的好看动漫！
+                    </div>
+                    <div class="floor-footer">
+                        <span>1楼</span>
+                        <span>2026-05-19 10:01</span>
+                        <a class="btn-reply-floor" href="javascript:void(0);">回复</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2楼 -->
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(2).png" alt="" /></div>
+                    <a class="user-name-link">机甲战神007</a>
+                    <span class="user-badge badge-mid">Lv.6</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        强烈推荐《星际追风少年》！当时每天傍晚六点守着地方台看，那机甲变形和推进器的声效太燃了，男主的“裂空强袭形态”到今天都是我心中的机甲颜值巅峰！
+                    </div>
+                    
+                    <!-- 楼中楼丰富 -->
+                    <div class="lzl-container">
+                        <div class="lzl-item">
+                            <a class="lzl-user">千层套路王</a>: <span class="lzl-content">卧槽，终于找到同道了！我也记得这部，最后的星际轨道决战看热血沸腾。特别是第26集那个双向重力炮合击，特效在当时绝对超前！</span>
+                            <div class="lzl-time-reply">2020-07-08 10:06 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-item">
+                            <a class="lzl-user">机甲战神007</a>: <span class="lzl-content">@千层套路王 对吧对吧！特别是那个最终决战BGM，我现在脑子里还会自动播放。那个配乐据说是日本一个专门做管弦乐的乐团搞的，难怪大气磅礴！</span>
+                            <div class="lzl-time-reply">2020-07-08 10:10 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-item">
+                            <a class="lzl-user">月光疾风</a>: <span class="lzl-content">这部我也看过！我当时还花光压岁钱买了个蓝色的山寨拼装机甲，因为说明书是全日文的，拼了三天三夜才装好，到现在还摆在我书架最显眼的位置。</span>
+                            <div class="lzl-time-reply">2020-07-08 10:14 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-item">
+                            <a class="lzl-user">零号机驾驶员</a>: <span class="lzl-content">可惜这片子后来重播率太低了，而且当年地方台经常掐点放，导致最后两集我硬是没在电视上看到，多亏了初中去学校门口的租碟店租了VCD才把结局给补完。</span>
+                            <div class="lzl-time-reply">2020-07-08 10:22 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-panel"><a class="btn-lzl-say" href="javascript:void(0);">我也说一句</a></div>
+                    </div>
+
+                    <div class="floor-footer">
+                        <span>2楼</span>
+                        <span>2020-07-08 10:05</span>
+                        <a class="btn-reply-floor" href="javascript:void(0);">回复(4)</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3楼 -->
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(3).png" alt="" /></div>
+                    <a class="user-name-link">草莓味的风</a>
+                    <span class="user-badge badge-mid">Lv.8</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        有人记得《咕噜小仙子》吗？一部魔法少女类型的。那个星星魔法棒玩具我小时候求了我妈整整一个月才给买，每天在院子里瞎挥喊变身口诀，现在想想太社死了2333。
+                    </div>
+                    
+                    <!-- 楼中楼丰富 -->
+                    <div class="lzl-container">
+                        <div class="lzl-item">
+                            <a class="lzl-user">小仙女不吃香菜</a>: <span class="lzl-content">哈哈哈哈笑死，我也买过，我当时买的是月亮款，天天跟隔壁小伙伴在楼下对波。而且那个魔法棒一摇晃还会发出那种单音调的八音盒音乐，在晚上听吵得要死，我爸差点给我扔窗外去！</span>
+                            <div class="lzl-time-reply">2019-03-12 10:15 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-item">
+                            <a class="lzl-user">草莓味的风</a>: <span class="lzl-content">@小仙女不吃香菜 没错就是那个音乐！我还记得口诀叫“呼哩呼噜，星穹极光，变身！”。当年班里女生谁要是有一个正版的魔法棒，绝对是全班的绝对焦点。</span>
+                            <div class="lzl-time-reply">2019-03-12 10:19 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-item">
+                            <a class="lzl-user">魔法少女奈叶</a>: <span class="lzl-content">这部动漫的画风真的很赞，有点类似于早期的CLAMP风格，而且剧情并不幼稚，后期讲到精灵一族的古老契约被黑暗魔法污染的时候，居然还有点压抑。</span>
+                            <div class="lzl-time-reply">2019-03-12 10:28 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-panel"><a class="btn-lzl-say" href="javascript:void(0);">我也说一句</a></div>
+                    </div>
+
+                    <div class="floor-footer">
+                        <span>3楼</span>
+                        <span>2019-03-12 10:12</span>
+                        <a class="btn-reply-floor" href="javascript:void(0);">回复(3)</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增4楼：无关老动漫大长评 -->
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(4).png" alt="" /></div>
+                    <a class="user-name-link">童年收割机</a>
+                    <span class="user-badge badge-high">Lv.10</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        我必须给你们安利一部90年代末期的神作：《百变怪兽饲养员》。大概是在2001左右在国内一些地方教育台放过。讲一个主角用掌上游戏机把家里的宠物狗扫描进去，然后进入一个数码怪兽世界冒险的故事。设定类似于数码宝贝和宠物小精灵的结合体，但是风格更加偏向写实和科幻。里面各种芯片升级和怪兽进化路线的规划，今天看依然非常有游戏性。当时为了买它的配套掌机卡带，我连续三个星期每天只吃两个馒头！
+                    </div>
+                    
+                    <div class="lzl-container">
+                        <div class="lzl-item">
+                            <a class="lzl-user">寂寞的泡面</a>: <span class="lzl-content">卧槽！这部我也看过，男主角叫阿治对不对？他的第一只初始兽是个像红毛小狮子的怪兽，最后超神进化成了“焚天劫火兽”，帅得一批！我记得国内当时还翻译成《怪兽进化大师》。</span>
+                            <div class="lzl-time-reply">2018-11-26 10:36 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-item">
+                            <a class="lzl-user">童年收割机</a>: <span class="lzl-content">@寂寞的泡面 对！就是那只红毛狮子！大结局阿治为了保护数码世界不被毁灭，最后选择把掌机里的数据永久格式化，和小狮子道别的场景，绝对是催泪弹，比今天那些快餐动漫感人一万倍。</span>
+                            <div class="lzl-time-reply">2018-11-26 10:42 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-panel"><a class="btn-lzl-say" href="javascript:void(0);">我也说一句</a></div>
+                    </div>
+
+                    <div class="floor-footer">
+                        <span>4楼</span>
+                        <span>2018-11-26 10:30</span>
+                        <a class="btn-reply-floor" href="javascript:void(0);">回复(2)</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增5楼：EVA和古老动画深度大探讨 -->
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(5).png" alt="" /></div>
+                    <a class="user-name-link">葛城美里单推人</a>
+                    <span class="user-badge badge-mid">Lv.7</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        既然楼主想求冷门，我推荐一部国内引进时被剪得七零八落但绝对硬核神作的科幻动画：《深渊幻影》（原名叫《Phantom Aura》）。大概是在2005年地方卫视深夜时段播过。讲人类通过脑电波进入深层精神世界消灭梦魇，但梦魇其实是人类历史中被遗忘的记忆残骸。整部动画基调极其压抑，探讨了存在主义和群体潜意识，有点EVA和盗梦空间的结合感。当时因为画面色调太阴暗、台词过于玄乎，很多地方台播了五六集就被家长投诉下架了。但它那首主题曲真的绝美，全是无歌词的空灵吟唱，听得头皮发麻。
+                    </div>
+                    
+                    <div class="lzl-container">
+                        <div class="lzl-item">
+                            <a class="lzl-user">代码敲不完</a>: <span class="lzl-content">听说过这部，据说它的监督和EVA的制作团队有重合？当年那种赛博朋克加心灵哲学的动画风格真的太有时代特色了，现在根本做不出这种带点疯癫和艺术探索气质的片子。</span>
+                            <div class="lzl-time-reply">2023-09-05 10:55 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-item">
+                            <a class="lzl-user">葛城美里单推人</a>: <span class="lzl-content">@代码敲不完 没错，它的副监督参与过《新世纪天鹰战士》（就是EVA的大陆阉割引进版）的本土化配音和剪辑，所以在氛围渲染上带了很重的庵野秀明流派味道。极其推荐去一些老旧资源网扒一扒无删减的日语原版，绝对震撼。</span>
+                            <div class="lzl-time-reply">2023-09-05 11:02 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-panel"><a class="btn-lzl-say" href="javascript:void(0);">我也说一句</a></div>
+                    </div>
+
+                    <div class="floor-footer">
+                        <span>5楼</span>
+                        <span>2023-09-05 10:48</span>
+                        <a class="btn-reply-floor" href="javascript:void(0);">回复(2)</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11楼 (指定剧情楼层 - 精简楼中楼，仅保留跳转链接，去除任何其他讨论，保持绝对纯净) -->
+            <div class="post-floor" id="floor-11">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(6).png" alt="" /></div>
+                    <a class="user-name-link">追忆流年</a>
+                    <span class="user-badge badge-mid">Lv.6</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        <strong>《辉光勇者》</strong>很好看，但是好像电视上都没有播完就停播了。
+                    </div>
+                    
+                    <!-- 楼中楼精简：严格只有链接，没有任何其他发言 -->
+                    <div class="lzl-container">
+                        <div class="lzl-item">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%231a0000'/%3E%3Cellipse cx='12' cy='12' rx='9' ry='5.5' fill='%23fff'/%3E%3Ccircle cx='12' cy='12' r='3.4' fill='%23c0392b'/%3E%3Ccircle cx='12' cy='12' r='1.4' fill='%23000'/%3E%3C/svg%3E" alt="眼睛头像" title="这个用户的头像是一只眼睛……" style="width:18px;height:18px;vertical-align:middle;margin-right:4px;border-radius:3px;" />
+                            <a class="lzl-user">资源分享小能手</a>: <span class="lzl-content">网盘链接：<a href="feidie.html?play=huiguang" target="_blank" style="color: #2d64b3; font-weight: bold; text-decoration: underline;">链接</a></span>
+                            <div class="lzl-time-reply">2024-02-14 11:22 <a href="javascript:void(0);">回复</a></div>
+                        </div>
+                        <div class="lzl-panel"><a class="btn-lzl-say" href="javascript:void(0);">我也说一句</a></div>
+                    </div>
+
+                    <div class="floor-footer">
+                        <span>11楼</span>
+                        <span>2024-02-14 11:18</span>
+                        <a class="btn-reply-floor" href="javascript:void(0);">回复(1)</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12楼 -->
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(7).png" alt="" /></div>
+                    <a class="user-name-link">历史的尘埃</a>
+                    <span class="user-badge badge-mid">Lv.7</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        蹭蹭11楼。我推荐个历史向穿越的：《时空巡逻队》。每一集主角团都要穿梭去不同的虚构历史碎片去修复时间漏洞。小时候一边看精彩战斗一边还能跟着涨各种奇怪的历史知识，妥妥的寓教于乐。
+                    </div>
+                    <div class="floor-footer">
+                        <span>12楼</span>
+                        <span>2021-12-03 11:30</span>
+                        <a class="btn-reply-floor" href="javascript:void(0);">回复</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分页区域 -->
+            <div class="pagination-box" id="pagination-box">
+                <span class="page-btn active" data-page="1">1</span>
+                <a class="page-btn" href="javascript:void(0);" data-page="2">2</a>
+                <a class="page-btn" href="javascript:void(0);" data-page="next">下一页&gt;</a>
+                <a class="page-btn" href="javascript:void(0);" data-page="last">尾页</a>
+            </div>
+        </div>
+
+        <!-- ===== 第 2 页楼层 ===== -->
+        <div id="page-2" style="display:none;">
+            <div class="thread-header">
+                <h1 class="thread-title">【闲聊】有没有什么好的童年动漫，大家来分享一下</h1>
+            </div>
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(8).png" alt="" /></div>
+                    <a class="user-name-link">星空漫游者</a>
+                    <span class="user-badge badge-mid">Lv.5</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        有人看过《深渊幻影》吗？当年地方台深夜档播过几集就被家长投诉下架了，画风压抑但配乐绝了，全是无歌词的空灵吟唱。
+                    </div>
+                    <div class="floor-footer"><span>13楼</span><span>2018-06-21 14:02</span><a class="btn-reply-floor" href="javascript:void(0);">回复</a></div>
+                </div>
+            </div>
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(2).png" alt="" /></div>
+                    <a class="user-name-link">机甲战神007</a>
+                    <span class="user-badge badge-mid">Lv.6</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        楼上说的对！我还安利一部《星际追风少年》，机甲变形那段放到现在也不过时，男主的"裂空强袭形态"至今是我心中的颜值巅峰。
+                    </div>
+                    <div class="floor-footer"><span>14楼</span><span>2022-04-17 14:18</span><a class="btn-reply-floor" href="javascript:void(0);">回复(2)</a></div>
+                </div>
+            </div>
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(3).png" alt="" /></div>
+                    <a class="user-name-link">草莓味的风</a>
+                    <span class="user-badge badge-mid">Lv.8</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+                        推荐《咕噜小仙子》！魔法棒玩具当年求了我妈一个月才买到，每天在院子里喊变身口诀，现在想想太社死了2333
+                    </div>
+                    <div class="floor-footer"><span>15楼</span><span>2025-01-09 14:35</span><a class="btn-reply-floor" href="javascript:void(0);">回复</a></div>
+                </div>
+            </div>
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(7).png" alt="" /></div>
+                    <a class="user-name-link">历史的尘埃</a>
+                    <span class="user-badge badge-mid">Lv.7</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+《时空巡逻队》也不错，每一集穿梭不同历史碎片修复时间漏洞，小时候一边看战斗一边还能涨知识，寓教于乐。
+                    </div>
+                    <div class="floor-footer"><span>16楼</span><span>2020-10-28 15:01</span><a class="btn-reply-floor" href="javascript:void(0);">回复</a></div>
+                </div>
+            </div>
+            <div class="post-floor">
+                <div class="floor-left">
+                    <div class="user-avatar-box"><img src="images/tieba/(4).png" alt="" /></div>
+                    <a class="user-name-link">童年收割机</a>
+                    <span class="user-badge badge-high">Lv.10</span>
+                </div>
+                <div class="floor-right">
+                    <div class="post-text-content">
+《百变怪兽饲养员》有人记得吗？掌上游戏机扫描宠物狗进数码世界冒险，芯片升级路线规划得特别有意思，当年为买配套卡带连续三周只吃馒头。
+                    </div>
+                    <div class="floor-footer"><span>17楼</span><span>2019-07-04 15:22</span><a class="btn-reply-floor" href="javascript:void(0);">回复(1)</a></div>
+                </div>
+            </div>
+            <div class="pagination-box" id="pagination-box-2">
+                <a class="page-btn" href="javascript:void(0);" data-page="prev">&lt;上一页</a>
+                <a class="page-btn" href="javascript:void(0);" data-page="1">1</a>
+                <span class="page-btn active" data-page="2">2</span>
+                <a class="page-btn" href="javascript:void(0);" data-page="last">尾页</a>
+            </div>
+        </div>
+
+        </div>
+
+        <!-- 右侧侧边栏 -->
+        <div class="right-sidebar">
+            <div class="sidebar-block">
+                <div class="sidebar-title">本吧吧主</div>
+                <div class="bar-master-box">
+                    <div class="master-avatar"><img src="images/tieba/(1).png" alt="" /></div>
+                    <div>
+                        <a href="#" style="font-weight:bold; font-size:13px;">寂寞的泡面</a>
+                        <p style="color:#aaa; margin-top:2px;">专注于挖掘尘封的童年神作</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-block">
+                <div class="sidebar-title">白云吧热议榜</div>
+                <ul class="hot-list">
+                    <li><span class="hot-num top3">1</span><a class="hot-text" href="#">【置顶】白云吧官方交友与动漫推荐规则帖</a></li>
+                    <li><span class="hot-num top3">2</span><a class="hot-text" href="#">盘点那些年只播了一半就被停播的冷门神作</a></li>
+                    <li><span class="hot-num top3">3</span><a class="hot-text" href="#">《深渊幻影》主题曲空耳版，听得头皮发麻</a></li>
+                    <li><span class="hot-num">4</span><a class="hot-text" href="#">现在的原创动漫到底缺失了什么？</a></li>
+                    <li><span class="hot-num">5</span><a class="hot-text" href="#">求一部主角手持一把名叫“归墟”武器的动漫</a></li>
+                    <li><span class="hot-num">6</span><a class="hot-text" href="#">诚招本吧小管家及图片小编，有意的进</a></li>
+                    <li><span class="hot-num">7</span><a class="hot-text" href="#">聊一聊那些经典的“致郁系”动漫结局</a></li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-block">
+                <div class="sidebar-title">贴吧公共专区</div>
+                <p style="color:#999; line-height: 20px;">请各位吧友积极遵守国家网络信息管理指南，文明上网，理性讨论，切勿散布不良违法言论或进行人身攻击。</p>
+            </div>
+        </div>
+
+    </div>
+
+<script type="text/javascript">
+    // 关注 / 签到交互
+    function doFollow() {
+        var btn = document.getElementById("btn-follow");
+        if (!btn) return;
+        if (btn.getAttribute("data-followed") === "1") {
+            btn.textContent = "+关注";
+            btn.setAttribute("data-followed", "0");
+            showToast("已取消关注白云吧");
+        } else {
+            btn.textContent = "已关注";
+            btn.setAttribute("data-followed", "1");
+            showToast("关注成功！白云吧已加入你的关注列表");
+        }
+    }
+    function doSign() {
+        var btn = document.getElementById("btn-sign");
+        if (!btn) return;
+        var today = new Date().toDateString();
+        var last = localStorage.getItem("tieba_sign_date");
+        if (last === today) {
+            showToast("今日已签到，连续签到 " + (localStorage.getItem("tieba_sign_days") || "1") + " 天");
+            return;
+        }
+        var days = parseInt(localStorage.getItem("tieba_sign_days") || "0", 10) + 1;
+        localStorage.setItem("tieba_sign_date", today);
+        localStorage.setItem("tieba_sign_days", String(days));
+        btn.textContent = "已签到";
+        btn.style.background = "#888";
+        showToast("签到成功！经验+5，连续签到 " + days + " 天");
+    }
+    function showToast(msg) {
+        var t = document.getElementById("tieba-toast");
+        if (!t) {
+            t = document.createElement("div");
+            t.id = "tieba-toast";
+            t.style.cssText = "position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;padding:10px 24px;border-radius:4px;font-size:13px;z-index:9999;transition:opacity 0.3s;";
+            document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.style.opacity = "1";
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () { t.style.opacity = "0"; }, 2500);
+    }
+    // 分页切换
+    function goPage(n) {
+        var p1 = document.getElementById("page-1");
+        var p2 = document.getElementById("page-2");
+        if (n === 2) {
+            p1.style.display = "none";
+            p2.style.display = "block";
+            window.scrollTo(0, 0);
+        } else {
+            p1.style.display = "block";
+            p2.style.display = "none";
+            window.scrollTo(0, 0);
+        }
+    }
+    document.addEventListener("click", function (e) {
+        var btn = e.target.closest ? e.target.closest(".page-btn[data-page]") : null;
+        if (!btn || !btn.getAttribute("data-page")) return;
+        var p = btn.getAttribute("data-page");
+        if (p === "2" || p === "next" || p === "last") goPage(2);
+        else if (p === "1" || p === "prev") goPage(1);
+    });
+    // 恢复签到状态
+    (function () {
+        var today = new Date().toDateString();
+        if (localStorage.getItem("tieba_sign_date") === today) {
+            var s = document.getElementById("btn-sign");
+            if (s) { s.textContent = "已签到"; s.style.background = "#888"; }
+        }
+    })();
+    // 官网崩溃（site_collapsed）后，11楼被"真相化"抹除——仿佛从未存在
+    (function () {
+        function purgeFloor11() {
+            if (localStorage.getItem("site_collapsed") === "true") {
+                var f = document.getElementById("floor-11");
+                if (f) { f.parentNode.removeChild(f); }
+            }
+        }
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", purgeFloor11);
+        } else { purgeFloor11(); }
+    })();
+    // 如果该页面是打开的状态，当LocalStorage发生变化时强制进行刷新
+    window.addEventListener('storage', function(e) {
+        window.location.reload();
+    });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

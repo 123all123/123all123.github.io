@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>李林晔_智搜百科</title>
+<style type="text/css">
+    body { margin: 0; padding: 0; background-color: #fff; font-family: "宋体", SimSun, Arial; font-size: 12px; color: #333; line-height: 1.6; }
+    a { color: #136ec2; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    
+    /* 头部 */
+    #baike-header { height: 80px; border-bottom: 2px solid #136ec2; background-color: #fcfcfc; }
+    .header-container { width: 980px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 100%; }
+    .baike-logo { font-size: 22px; font-weight: bold; color: #136ec2; font-family: "Microsoft YaHei", sans-serif; display: flex; align-items: center; gap: 5px; }
+    .baike-logo span { background-color: #136ec2; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 14px; margin-left: 5px; }
+    .search-box { display: flex; align-items: center; }
+    .search-input { width: 350px; height: 26px; border: 1px solid #ccc; padding: 0 5px; outline: none; font-size: 13px; }
+    .search-btn { width: 80px; height: 28px; background-color: #136ec2; border: none; color: #fff; font-weight: bold; cursor: pointer; font-size: 12px; }
+    
+    /* 主体 */
+    #baike-main { width: 980px; margin: 20px auto; display: flex; gap: 30px; }
+    #baike-left { width: 700px; }
+    #baike-right { width: 250px; border-left: 1px solid #eee; padding-left: 20px; }
+    
+    /* 标题 */
+    .lemma-title { border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+    .lemma-title h1 { font-size: 28px; font-weight: normal; margin: 0; font-family: "Microsoft YaHei", sans-serif; color: #000; }
+    .lemma-title .sub-title { font-size: 14px; color: #666; margin-top: 5px; }
+    
+    /* 摘要 */
+    .lemma-summary { font-size: 14px; text-indent: 2em; margin-bottom: 20px; line-height: 1.8; color: #333; }
+    
+    /* 基本信息表 */
+    .basic-info-box { border: 1px solid #e8e8e8; background-color: #fbfbfb; padding: 15px; margin-bottom: 25px; display: flex; gap: 20px; }
+    .basic-info-box { border: 1px solid #e8e8e8; background-color: #fbfbfb; padding: 15px; margin-bottom: 25px; display: flex; gap: 20px; }
+    .basic-info-table { width: 100%; border-collapse: collapse; }
+    .basic-info-table th { width: 80px; text-align: left; color: #666; font-weight: normal; padding: 6px 0; border-bottom: 1px dashed #eee; }
+    .basic-info-table td { color: #333; padding: 6px 0; border-bottom: 1px dashed #eee; }
+    .seiyuu-photo { width: 120px; height: 160px; border: 1px solid #ccc; background-color: #eee; overflow: hidden; flex-shrink: 0; box-sizing: border-box; }
+    .seiyuu-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    
+    /* 目录 */
+    .lemma-catalog { border: 1px solid #dcdcdc; background-color: #fcfcfc; padding: 15px; margin-bottom: 25px; width: 250px; }
+    .catalog-title { font-size: 14px; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; color: #000; }
+    .catalog-list { list-style: none; padding: 0; margin: 0; }
+    .catalog-list li { margin-bottom: 6px; }
+    
+    /* 章节 */
+    .lemma-section { margin-bottom: 30px; }
+    .section-header { font-size: 18px; font-weight: bold; color: #000; border-bottom: 1px solid #136ec2; padding-bottom: 5px; margin-bottom: 15px; font-family: "Microsoft YaHei", sans-serif; display: flex; align-items: center; }
+    .section-header span { background-color: #136ec2; width: 4px; height: 18px; display: inline-block; margin-right: 8px; }
+    .section-content { font-size: 13px; line-height: 1.8; text-indent: 2em; }
+    .section-content ul { list-style-type: square; padding-left: 25px; text-indent: 0; }
+    .section-content li { margin-bottom: 8px; }
+    
+    /* 右侧侧边栏 */
+    .right-box { margin-bottom: 25px; }
+    .right-box-title { font-size: 14px; font-weight: bold; border-bottom: 2px solid #ccc; padding-bottom: 5px; margin-bottom: 10px; }
+    .right-box-list { list-style: none; padding: 0; margin: 0; }
+    .right-box-list li { margin-bottom: 8px; font-size: 12px; }
+    
+    #baike-footer { border-top: 1px solid #e0e0e0; padding: 20px 0; text-align: center; color: #999; font-size: 11px; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<!-- 头部 -->
+<div id="baike-header">
+    <div class="header-container">
+        <div class="baike-logo">
+            智搜百科<span>百科</span>
+        </div>
+        <div class="search-box">
+            <input type="text" class="search-input" value="李林晔" readonly="readonly" />
+            <button class="search-btn">搜索词条</button>
+        </div>
+        <div style="font-size: 12px; color: #666;">
+            <a href="javascript:void(0);">登录</a> | <a href="javascript:void(0);">注册</a>
+        </div>
+    </div>
+</div>
+
+<!-- 主体 -->
+<div id="baike-main">
+    <!-- 左侧内容 -->
+    <div id="baike-left">
+        <div class="lemma-title">
+            <h1>李林晔</h1>
+            <div class="sub-title">中国内地女性配音演员</div>
+        </div>
+        
+        <div class="lemma-summary">
+            李林晔，中国内地新生代女性配音演员，毕业于北京某艺术院校播音主持专业。自2004年起正式进入配音行业，其嗓音甜美清脆、富有朝气，擅长演绎活泼可爱的少女、精灵以及聪慧的小男孩角色。在多部国产优秀动画片、广播剧及译制片中均有出色表现，深受业内好评与观众喜爱。
+        </div>
+        
+        <div class="basic-info-box">
+            <table class="basic-info-table">
+                <tr>
+                    <th>中文名</th>
+                    <td>李林晔</td>
+                    <th>国籍</th>
+                    <td>中国</td>
+                </tr>
+                <tr>
+                    <th>民族</th>
+                    <td>汉族</td>
+                    <th>职业</th>
+                    <td>配音演员</td>
+                </tr>
+                <tr>
+                    <th>毕业院校</th>
+                    <td>北京艺术学院</td>
+                    <th>代表作品</th>
+                    <td>《星际追风少年》《咕噜小仙子》</td>
+                </tr>
+            </table>
+            <div class="seiyuu-photo">
+                <img src="images/lly.png" alt="李林晔" />
+            </div>
+        </div>
+        
+        <div class="lemma-catalog">
+            <div class="catalog-title">目录</div>
+            <ul class="catalog-list">
+                <li>1 <a href="#sec-experience">演艺经历</a></li>
+                <li>2 <a href="#sec-works">代表作品</a></li>
+                <li>3 <a href="#sec-external">外部链接</a></li>
+            </ul>
+        </div>
+        
+        <div class="lemma-section" id="sec-experience">
+            <div class="section-header"><span></span>演艺经历</div>
+            <div class="section-content">
+                <p>李林晔从小对声音艺术有着浓厚的兴趣。在校期间曾多次获得朗诵及主持人大赛奖项。2004年毕业后，因一次偶然的机会参与了某国产动画短片的配音试音，凭借极具辨识度的清脆嗓音被导演相中，从此正式开启了她的职业配音生涯。</p>
+                <p>在随后的几年中，她陆续为多部热播动画片中的核心女性角色配音。她对角色的情感把握细腻，台词功底扎实，能够将少女的活泼、任性、善良与勇敢表现得淋漓尽致。除了动画配音外，她还积极参与了多部儿童广播剧的录制，并在部分引进译制片中担任主要角色的配音工作。</p>
+            </div>
+        </div>
+        
+        <div class="lemma-section" id="sec-works">
+            <div class="section-header"><span></span>代表作品</div>
+            <div class="section-content">
+                <p>以下为李林晔近年来参与的主要配音作品（部分）：</p>
+                <ul>
+                    <li><b>2005年：</b>《星际追风少年》 饰 <b>蓝天</b>（女主角，活泼勇敢的星际领航员）</li>
+                    <li><b>2006年：</b>《咕噜小仙子》 饰 <b>咕噜</b>（主角，森林里的冒失小仙子）</li>
+                    <li><b>2008年：</b>《神奇小精灵》 饰 <b>奇奇</b>（主角，聪慧机敏的丛林守护者）</li>
+                    <li><b>2010年：</b>《云端城堡的秘密》 饰 <b>艾米丽</b>（女二号，温柔善良的城堡公主）</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="lemma-section" id="sec-external">
+            <div class="section-header"><span></span>外部链接</div>
+            <div class="section-content">
+                <p>如需了解更多关于李林晔的个人生活与最新动态，欢迎访问以下链接：</p>
+                <ul>
+                    <li>个人博客：<a href="blog_lilinye.html" target="_blank" style="font-weight: bold; color: #136ec2; text-decoration: underline;">林间微风的日志 (http://blog.sina.com.cn/lilinye_breeze)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧侧边栏 -->
+    <div id="baike-right">
+        <div class="right-box">
+            <div class="right-box-title">他人眼中的李林晔</div>
+            <div style="font-size: 11px; color: #666; line-height: 1.6; font-style: italic;">
+                “李林晔是一个极具天赋且非常敬业的配音演员。在录音棚里，她的笑声非常有感染力，总能带给大家欢乐。她配音的角色总是充满了生命力。” —— 某动画导演评价
+            </div>
+        </div>
+        <div class="right-box">
+            <div class="right-box-title">相关词条</div>
+            <ul class="right-box-list">
+                <li><a href="javascript:void(0);">配音演员</a></li>
+                <li><a href="javascript:void(0);">国产动画</a></li>
+                <li><a href="javascript:void(0);">星际追风少年</a></li>
+                <li><a href="javascript:void(0);">咕噜小仙子</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="baike-footer">
+    Copyright &copy; 2026 智搜百科 | <a href="javascript:void(0);">关于智搜百科</a> | <a href="javascript:void(0);">使用帮助</a>
+</div>
+
+<script type="text/javascript">
+    localStorage.setItem('phase2_seen','1');
+    // 监听 storage 变化
+    window.addEventListener('storage', function(e) {
+        window.location.reload();
+    });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

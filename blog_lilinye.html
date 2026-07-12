@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>林间微风的日志 - 李林晔的个人博客</title>
+<style type="text/css">
+    body { margin: 0; padding: 0; background-color: #e3ebd0; font-family: "宋体", SimSun, Arial; font-size: 12px; color: #4b5a32; line-height: 1.8; }
+    a { color: #5a733e; text-decoration: none; }
+    a:hover { text-decoration: underline; color: #3b4e24; }
+    
+    /* 顶部横幅 */
+    #blog-header { height: 180px; background-color: #a4c284; background-image: linear-gradient(135deg, #a4c284 0%, #cbdca5 100%); border-bottom: 4px solid #7c9b5a; display: flex; align-items: center; }
+    .header-content { width: 960px; margin: 0 auto; padding-left: 20px; }
+    .blog-title { font-family: "Microsoft YaHei", sans-serif; font-size: 32px; font-weight: bold; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.15); }
+    .blog-subtitle { font-size: 13px; color: #f0f7e6; margin-top: 8px; font-style: italic; }
+    
+    /* 导航栏 */
+    #blog-nav { height: 35px; background-color: #7c9b5a; }
+    .nav-container { width: 960px; margin: 0 auto; }
+    .nav-list { list-style: none; padding: 0; margin: 0; }
+    .nav-list li { float: left; line-height: 35px; }
+    .nav-list li a { display: block; padding: 0 25px; color: #fff; font-weight: bold; font-size: 13px; }
+    .nav-list li a:hover { background-color: #658145; }
+    
+    /* 主体布局 */
+    #blog-main { width: 960px; margin: 25px auto; display: flex; gap: 25px; }
+    #blog-left { width: 680px; }
+    #blog-right { width: 255px; }
+    
+    /* 博客文章 */
+    .blog-post { background-color: #fff; border: 1px solid #c2d5a7; border-radius: 5px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .post-title { font-family: "Microsoft YaHei", sans-serif; font-size: 18px; font-weight: bold; color: #2e3b1c; border-bottom: 1px dashed #c2d5a7; padding-bottom: 10px; margin-bottom: 15px; }
+    .post-meta { font-size: 11px; color: #8fa374; margin-bottom: 15px; }
+    .post-content { font-size: 13px; color: #3b4e24; text-align: justify; }
+    .post-content p { margin-bottom: 12px; text-indent: 2em; }
+    
+    /* 加密文章样式 */
+    .encrypted-box { background-color: #f5f9f0; border: 1px dashed #a4c284; padding: 20px; border-radius: 4px; text-align: center; margin-top: 10px; }
+    .encrypted-title { font-size: 14px; font-weight: bold; color: #c0392b; margin-bottom: 10px; }
+    .password-input { padding: 5px 10px; border: 1px solid #cbdca5; border-radius: 3px; outline: none; width: 180px; text-align: center; font-size: 12px; }
+    .decrypt-btn { padding: 5px 15px; background-color: #7c9b5a; border: none; color: #fff; font-weight: bold; border-radius: 3px; cursor: pointer; margin-left: 8px; font-size: 12px; }
+    .decrypt-btn:hover { background-color: #658145; }
+    
+    /* 右侧侧边栏 */
+    .sidebar-widget { background-color: #fff; border: 1px solid #c2d5a7; border-radius: 5px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .widget-title { font-family: "Microsoft YaHei", sans-serif; font-size: 13px; font-weight: bold; color: #2e3b1c; border-bottom: 2px solid #7c9b5a; padding-bottom: 6px; margin-bottom: 15px; }
+    .profile-box { text-align: center; }
+    .profile-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 10px; overflow: hidden; border: 2px solid #c8d8a8; }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .profile-name { font-size: 14px; font-weight: bold; color: #2e3b1c; margin-bottom: 5px; }
+    .profile-desc { font-size: 11px; color: #7f8c8d; line-height: 1.5; text-align: left; margin-top: 10px; }
+    
+    .archive-list { list-style: none; padding: 0; margin: 0; }
+    .archive-list li { padding: 6px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; }
+    
+    #blog-footer { text-align: center; color: #7c9b5a; padding: 20px 0; font-size: 11px; border-top: 1px solid #cbdca5; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<!-- 顶部横幅 -->
+<div id="blog-header">
+    <div class="header-content">
+        <div class="blog-title">林间微风的日志</div>
+        <div class="blog-subtitle">记录生活，记录声音，记录每一个美好的瞬间。</div>
+    </div>
+</div>
+
+<!-- 导航栏 -->
+<div id="blog-nav">
+    <div class="nav-container">
+        <ul class="nav-list">
+            <li><a href="javascript:void(0);">博客首页</a></li>
+            <li><a href="javascript:void(0);">我的日志</a></li>
+            <li><a href="javascript:void(0);">相册</a></li>
+            <li><a href="javascript:void(0);">关于我</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- 主体 -->
+<div id="blog-main">
+    <!-- 左侧文章列表 -->
+    <div id="blog-left">
+        <!-- 文章 7 -->
+        <div class="blog-post">
+            <div class="post-title">2023，打算把博客继续写下去</div>
+            <div class="post-meta">发表时间：2023-03-08 20:31:17 | 分类：博客公告 | 阅读(21) | 评论(1)</div>
+            <div class="post-content">
+                <p>好久没更新了。不是没话说，是不知道哪些话还适合放在网上。最近又把博客后台密码改简单了——老毛病，记不住复杂的。</p>
+                <p>打算继续写。写爬山，写钓鱼，写录音棚里那些琐碎的小事。也许多年以后，有人翻到这些字，会觉得：啊，原来那时候，还有人认真生活过。林间微风，还会再吹一阵吧。</p>
+            </div>
+        </div>
+
+        <!-- 文章 6 -->
+        <div class="blog-post">
+            <div class="post-title">疫情那几年，家里安静得能听见时钟走</div>
+            <div class="post-meta">发表时间：2021-11-20 09:15:48 | 分类：碎碎念 | 阅读(34) | 评论(0)</div>
+            <div class="post-content">
+                <p>那几年演出少，在家待了很久。把旧硬盘里没整理完的配音素材翻出来归档，有的项目文件名还是好多年前的日期，听了一遍，没敢再听第二遍。</p>
+                <p>窗外有人遛狗，小孩追着跑。我忽然觉得，能听见这些声音，已经很好了。至于那个梦——偶尔还会做。醒来就泡杯茶，继续过普通的一天。</p>
+            </div>
+        </div>
+
+        <!-- 文章 5 -->
+        <div class="blog-post">
+            <div class="post-title">注销快聊账号之前，我把动态都删了</div>
+            <div class="post-meta">发表时间：2018-09-03 16:44:02 | 分类：生活随笔 | 阅读(56) | 评论(2)</div>
+            <div class="post-content">
+                <p>快聊通知说账号可以注销了。我翻了一遍自己发过的东西，大多是些日常：爬山、吃面、加班、给林老师留言。有一条是 2012 年的，我说「别一个人待着」。现在看，像是对别人说的，也像是对自己说的。</p>
+                <p>删完之后页面空空的。我最后还是没点注销——不知道为什么，总觉得那样做，就像承认有些人真的不会再回来了。博客还留着吧，反正也没几个人看。</p>
+            </div>
+        </div>
+
+        <!-- 文章 4 -->
+        <div class="blog-post">
+            <div class="post-title">录音棚里的春天，和一杯放凉的奶茶</div>
+            <div class="post-meta">发表时间：2015-04-11 21:08:33 | 分类：工作随笔 | 阅读(89) | 评论(5)</div>
+            <div class="post-content">
+                <p>春天来了，录音棚外的玉兰花开了。同事说花香飘进隔音门缝里，像某种不合时宜的温柔。那天我们补录了一段战斗场景的群杂，喊到嗓子哑了，出来在路边买了奶茶，坐在台阶上吹风。</p>
+                <p>忽然想起很多年前，也是这样的傍晚，林老师请大家喝奶茶，说「等成片出来，我们拍一张更大的合照」。后来那张合照，我再也没有见过完整版。奶茶凉了，我还是喝完了。</p>
+            </div>
+        </div>
+
+        <!-- 文章 3 -->
+        <div class="blog-post">
+            <div class="post-title">最近总感觉忘东忘西的...</div>
+            <div class="post-meta">发表时间：2015-08-18 22:15:40 | 分类：碎碎念 | 阅读(215) | 评论(14)</div>
+            <div class="post-content">
+                <p>最近不知道怎么回事，脑子越来越不好使了，老是丢三落四的。前天出门忘了带钥匙，结果在门口等了两个小时等开锁师傅；昨天去超市买东西，付完钱居然把买好的东西落在了收银台，走到半路才想起来折回去拿……今天早上更离谱，明明手里拿着手机，却满屋子转着找手机，还一边找一边念叨，直到不小心按到了音量键才反应过来，真是要被自己给蠢哭了！</p>
+                <p>最让我头疼的是记密码。现在各种论坛、邮箱、博客的账号越来越多，而且每个地方要求的密码格式还不一样，有的要大写字母，有的要特殊符号。我最近连自己的邮箱密码和这个博客的后台密码都老是记错，试了好几次都提示密码错误，最后不得不通过密保问题来重置，折腾得我满头大汗。朋友们老是笑我，说我年纪轻轻的就提前进入老年痴呆了，脑子里装的都是浆糊，真是气死我了！我明明才二十多岁啊，怎么记忆力退化得像个老奶奶一样。</p>
+                <p>没办法，为了防止自己再次被锁在各种账号外面，我只能把所有的密码都统一改成一些最简单的单词。我记得我设的密码是我之前参加制作的那首歌的日期，简单好记，但那首歌叫什么来着？哎，希望我的记忆力能快点恢复正常吧，不然以后出门真的要拿个小本本把所有事情都记下来，或者在脖子上挂个备忘牌了。大家有没有什么增强记忆力的小妙招啊？求推荐，救救孩子吧！</p>
+            </div>
+        </div>
+
+        <!-- 文章 2 (加密) -->
+        <div class="blog-post">
+            <div class="post-title" id="post3-title">【私密日志】一个奇怪的梦（已加密）</div>
+            <div class="post-meta">发表时间：2013-02-03 01:14:22 | 分类：私密日志 | 阅读(0) | 评论(0)</div>
+            <div class="post-content" id="post3-content">
+                <div class="encrypted-box" id="encrypt-area">
+                    <div class="encrypted-title">🔒 该日志已被作者加密，请输入密码查看：</div>
+                    <input type="password" class="password-input" id="blog-pwd" placeholder="请输入密码" />
+                    <button class="decrypt-btn" onclick="checkBlogPassword()">解密</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文章 1 -->
+        <div class="blog-post">
+            <div class="post-title">周末去京郊爬山钓鱼，大自然真的太治愈了</div>
+            <div class="post-meta">发表时间：2009-05-12 19:42:15 | 分类：生活随笔 | 阅读(142) | 评论(8)</div>
+            <div class="post-content">
+                <p>上个周末和几个朋友一起去了京郊的一处山谷。平时在录音棚里待久了，整天面对着冰冷的麦克风和隔音墙，感觉整个人都要发霉了。一走进大自然，呼吸到新鲜的空气，看到满眼的绿色，真的感觉整个人都被治愈了。山里的空气带着泥土和青草的芬芳，和城市里那种混杂着汽车尾气和灰尘的味道完全不同。深吸一口气，感觉肺部都被彻底净化了，连日来配音工作积攒的压力和疲惫也一扫而空。</p>
+                <p>我们在清澈的小溪边扎了营，朋友们在钓鱼，我则在旁边拿着相机到处拍花花草草。山里的野花开得特别灿烂，虽然叫不出名字，但那种生命力真的很让人感动。它们不需要温室的呵护，也不需要人工的浇灌，仅仅凭借着雨露和阳光，就在这乱石嶙峋的山谷里开出了最绚丽的色彩。我用镜头记录下了好几朵野花在微风中摇曳的姿态，那一刻，时间仿佛都慢了下来。</p>
+                <p>下午的时候，在朋友的极力怂恿下，我还尝试着钓了一下鱼。本来以为钓鱼是一件需要极度耐心和定力的枯燥事情，没想到居然真的被我钓上来一条小鲫鱼！当浮漂突然沉下去、鱼线拉紧的那一瞬间，我的心跳都漏了半拍。虽然最后把它放生回了溪水里，但那种激动的成就感真的无法用言语表达。看着它摆动尾巴，迅速消失在清澈见底的溪流中，心里有一种说不出的满足感。</p>
+                <p>晚上躺在帐篷里，听着帐篷外的风声和溪水声，感觉心里特别宁静。没有了城市的喧嚣，没有了电话的打扰，大自然用它最原始、最纯粹的节奏拥抱着我们。这种宁静是如此的奢侈，又是如此的必要。大自然真的有一种神奇的魔力，能让人忘却所有的烦恼和疲惫。以后一定要多抽时间出来走走，不能再整天把自己关在黑漆漆的录音棚或者宅在家里了！身体和灵魂，总要有一个在路上嘛！</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧侧边栏 -->
+    <div id="blog-right">
+        <!-- 个人资料 -->
+        <div class="sidebar-widget">
+            <div class="widget-title">关于我</div>
+            <div class="profile-box">
+                <div class="profile-avatar"><img src="images/lly.png" alt="李林晔" /></div>
+                <div class="profile-name">林间微风</div>
+                <div style="color: #7c9b5a; font-weight: bold;">李林晔</div>
+                <div class="profile-desc">
+                    职业：配音演员<br />
+                    星座：巨蟹座<br />
+                    爱好：大自然、登山、钓鱼、摄影、记录生活<br />
+                    寄语：林间微风，拂过心田。用声音传递温度，用文字记录美好。
+                </div>
+            </div>
+        </div>
+        
+        <!-- 归档 -->
+        <div class="sidebar-widget">
+            <div class="widget-title">日志归档</div>
+            <ul class="archive-list">
+                <li><a href="javascript:void(0);">2023年03月</a> <span>(1)</span></li>
+                <li><a href="javascript:void(0);">2021年11月</a> <span>(1)</span></li>
+                <li><a href="javascript:void(0);">2018年09月</a> <span>(1)</span></li>
+                <li><a href="javascript:void(0);">2015年08月</a> <span>(1)</span></li>
+                <li><a href="javascript:void(0);">2015年04月</a> <span>(1)</span></li>
+                <li><a href="javascript:void(0);">2013年02月</a> <span>(1)</span></li>
+                <li><a href="javascript:void(0);">2009年05月</a> <span>(1)</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="blog-footer">
+    Copyright &copy; 2005-2023. Powered by Sin Blog.
+</div>
+
+<script type="text/javascript">
+    function checkBlogPassword() {
+        var pwd = document.getElementById("blog-pwd").value.trim();
+        if (pwd === "20070203") {
+            alert("解密成功！");
+            localStorage.setItem("blog_private_unlocked", "true");
+
+            // 改变标题
+            document.getElementById("post3-title").innerText = "【私密日志】一个奇怪的梦";
+
+            // 展示内容
+            var contentHtml =
+                "<p>昨晚做了一个非常真实的梦。梦里是一片焦黑的废墟，天空是血红色的，四周充斥着刺鼻的硝烟味。在废墟的中央，站着一只巨大无比的黑色巨龙，它张开双翼，朝我喷射着滚烫的血红色火焰。那火焰的温度是如此真实，我甚至能感觉到皮肤被灼烧的剧烈痛楚，耳边全是狂风和巨龙咆哮的轰鸣声。</p>" +
+                "<p>在梦里我害怕极了，浑身都在发抖，甚至连逃跑的力气都没有。我只能眼睁睁地看着那团铺天盖地的烈焰朝我席卷而来。但就在那团火焰即将把我彻底吞噬的一瞬间，梦里似乎还有另外一个人突然挡在了我的身前。那是一个挺拔而坚毅的背影，手持着一柄散发着耀眼金色光芒的巨剑。他用身体和那柄巨剑替我挡下了所有的烈焰，金色的光芒在黑暗中撑起了一片绝对安全的领域……</p>" +
+                "<p>更奇怪的是，梦里还有一段旋律，一直在耳边回响——那分明就是我们当年一起录的那首主题曲。梦里有个声音告诉我：<b>无论多黑，同伴都会在你身边；我们会用歌声，绘制出对抗黑暗的文字。</b>我醒来的时候，这句话还清清楚楚地刻在脑子里。</p>" +
+                "<p>我说不清这是什么意思。这种感觉太诡异、太让人难过了，甚至让我有想哭的冲动。我明明只是一个普通的配音演员，为什么会做这种仿佛亲身经历过神魔大战一样的梦？我把它原原本本记在这里。也许有一天，我会明白，那个挡在我身前的金色背影，到底是谁。</p>";
+
+            document.getElementById("post3-content").innerHTML = contentHtml;
+        } else {
+            alert("密码错误，解密失败！");
+            document.getElementById("blog-pwd").value = "";
+        }
+    }
+
+    localStorage.setItem('phase2_seen','1');
+    // 监听 storage 变化
+    window.addEventListener('storage', function(e) {
+        window.location.reload();
+    });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

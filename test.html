@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<script type="text/javascript">
+    if (localStorage.getItem("site_collapsed") === "true") {
+        window.location.href = "error.html";
+    }
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>【互动测试】你最像《辉光勇者》里的谁？ - Glow Legend</title>
+<style type="text/css">
+    body { margin: 0; padding: 0; font-family: "宋体", SimSun, Arial; font-size: 12px; color: #333; background-color: #f7f1e3; }
+    #wrapper { width: 960px; margin: 0 auto; background: #fff; border: 1px solid #d4c4a8; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    #header { width: 960px; height: 120px; background: #ffeaa7; text-align: center; line-height: 120px; font-size: 24px; font-weight: bold; color: #d35400; border-bottom: 3px solid #d35400; }
+    #nav { height: 35px; background: #d35400; }
+    #nav li { float: left; line-height: 35px; font-size: 14px; font-weight: bold; list-style: none; }
+    #nav li a { padding: 0 25px; color: #fff; display: block; text-decoration: none; }
+    #nav li a:hover { background: #e67e22; }
+    
+    .content { padding: 30px; }
+    .test-box { border: 1px solid #e0d0b8; background: #faf6f0; padding: 25px; border-radius: 4px; }
+    .box-title { font-size: 16px; font-weight: bold; color: #d35400; border-bottom: 2px solid #d35400; padding-bottom: 8px; margin-bottom: 20px; }
+    
+    /* 阶段视图切换 */
+    .stage { display: none; }
+    .active-stage { display: block; }
+    
+    /* 表单输入样式 */
+    .input-row { margin-bottom: 15px; }
+    .input-row label { display: inline-block; width: 120px; text-align: right; margin-right: 15px; font-weight: bold; font-size: 13px; }
+    .input-row input { width: 220px; padding: 5px; border: 1px solid #ccc; font-size: 13px; }
+    .btn-start, .btn-submit { background: #d35400; color: #fff; border: 1px solid #b34400; padding: 6px 20px; font-weight: bold; font-size: 13px; cursor: pointer; border-radius: 2px; }
+    .btn-start:hover, .btn-submit:hover { background: #e67e22; }
+    
+    /* 题目渲染样式 */
+    .question-card { margin-bottom: 25px; background: #fff; border: 1px solid #e6dec5; padding: 15px; border-radius: 3px; }
+    .q-title { font-size: 13px; font-weight: bold; color: #15428b; margin-bottom: 12px; }
+    .option-list { list-style: none; margin: 0; padding: 0; }
+    .option-list li { padding: 6px 10px; margin-bottom: 5px; border: 1px solid #eee; border-radius: 2px; cursor: pointer; }
+    .option-list li:hover { background: #fff9e6; border-color: #ffd8a8; }
+    .option-list li.selected { background: #ffe3e3; border-color: #fca8a8; font-weight: bold; }
+    
+    .q-textarea { width: 95%; height: 60px; padding: 8px; border: 1px solid #ccc; font-size: 12px; resize: vertical; font-family: "宋体"; }
+    
+    /* 结果展示样式 */
+    .result-name { font-size: 20px; font-weight: bold; color: #d35400; margin-bottom: 15px; text-align: center; }
+    .result-banner { border: 2px solid #d35400; background: #fff2e6; padding: 15px; border-radius: 4px; margin-bottom: 20px; text-align: center; }
+    .result-char { font-size: 18px; font-weight: bold; color: #cc3300; }
+    .tags { margin-top: 8px; }
+    .tag { display: inline-block; background: #d35400; color: #fff; padding: 2px 8px; margin: 0 4px; border-radius: 2px; font-size: 11px; }
+    
+    .analysis-section { margin-top: 15px; line-height: 1.8; text-indent: 2em; font-size: 13px; color: #444; border-top: 1px dashed #e0d0b8; padding-top: 15px; }
+    .quote-box { margin: 15px 0; padding: 10px; border-left: 4px solid #d35400; background: #faf0e6; font-style: italic; font-weight: bold; }
+    .verdict-box { background: #f0fdf4; border: 1px dashed #4ade80; color: #166534; padding: 12px; margin-top: 20px; border-radius: 4px; line-height: 1.6; }
+    
+    #footer { background: #efefef; border-top: 2px solid #d35400; text-align: center; padding: 20px 0; line-height: 2; color: #666; }
+    .clear { clear: both; }
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+    <div id="header">《辉光勇者》动漫互动测试区</div>
+    <div id="nav">
+        <ul>
+            <li><a href="guanwang.html">返回官网首页</a></li>
+            <li><a href="news.html">新闻公告</a></li>
+            <li><a href="test.html">趣味性格测试</a></li>
+            <li><a href="forum.html">官方论坛</a></li>
+        </ul>
+        <div class="clear"></div>
+    </div>
+    
+    <div class="content">
+        <div class="test-box">
+            
+            <!-- 第一阶段：注册阶段 -->
+            <div id="stage-register" class="stage active-stage">
+                <div class="box-title">★ 第一步：输入冒险小队通行证</div>
+                <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">欢迎来到辉光勇者的世界！在踏上净化魔王的旅途前，请留下你的大名，我们将为你注入光明庇佑！</p>
+                
+                <div class="input-row">
+                    <label>你的勇士姓名:</label>
+                    <input type="text" id="user-name" placeholder="请输入你的昵称或姓名" />
+                </div>
+                <div class="input-row">
+                    <label>你的 <strong>oo 邮箱</strong>:</label>
+                    <input type="text" id="user-email" placeholder="请输入你的 oo 邮箱账号" autocomplete="off" />
+                </div>
+                <div id="email-error" style="color:#c0392b; font-size:12px; margin:0 0 12px 135px; display:none;">✖ 邮箱错误：该 oo 邮箱账号不存在，请核对后重试。</div>
+                <div class="input-row" style="padding-top: 10px;">
+                    <label>&nbsp;</label>
+                    <button class="btn-start" onclick="submitRegister()">开始性格能力测试 &gt;&gt;</button>
+                </div>
+            </div>
+            
+            <!-- 第二阶段：测试阶段 -->
+            <div id="stage-quiz" class="stage">
+                <div class="box-title">★ 第二步：辉光勇者 · 心理性格试炼</div>
+                <p style="color: #d35400; font-weight: bold; margin-bottom: 15px;" id="welcome-msg"></p>
+                
+                <div class="question-card">
+                    <div class="q-title">Q1：在被迷雾笼罩的幽暗森林里冒险时迷路了，冒险小队陷入困境，你第一反应会怎么做？</div>
+                    <ul class="option-list" data-q="q1">
+                        <li data-val="A">A. 保持绝对理智，分析日照角度与夜间星象，用罗盘计算出最合理的逃生路线。</li>
+                        <li data-val="B">B. 别想那么多，先凭直觉挑一个方向跑起来！车到山前必有路！</li>
+                        <li data-val="C">C. 害怕得不知所措，紧紧拽着身边同伴的衣角，哭着拜托他们不要丢下自己。</li>
+                        <li data-val="D">D. 默默顶着严寒，在四周寻找安全的扎营避风处，主动承担夜晚守夜盯梢的职责。</li>
+                        <li data-val="E">E. 优雅地从兜里掏出一面镜子整理头发，并顺便变个好玩的恶作剧幻术来逗乐和转移大家紧张的情绪。</li>
+                    </ul>
+                </div>
+                
+                <div class="question-card">
+                    <div class="q-title">Q2：前方突然遭遇了魔王手下凶神恶煞的魔兽挡道，你第一反应是？</div>
+                    <ul class="option-list" data-q="q2">
+                        <li data-val="A">A. 沉着念咒，吟唱高阶星穹法术，精确寻找并打击魔兽的物理和法术弱点。</li>
+                        <li data-val="B">B. 兴奋得摩拳擦掌，立刻拉满风之长弓，在谁都没反应过来之前先射出一箭！</li>
+                        <li data-val="C">C. 哪怕双手都在剧烈发抖，还是努力咬着牙、举起自己那柄沉重的钉头锤努力做出护卫姿态。</li>
+                        <li data-val="D">D. 毫不迟疑地高高举起闪耀着光芒的重盾，牢牢挡在小队的最前线抗下全部伤害。</li>
+                        <li data-val="E">E. 瞬间变出四五个虚无假身让魔兽晕头转向，用最华丽炫酷的假动作大出风头并借机嘲讽。</li>
+                    </ul>
+                </div>
+                
+                <div class="question-card">
+                    <div class="q-title">Q3：当冒险小队因为接下来的行进路线发生了激烈争吵、濒临决裂时，你会扮演什么样的角色？</div>
+                    <ul class="option-list" data-q="q3">
+                        <li data-val="A">A. 默默退到一旁冷眼旁观，不参与毫无逻辑的宣泄，等大家都吵累了再一针见血地指出各自的漏洞。</li>
+                        <li data-val="B">B. 哈哈大笑着在中间插科打诨，说一些天马行空的沙雕俏皮话把大家的注意力转移开。</li>
+                        <li data-val="C">C. 慌慌张张地给每个人递上自己手制的爱心饼干，一边带着委屈的哭腔请求大家不要吵了。</li>
+                        <li data-val="D">D. 一句话也不辩解，默默去帮所有人擦拭保养武器、清点口粮和搭建晚上宿营的帐篷。</li>
+                        <li data-val="E">E. 优雅地端坐在一旁观赏好戏，一边用极尽毒舌而又极其精确的艺术词汇幽默地把每一个人调侃一遍。</li>
+                    </ul>
+                </div>
+                
+                <div class="question-card">
+                    <div class="q-title">Q4：【未来展望】在未来的冒险或者人生旅途之中，你最想成为什么样的角色？</div>
+                    <ul class="option-list" data-q="q4">
+                        <li data-val="A">A. 掌握世间全部真理与至高无上奥秘知识的理智学者。</li>
+                        <li data-val="B">B. 乘着穿林之风、自由自在漂泊探索世界边界的神秘射手。</li>
+                        <li data-val="C">C. 虽然时常胆怯，却被大家深爱着，并能用纯净心灵治愈同伴的可爱精灵。</li>
+                        <li data-val="D">D. 成为他人最坚强、最坚不可摧的铠甲与港湾的温柔守护者。</li>
+                        <li data-val="E">E. 活得张扬精彩、不受一切条条框框束缚、在世间华丽巡演的表演艺术家。</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; padding-top: 10px;">
+                    <button class="btn-submit" onclick="submitQuiz()">验证本源！获取契合角色性格报告 &gt;&gt;</button>
+                </div>
+            </div>
+            
+            <!-- 第三阶段：结果阶段 -->
+            <div id="stage-result" class="stage">
+                <div class="box-title">★ 灵魂印记契合报告</div>
+                
+                <div class="result-name" id="res-user-title"></div>
+                
+                <div class="result-banner">
+                    你与《辉光勇者》中的以下核心角色最为契合：<br />
+                    <span class="result-char" id="res-char-name"></span>
+                    <div class="tags" id="res-tags"></div>
+                </div>
+                
+                <div class="analysis-section">
+                    <strong>🎨 深度性格剖析：</strong><br />
+                    <span id="res-analysis"></span>
+                </div>
+                
+                <div class="quote-box" id="res-quote"></div>
+                
+                <div class="verdict-box" id="res-verdict"></div>
+                
+                <p style="margin-top: 30px; text-align: center;">
+                    <a href="guanwang.html" style="color:#d35400; font-weight:bold; text-decoration:underline;">&lt;&lt; 返回官方网站首页</a>
+                </p>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div id="footer">
+        Copyright &copy; 2007-2008 Glow Legend Animation Studio.<br/>
+        辉光勇者动画制作委员会 版权所有 最佳分辨率 1024*768
+    </div>
+</div>
+
+<script type="text/javascript">
+    var nameInput = document.getElementById("user-name");
+    var userAnswers = { q1: null, q2: null, q3: null, q4: null };
+    var CORRECT_EMAIL = "qwer1234@oo.com";
+    var emailInput = document.getElementById("user-email");
+
+    var lists = document.querySelectorAll(".option-list");
+    for (var i = 0; i < lists.length; i++) {
+        (function(list) {
+            var qKey = list.getAttribute("data-q");
+            var items = list.querySelectorAll("li");
+            for (var j = 0; j < items.length; j++) {
+                items[j].onclick = function() {
+                    for (var k = 0; k < items.length; k++) {
+                        items[k].classList.remove("selected");
+                    }
+                    this.classList.add("selected");
+                    userAnswers[qKey] = this.getAttribute("data-val");
+                };
+            }
+        })(lists[i]);
+    }
+
+    function submitRegister() {
+        var name = nameInput.value.trim();
+        if (!name) {
+            alert("请输入您的勇士姓名！");
+            return;
+        }
+
+        var email = emailInput.value.trim().toLowerCase();
+        var errEl = document.getElementById("email-error");
+        if (email !== CORRECT_EMAIL) {
+            errEl.style.display = "block";
+            emailInput.focus();
+            return;
+        }
+        errEl.style.display = "none";
+
+        localStorage.setItem("test_name", name);
+        localStorage.setItem("player_name", name);
+        localStorage.setItem("player_email", email);
+
+        if (!localStorage.getItem("oo_first_visit")) {
+            localStorage.setItem("oo_first_visit", new Date().toISOString());
+        }
+
+        startQuiz(name);
+    }
+
+    function startQuiz(name) {
+        document.getElementById("stage-register").classList.remove("active-stage");
+        document.getElementById("stage-quiz").classList.add("active-stage");
+        document.getElementById("welcome-msg").innerText = "✨ 尊敬的旅人【" + name + "】，请在以下神圣的意志试炼中，遵循你的直觉进行选择！";
+    }
+
+    function submitQuiz() {
+        if (!userAnswers.q1 || !userAnswers.q2 || !userAnswers.q3 || !userAnswers.q4) {
+            alert("所有性格试炼题均为必选题，请完成所有选择！");
+            return;
+        }
+
+        var counts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+        counts[userAnswers.q1]++;
+        counts[userAnswers.q2]++;
+        counts[userAnswers.q3]++;
+        counts[userAnswers.q4]++;
+
+        var maxVal = "A";
+        var maxCount = 0;
+        for (var key in counts) {
+            if (counts[key] > maxCount) {
+                maxCount = counts[key];
+                maxVal = key;
+            }
+        }
+
+        localStorage.setItem("test_result", maxVal);
+        renderResult(maxVal);
+    }
+
+    // 渲染测试报告结果
+    function renderResult(type) {
+        var name = localStorage.getItem("test_name") || "神秘勇士";
+        
+        document.getElementById("stage-register").classList.remove("active-stage");
+        document.getElementById("stage-quiz").classList.remove("active-stage");
+        document.getElementById("stage-result").classList.add("active-stage");
+        
+        document.getElementById("res-user-title").innerText = "冒险者【" + name + "】的契合本源";
+
+        var charName = "";
+        var tags = [];
+        var analysis = "";
+        var quotes = "";
+        var verdict = "";
+
+        if (type === "A") {
+            charName = "法恩 —— 沉静的星穹";
+            tags = ["完美主义", "过度思考", "外冷内热", "守护者"];
+            analysis = "法恩是那种在任何小组作业里都会默默把最难的活儿揽过去，然后通宵做完的人。他以冷静和理智为盾，完美地执行每一个法术，实则极度恐惧失败。他的毒舌往往是对自己的不满，而非针对他人。他需要的是无条件的信任，而不是“天才”的称赞。";
+            quotes = "口头禅：“我计算过成功率了……大概。” “别乱碰，那是精密的魔法阵列。”";
+            verdict = "【星穹智者·法恩】<br />你是典型的理智派，逻辑严密，值得信赖。只是偶尔要记得，完美不是爱的入场券，偶尔示弱也是一种勇敢。你的洞察力就是最强的辉光。";
+        } else if (type === "B") {
+            charName = "莉亚 —— 穿林之风";
+            tags = ["乐天派", "行动先于思考", "直觉敏锐", "气氛调节器"];
+            analysis = "队伍里的胶水，她的笑声能粘合一切裂痕。莉亚的字典里没有“沮丧”，只有“换个方向试试”。她的冒失源于对世界纯粹的好奇，而她的心比任何人都纯粹。最受不了看别人独自难过，会用笨拙的方法哄你开心。";
+            quotes = "口头禅：“哎呀，先跑起来再说！” “放心，我的弓可比我的脑子准多了！”";
+            verdict = "【穿林之风·莉亚】<br />你是团队的太阳，直觉敏锐，行动力极强。你相信“车到山前必有路”，而这条路往往是你闯出来的。请保持这份赤子之心，它是驱散黑暗的利器。";
+        } else if (type === "C") {
+            charName = "小满 —— 未绽的圣光";
+            tags = ["软萌团宠", "潜在强者", "治愈系（物理）", "依赖体质"];
+            analysis = "外表软糯好捏，内心却意外地倔强。因为能力不足而极度缺乏安全感，所以总是紧紧跟着哥哥姐姐们。她的“治疗”很疼但很管用，最大的恐惧是被队伍丢下。她不是不知道自己的钉头锤很重，但那是她唯一能保护大家的方式。";
+            quotes = "口头禅：“呜…这个药不苦的，真的！” “我、我也是有用的！”";
+            verdict = "【未绽圣光·小满】<br />你或许觉得自己弱小又爱哭，但你拥有团队中最稀缺的能力——共情与无法被污染的纯净。你害怕的、焦虑的地方，恰好藏着你尚未察觉的巨大力量。";
+        } else if (type === "D") {
+            charName = "格雷特 —— 流浪的巨盾";
+            tags = ["沉默寡言", "牺牲精神", "铁汉柔情", "方向痴"];
+            analysis = "他可以面不改色地挡住滚落的巨石，却会在给小满编花环时手伴手乱。从不谈论自己的过去，只会用行动说“有我在”。他性格里最大的缺陷是：太不把自己当回事，总认为自己只是块盾牌，而非有血有肉的人。";
+            quotes = "口头禅：(默默守护，无声注视其背影)";
+            verdict = "【沉默巨盾·格雷特】<br />你习惯把责任和伤痛都埋在心里，用行动表达爱。你的温柔是深沉的，哪怕不被理解。请相信，你从来不是道具，你是大家不可或缺的铠甲。";
+        } else if (type === "E") {
+            charName = "虚饰的萨利耶";
+            tags = ["毒舌自恋", "演技派", "渴望关注", "恶作剧大师"];
+            analysis = "比起杀死勇者，他更沉迷于用幻术制造各种社会性死亡的尴尬场景来戏耍队伍。他的攻击性源于极度的孤独，绑架人质只是为了有人能看着他演戏。本质上是个傲娇，被打败后会气急败坏地放狠话，但下次还是会放水。";
+            quotes = "口头禅：(拿出魔镜)“在我的剧本里，你们甚至不配做背景板呢。”";
+            verdict = "【虚饰之镜·萨利耶】<br />你热衷于活得精彩漂亮，讨厌无聊和庸俗。你的“表演”是保护色，其实你比谁都渴望被真正看见。放下镜子的时候，或许能交到意想不到的朋友。";
+        }
+
+        document.getElementById("res-char-name").innerText = charName;
+        
+        var tagsEl = document.getElementById("res-tags");
+        tagsEl.innerHTML = "";
+        for (var i = 0; i < tags.length; i++) {
+            tagsEl.innerHTML += '<span class="tag">' + tags[i] + '</span>';
+        }
+        
+        document.getElementById("res-analysis").innerText = analysis;
+        document.getElementById("res-quote").innerText = quotes;
+        document.getElementById("res-verdict").innerHTML = verdict;
+    }
+
+    // 首次载入拦截，若测过则强制直达结果
+    window.onload = function() {
+        var completedType = localStorage.getItem("test_result");
+        if (completedType) {
+            renderResult(completedType);
+        } else {
+            var savedName = localStorage.getItem("test_name");
+            if (savedName) {
+                nameInput.value = savedName;
+            }
+            nameInput.focus();
+        }
+    };
+
+    // 如果该页面是打开的状态，当LocalStorage发生变化时强制进行刷新
+    window.addEventListener('storage', function(e) {
+        window.location.reload();
+    });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

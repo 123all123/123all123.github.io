@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="智搜工具中心：图像、音频、编码与密码学小工具集合。" />
+<title>智搜工具中心</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI","Microsoft YaHei",Arial,sans-serif; background: #f5f7fb; color: #333; min-height: 100vh; }
+  .top { background: #fff; border-bottom: 1px solid #ebebeb; padding: 14px 24px; display: flex; align-items: center; gap: 20px; }
+  .logo { font-size: 22px; font-weight: bold; color: #3385ff; cursor: pointer; }
+  .top-sub { font-size: 13px; color: #888; }
+  .wrap { max-width: 920px; margin: 32px auto; padding: 0 20px 48px; }
+  h1 { font-size: 24px; color: #222; margin-bottom: 8px; }
+  .intro { color: #666; font-size: 14px; line-height: 1.8; margin-bottom: 20px; }
+  .search-box { display: flex; gap: 10px; margin-bottom: 12px; }
+  .search-input {
+    flex: 1;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #d9dfea;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  }
+  .search-input:focus { border-color: #3385ff; box-shadow: 0 0 0 2px rgba(51,133,255,.12); }
+  .search-btn {
+    height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    background: #3385ff;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .search-btn:hover { background: #2b74e6; }
+  .search-stats { font-size: 13px; color: #666; margin-bottom: 18px; min-height: 20px; }
+  .search-stats em { color: #c00; font-style: normal; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+  .tool-card { background: #fff; border: 1px solid #e3e7ee; border-radius: 12px; padding: 20px; transition: box-shadow .2s, border-color .2s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+  .tool-card:hover { border-color: #3385ff; box-shadow: 0 6px 20px rgba(51,133,255,.12); }
+  .tool-card .ico { font-size: 28px; margin-bottom: 10px; }
+  .tool-card h2 { font-size: 16px; color: #222; margin-bottom: 8px; }
+  .tool-card p { font-size: 13px; color: #666; line-height: 1.7; }
+  .tool-card .tag { display: inline-block; margin-top: 12px; font-size: 11px; color: #3385ff; background: #eef4ff; padding: 3px 8px; border-radius: 4px; }
+  .no-results { background: #fff; border: 1px dashed #d9dfea; border-radius: 12px; padding: 28px; text-align: center; color: #888; font-size: 14px; }
+  a.back { color: #3385ff; font-size: 13px; text-decoration: none; }
+  a.back:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo" onclick="location.href='find.html'">智搜</div>
+  <span class="top-sub">工具中心</span>
+</div>
+<div class="wrap">
+  <h1>智搜工具</h1>
+  <p class="intro">面向搜索、解谜与多媒体分析的小工具集合。部分工具需通过下方搜索或智搜检索关键词后才会出现。</p>
+
+  <div class="search-box">
+    <input type="text" id="tool-search-input" class="search-input" autocomplete="off" placeholder="搜索工具名称或关键词" />
+    <button type="button" id="tool-search-btn" class="search-btn">搜索</button>
+  </div>
+  <div class="search-stats" id="search-stats"></div>
+
+  <div class="grid" id="tool-grid"></div>
+  <p style="margin-top:28px;"><a class="back" href="find.html">&larr; 返回智搜首页</a></p>
+</div>
+<script>
+  const toolData = [
+    {
+      keywords: ["音频", "频谱", "声音", "隐写", "歌声", "spectrogram", "视频"],
+      ico: "🎵",
+      title: "音频频谱查看",
+      desc: "上传音频或视频，从视频中提取音轨并生成频谱图，用于发现声音中隐藏的图案与文字。",
+      tag: "音频 · 隐写",
+      url: "tools_audio.html"
+    },
+    {
+      keywords: ["rgb", "颜色", "通道", "图像", "图片", "红绿蓝", "滤镜"],
+      ico: "🎨",
+      title: "RGB 颜色通道分离",
+      desc: "分离图像的红、绿、蓝单通道，查看各通道灰度分布，常用于图像隐写分析。",
+      tag: "图像",
+      url: "tools_rgb.html"
+    },
+    {
+      keywords: ["零宽", "零宽隐写", "zwsp", "文本", "不可见", "隐写", "文字"],
+      ico: "👁",
+      title: "零宽隐写提取",
+      desc: "从看似普通的文本中检测并提取零宽字符里隐藏的编码信息。",
+      tag: "文本 · 隐写",
+      url: "tools_zwsp.html",
+      listed: false
+    },
+    {
+      keywords: ["异或", "xor", "十六进制", "密码", "密钥", "hex"],
+      ico: "⊕",
+      title: "十六进制异或 (XOR)",
+      desc: "多个十六进制字符串按位异或，支持 UTF-8 解码，用于密钥拼接与还原。",
+      tag: "编码 · 密码",
+      url: "tools_xor.html",
+      listed: false
+    },
+    {
+      keywords: ["摩斯", "摩斯密码", "morse", "点划", "电报码"],
+      ico: "📡",
+      title: "摩斯密码解码",
+      desc: "将摩斯点划序列解码为英文字母，字母与单词之间均以空格分隔。",
+      tag: "编码",
+      url: "tools_morse.html"
+    },
+    {
+      keywords: ["base64", "解码", "编码", "base64解码"],
+      ico: "🔤",
+      title: "Base64 解码",
+      desc: "将 Base64 编码字符串解码为可读文本，支持自动识别填充与常见变体。",
+      tag: "编码",
+      url: "tools_base64.html"
+    },
+    {
+      keywords: ["十六进制", "hex", "字符串", "转文字", "hex转字符串"],
+      ico: "🔢",
+      title: "十六进制转字符串",
+      desc: "将十六进制字节序列按 UTF-8 解码为可读字符串，便于阅读密钥与密文。",
+      tag: "编码",
+      url: "tools_hexstr.html"
+    }
+  ];
+
+  const grid = document.getElementById("tool-grid");
+  const stats = document.getElementById("search-stats");
+  const input = document.getElementById("tool-search-input");
+  const btn = document.getElementById("tool-search-btn");
+
+  function normalize(s) {
+    return (s || "").trim().toLowerCase();
+  }
+
+  function matchTool(item, keyword) {
+    const q = normalize(keyword);
+    if (!q) return true;
+    return item.keywords.some(kw => normalize(kw) === q)
+      || normalize(item.title).includes(q)
+      || normalize(item.desc).includes(q)
+      || normalize(item.tag).includes(q);
+  }
+
+  function renderTools(list, keyword) {
+    grid.innerHTML = "";
+    const q = keyword.trim();
+    const visibleCount = toolData.filter(item => item.listed !== false).length;
+    if (!q) {
+      stats.textContent = "共 " + visibleCount + " 个工具可直接使用，更多工具请尝试搜索";
+      list = list.filter(item => item.listed !== false);
+    } else if (list.length === 0) {
+      stats.innerHTML = "未找到与「<em>" + q + "</em>」相关的工具";
+      const empty = document.createElement("div");
+      empty.className = "no-results";
+      empty.textContent = "未找到匹配的工具，请换关键词重试";
+      grid.appendChild(empty);
+      return;
+    } else {
+      stats.innerHTML = "为您找到与「<em>" + q + "</em>」相关的 " + list.length + " 个工具";
+    }
+
+    list.forEach(item => {
+      const card = document.createElement("a");
+      card.className = "tool-card";
+      card.href = item.url;
+      card.innerHTML =
+        '<div class="ico">' + item.ico + '</div>' +
+        '<h2>' + item.title + '</h2>' +
+        '<p>' + item.desc + '</p>' +
+        '<span class="tag">' + item.tag + '</span>';
+      grid.appendChild(card);
+    });
+  }
+
+  function doSearch() {
+    const keyword = input.value.trim();
+    const matched = toolData.filter(item => matchTool(item, keyword));
+    renderTools(matched, keyword);
+  }
+
+  btn.addEventListener("click", doSearch);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") doSearch(); });
+  input.addEventListener("input", () => {
+    if (!input.value.trim()) doSearch();
+  });
+
+  renderTools(toolData.filter(item => item.listed !== false), "");
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

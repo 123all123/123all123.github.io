@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="快聊 - 记录生活的社交空间。用户「一道光」的个人主页。" />
+<title>一道光 的快聊主页 · 快聊</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei",Arial,sans-serif; background: #eceff4; color: #333; font-size: 13px; }
+  a { color: #e8862b; text-decoration: none; } a:hover { text-decoration: underline; }
+  #top { height: 48px; background: #ff9a3c; display: flex; align-items: center; padding: 0 24px; color: #fff; }
+  #top .brand { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+  #top .brand small { font-size: 11px; opacity: .85; font-weight: normal; margin-left: 6px; }
+  .wrap { max-width: 900px; margin: 18px auto; display: flex; gap: 18px; padding: 0 12px; }
+  .left { width: 250px; }
+  .right { flex: 1; }
+  .card { background: #fff; border: 1px solid #e3e7ee; border-radius: 8px; margin-bottom: 16px; }
+  .profile { padding: 20px; text-align: center; }
+  .avatar { width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 10px; overflow: hidden; border: 2px solid #ffcf5c; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .post .ph .mini { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+  .post .ph .mini img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+  .uname { font-size: 18px; font-weight: bold; }
+  .bio { color: #7a828e; font-size: 12px; line-height: 1.8; margin-top: 10px; text-align: left; }
+  .bio b { color: #555; }
+  .stats { display: flex; justify-content: space-around; border-top: 1px solid #eef1f5; margin-top: 14px; padding-top: 12px; }
+  .stats div { font-size: 12px; color: #7a828e; } .stats b { display: block; color: #333; font-size: 15px; }
+  .post { padding: 16px 18px; border-bottom: 1px solid #eef1f5; }
+  .post:last-child { border-bottom: none; }
+  .post .ph { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .post .ph .t { font-size: 12px; color: #999; }
+  .post .body { line-height: 1.9; color: #333; }
+  .post .imgph { margin-top: 10px; overflow: hidden; border-radius: 6px; max-width: 360px; }
+  .post .imgph img { width: 100%; max-width: 360px; height: 200px; object-fit: cover; object-position: center; border-radius: 6px; display: block; }
+  .profile .album img { width: 100%; height: 80px; object-fit: cover; object-position: center; border-radius: 4px; }
+  .post .ops { margin-top: 10px; color: #9aa2ae; font-size: 12px; }
+  .post .ops span { cursor: pointer; margin-right: 18px; } .post .ops span:hover { color: #e8862b; }
+  .post .ops span.liked { color: #e8862b; }
+  .comments { display: none; margin-top: 12px; background: #f7f8fa; border-radius: 8px; padding: 10px 14px; }
+  .comments .c { padding: 7px 0; border-bottom: 1px dashed #e6e9ee; font-size: 12px; line-height: 1.7; }
+  .comments .c:last-child { border-bottom: none; }
+  .comments .cu { font-weight: bold; color: #5b7cb5; }
+  a.cu { color: #5b7cb5; text-decoration: none; cursor: pointer; }
+  a.cu:hover { text-decoration: underline; color: #3a5f9e; }
+  .post .ph b a { color: inherit; text-decoration: none; }
+  .post .ph b a:hover { color: #e8862b; }
+  .comments .ct { color: #b0b6bf; font-size: 11px; margin-left: 6px; }
+  .c-red .cu, .c-red span { color: #d40000 !important; }
+  .c-red .txt { color: #ff2d2d; font-weight: bold; }
+  .sec-title { padding: 12px 16px; font-weight: bold; color: #555; border-bottom: 1px solid #eef1f5; }
+</style>
+</head>
+<body>
+<div id="top"><span class="brand">快聊<small>KuaiLiao · 记录生活的每一道光</small></span></div>
+
+<div class="wrap">
+  <div class="left">
+    <div class="card profile">
+      <div class="avatar"><img src="images/lgm.png" alt="一道光" /></div>
+      <div class="uname">一道光</div>
+      <div class="bio">
+        <b>签名：</b>做一部能照进孩子心里的动画。<br/>
+        <b>邮箱：</b>linguangming@oo.com<br/>
+        <b>加入：</b>2003 年春
+      </div>
+      <div class="stats">
+        <div><b>247</b>动态</div><div><b>1.2k</b>关注</div><div><b>3.4k</b>粉丝</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec-title">TA 的相册</div>
+      <div style="padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <img src="images/kl_album1.png" width="100" height="80" alt="工作室日常照" />
+        <img src="images/kl_album2.png" width="100" height="80" alt="手绘分镜照" />
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="card">
+      <div class="sec-title">全部动态（按时间倒序）</div>
+
+      <!-- 2012 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2012-06-14 23:57</div></div></div>
+        <div class="body">
+          灯又坏了。我坐在空荡荡的工作室里，忽然觉得很好笑。<br/>
+          这些年我一直告诉别人，也告诉自己：只要努力，只要善良，好的结局总会来的。<br/>
+          可是没有。什么都没有来。<br/>
+          我大概终于想明白了——所谓希望，也许只是一种伪善。是我们不敢面对真相时，编给自己听的谎。
+        </div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 1</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_weifeng.html" class="cu">林间微风</a><span class="ct">2012-06-14 23:59</span><br/>
+            老师，别一个人待着了，明天我去看你，我们一起吃点热的，好不好？有什么事，一定要跟我说一声。</div>
+        </div>
+      </div>
+
+      <!-- 2011 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2011-11-03 01:42</div></div></div>
+        <div class="body">又加班到一点多。工作室只剩我一个人，窗外下着小雨，绘图板的光映在玻璃上，像一层薄薄的雾。<br/>泡了杯速溶咖啡，苦得皱眉，但还是喝完了。明天还要跟制片方开会，得把分镜再修一版。</div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 3</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_xingkong.html" class="cu">星空法师</a><span class="ct">2011-11-03 08:15</span><br/>老林你又熬夜？注意身体啊，动画是做不完的。</div>
+          <div class="c"><a href="kuailiao_weifeng.html" class="cu">林间微风</a><span class="ct">2011-11-03 09:30</span><br/>我给你带了早饭放在门口，记得拿。</div>
+          <div class="c"><span class="cu">阿泽</span><span class="ct">2011-11-03 10:02</span><br/>雨夜加班配咖啡，文艺青年标配哈哈</div>
+        </div>
+      </div>
+
+      <!-- 2010 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2010-08-18 19:20</div></div></div>
+        <div class="body">出差去外地谈合作，对方办公室挂着一幅山水画，说是名家真迹。我盯着看了半天，脑子里想的却是怎么把云层的渐变画进背景里。<br/>职业病没救了。🚄</div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 2</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><span class="cu">小林</span><span class="ct">2010-08-18 20:05</span><br/>林导出差还想着画画，敬业！</div>
+          <div class="c"><span class="cu">老周</span><span class="ct">2010-08-18 21:18</span><br/>谈合作顺利吗？回来请吃饭</div>
+        </div>
+      </div>
+
+      <!-- 2009 密码习惯 -->
+      <div class="post" id="post-pwd">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2009-07-15 20:33</div></div></div>
+        <div class="body">又有人说我的密码太简单了。可我向来喜欢把各种账号的密码都设成自己的出生日期，好记，不容易忘。<br/>邮箱、后台、快聊……能统一就统一。大家别笑我啊。😅</div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 3</span><span onclick="like(this)">👍 赞 12</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_xingkong.html" class="cu">星空法师</a><span class="ct">2009-07-15 20:48</span><br/>哈哈，我也喜欢。</div>
+          <div class="c"><span class="cu">阿泽</span><span class="ct">2009-07-15 21:05</span><br/>是不是不太安全……</div>
+          <div class="c"><a href="kuailiao_linguangming.html" class="cu">一道光</a><span class="ct">2009-07-15 21:18</span><br/>@阿泽 我之后注意修改一下 😅</div>
+        </div>
+      </div>
+
+      <!-- 2009 劳动节 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2009-05-01 11:00</div></div></div>
+        <div class="body">劳动节，别人放假，我在工作室赶进度。走廊里静悄悄的，只有空调嗡嗡响。<br/>打开窗户，闻到楼下槐花香味飘上来，忽然觉得——也挺好的。至少还有东西值得赶。</div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 5</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_xingkong.html" class="cu">星空法师</a><span class="ct">2009-05-01 12:30</span><br/>我也在加班，咱俩作伴。中午一起吃？</div>
+          <div class="c"><a href="kuailiao_weifeng.html" class="cu">林间微风</a><span class="ct">2009-05-01 13:15</span><br/>辛苦了老师，注意别太累。</div>
+          <div class="c"><span class="cu">FH_一纸江湖</span><span class="ct">2009-05-01 13:40</span><br/>槐花开了啊，改天我写进书里当一章开头～</div>
+          <div class="c"><span class="cu">阿泽</span><span class="ct">2009-05-01 14:00</span><br/>槐花开了？想去看看</div>
+          <div class="c"><a href="kuailiao_linguangming.html" class="cu">一道光</a><span class="ct">2009-05-01 14:22</span><br/>星空法师，行，老地方见。</div>
+        </div>
+      </div>
+
+      <!-- 2008 圣诞 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2008-12-24 22:10</div></div></div>
+        <div class="body">平安夜。组里几个人凑钱买了棵小圣诞树摆在茶水间，彩灯一闪一闪的，像小时候看的进口动画片里的场景。<br/>大家笑着合了张影，我说等成片出来再拍一张更大的。🎄</div>
+        <div class="imgph"><img src="images/kl_xmas.png" width="300" height="200" alt="茶水间小圣诞树" /></div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 3</span><span onclick="like(this)">👍 赞 42</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_weifeng.html" class="cu">林间微风</a><span class="ct">2008-12-24 22:35</span><br/>圣诞快乐！照片里你笑得好开心～</div>
+          <div class="c"><span class="cu">小林</span><span class="ct">2008-12-25 09:00</span><br/>林导圣诞快乐！明年一定会更好的！</div>
+          <div class="c"><span class="cu">老周</span><span class="ct">2008-12-25 10:15</span><br/>圣诞树不错，明年换棵大的</div>
+        </div>
+      </div>
+
+      <!-- 2008 日常 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2008-04-02 12:20</div></div></div>
+        <div class="body">中午和同事去吃了家新开的面馆，招牌是酸汤肥牛。就是排队排了四十分钟……不过味道确实对得起这四十分钟。🍜</div>
+        <div class="imgph"><img src="images/kl_noodle.png" width="360" height="200" alt="面馆酸汤肥牛照片" /></div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 2</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><span class="cu">阿泽</span><span class="ct">2008-04-02 12:40</span><br/>下次带上我！</div>
+          <div class="c"><span class="cu">小林</span><span class="ct">2008-04-02 13:02</span><br/>看着就流口水了哈哈</div>
+        </div>
+      </div>
+
+      <!-- 2007 秋日散步 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2007-09-20 17:45</div></div></div>
+        <div class="body">下班路上经过公园，银杏叶黄了一大片，阳光穿过来金灿灿的。站那儿看了五分钟，差点错过公交。<br/>秋天真好，让人想慢下来。🍂</div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 2</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_xingkong.html" class="cu">星空法师</a><span class="ct">2007-09-20 18:20</span><br/>这景色可以当背景参考，下次一起去拍点素材？</div>
+          <div class="c"><span class="cu">阿泽</span><span class="ct">2007-09-20 19:05</span><br/>银杏季最舒服了，羡慕</div>
+        </div>
+      </div>
+
+      <!-- 2007 策划启动（关键） -->
+      <div class="post" id="post-plan">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2007-01-08 09:15</div></div></div>
+        <div class="body">
+          决定了。酝酿了这么多年的企划，今天正式启动——《辉光勇者》。<br/>
+          我想做一个关于"希望"的故事：哪怕世界再黑，只要有人愿意举起那把剑，光就不会灭。<br/>
+          把身家都压上去了，有点怕，但更多的是激动。加油吧，我。✊
+        </div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 4</span><span onclick="like(this)">👍 赞 88</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_xingkong.html" class="cu">星空法师</a><span class="ct">2007-01-08 10:02</span><br/>
+            恭喜老林！这一天等太久了，我陪你把它做出来。🌟</div>
+          <div class="c"><a href="kuailiao_weifeng.html" class="cu">林间微风</a><span class="ct">2007-01-08 11:30</span><br/>老师加油！我们都会在背后支持你的！</div>
+          <div class="c"><span class="cu">阿泽</span><span class="ct">2007-01-08 12:15</span><br/>终于启动了！期待成片！</div>
+          <div class="c c-red"><span class="cu">？？？</span><span class="ct" id="red-time"></span><br/>
+            <span class="txt">希望……真的必要存在吗？</span></div>
+        </div>
+      </div>
+
+      <!-- 2006 生日 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2006-06-06 21:30</div></div></div>
+        <div class="body">今天生日。三十四岁了。朋友们凑钱给我买了块大蛋糕，还起哄让我许愿。<br/>我说愿望不能说出来——其实我许的是：希望有一天，我做的动画能被很多很多人记住。🎂</div>
+        <div class="imgph"><img src="images/kl_cake.png" width="320" height="200" alt="生日蛋糕照片，蜡烛写着34" /></div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 3</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_xingkong.html" class="cu">星空法师</a><span class="ct">2006-06-06 21:45</span><br/>生日快乐！6 月 6 日，好记的日子。🎉</div>
+          <div class="c"><a href="kuailiao_weifeng.html" class="cu">林间微风</a><span class="ct">2006-06-06 22:10</span><br/>老师生日快乐～愿望一定会实现的！</div>
+          <div class="c"><span class="cu">老周</span><span class="ct">2006-06-06 22:33</span><br/>34 啦？岁月不饶人啊哈哈</div>
+        </div>
+      </div>
+
+      <!-- 2005 酷暑 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2005-07-20 15:30</div></div></div>
+        <div class="body">四十一度。工作室空调坏了，大家轮流去小卖部买冰棍，一边舔一边改稿。<br/>小满的原型同事说"再热也要把线画直"——这话我记到现在。🍦</div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 3</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_weifeng.html" class="cu">林间微风</a><span class="ct">2005-07-20 16:10</span><br/>哈哈哈画直线那个是我说的吧！</div>
+          <div class="c"><span class="cu">小林</span><span class="ct">2005-07-20 17:00</span><br/>空调修好了没啊，别中暑了</div>
+          <div class="c"><span class="cu">老周</span><span class="ct">2005-07-20 18:30</span><br/>那年夏天确实热，冰棍救了一命</div>
+        </div>
+      </div>
+
+      <!-- 2003 起点 -->
+      <div class="post">
+        <div class="ph"><span class="mini"><img src="images/lgm.png" alt="" /></span><div><b><a href="kuailiao_linguangming.html">一道光</a></b><div class="t">2003-03-21 18:00</div></div></div>
+        <div class="body">注册了这个快聊。以后就在这里记录做动画的日子吧。<br/>今天买了新的绘图板，手有点抖，激动的。第一步，总要迈出去。</div>
+        <div class="ops"><span onclick="tog(this)">💬 评论 1</span><span onclick="like(this)">👍 赞</span></div>
+        <div class="comments">
+          <div class="c"><a href="kuailiao_xingkong.html" class="cu">星空法师</a><span class="ct">2003-03-22 09:00</span><br/>一起加油！</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function tog(el) {
+    var box = el.closest(".post").querySelector(".comments");
+    box.style.display = box.style.display === "block" ? "none" : "block";
+  }
+  function like(el) {
+    if (el.classList.contains("liked")) return;
+    el.classList.add("liked");
+    var t = el.textContent.trim();
+    var m = t.match(/(\d+)/);
+    el.textContent = m ? "👍 赞 " + (parseInt(m[1], 10) + 1) : "👍 赞 1";
+  }
+  // 红色颤抖评论的时间 = 玩家打开页面的当前时间
+  (function () {
+    var n = new Date();
+    function p(x){return ("0"+x).slice(-2);}
+    document.getElementById("red-time").textContent =
+      n.getFullYear() + "-" + p(n.getMonth()+1) + "-" + p(n.getDate()) + " " + p(n.getHours()) + ":" + p(n.getMinutes());
+  })();
+</script>
+<script src="js/placeholder.js"></script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

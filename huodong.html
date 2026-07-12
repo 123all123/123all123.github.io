@@ -1,0 +1,800 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<script src="js/page-shell.js"></script>
+<script type="text/javascript">
+    if (localStorage.getItem("site_collapsed") === "true" && localStorage.getItem("admin_activity_access") !== "true") {
+        window.location.href = "error.html";
+    }
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>【官方活动】莉亚的射击挑战 - 《辉光勇者》</title>
+<style type="text/css">
+    body { margin: 0; padding: 0; font-family: "宋体", SimSun, Arial; font-size: 12px; color: #333; background-color: #f7f1e3; transition: background-color 0.5s ease; }
+    #wrapper { width: 960px; margin: 0 auto; background: #fff; border: 1px solid #d4c4a8; box-shadow: 0 0 5px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+    #header { width: 960px; height: 120px; background: #ffeaa7; text-align: center; line-height: 120px; font-size: 24px; font-weight: bold; color: #d35400; border-bottom: 3px solid #d35400; }
+    #nav { height: 35px; background: #d35400; }
+    #nav ul { margin: 0; padding: 0; list-style: none; }
+    #nav li { float: left; line-height: 35px; font-size: 14px; font-weight: bold; }
+    #nav li a { padding: 0 25px; color: #fff; display: block; text-decoration: none; }
+    #nav li a:hover { background: #e67e22; }
+    
+    .content { padding: 30px; position: relative; }
+    .activity-box { border: 1px solid #e0d0b8; background: #faf6f0; padding: 25px; border-radius: 4px; text-align: center; position: relative; min-height: 520px; }
+    .box-title { font-size: 18px; font-weight: bold; color: #d35400; border-bottom: 2px solid #d35400; padding-bottom: 8px; margin-bottom: 20px; text-align: left; }
+    
+    /* Flash 播放器外壳样式 */
+    #flash-player-wrapper {
+        width: 600px;
+        margin: 0 auto;
+        background: #e0e0e0;
+        border: 4px solid #808080;
+        border-radius: 4px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        display: none;
+        overflow: hidden;
+    }
+    .flash-titlebar {
+        height: 24px;
+        background: linear-gradient(to bottom, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+        color: #fff;
+        font-family: Tahoma, Arial, sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 8px;
+        border-bottom: 1px solid #15428b;
+        user-select: none;
+    }
+    .flash-titlebar-btn {
+        display: flex;
+        gap: 2px;
+    }
+    .flash-btn {
+        width: 16px;
+        height: 14px;
+        background: #f0f0f0;
+        border: 1px solid #808080;
+        border-radius: 2px;
+        font-size: 9px;
+        color: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+    .flash-btn:hover {
+        background: #e0e0e0;
+    }
+    .flash-menubar {
+        height: 20px;
+        background: #f0f0f0;
+        border-bottom: 1px solid #d0d0d0;
+        display: flex;
+        gap: 12px;
+        padding: 0 10px;
+        align-items: center;
+        color: #000;
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        user-select: none;
+        text-align: left;
+    }
+    .flash-menubar span {
+        cursor: pointer;
+    }
+    .flash-menubar span:hover {
+        background: #3399ff;
+        color: #fff;
+        padding: 0 4px;
+        margin: 0 -4px;
+    }
+    .flash-controlbar {
+        height: 24px;
+        background: #f0f0f0;
+        border-top: 1px solid #d0d0d0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        font-size: 11px;
+        color: #666;
+        user-select: none;
+    }
+    .flash-controls-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .flash-play-icon {
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-left: 8px solid #4caf50;
+        border-bottom: 5px solid transparent;
+        cursor: pointer;
+    }
+    .flash-stop-icon {
+        width: 8px;
+        height: 8px;
+        background: #f44336;
+        cursor: pointer;
+    }
+
+    /* 游戏区域样式 */
+    #game-area { width: 600px; height: 450px; margin: 0 auto; background: #81c784; position: relative; overflow: hidden; display: none; }
+    
+    /* 游戏内鼠标指针 - 准星 */
+    #game-area, #game-area * {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="%23ff3333" stroke-width="2"/><line x1="16" y1="0" x2="16" y2="32" stroke="%23ff3333" stroke-width="2"/><line x1="0" y1="16" x2="32" y2="16" stroke="%23ff3333" stroke-width="2"/></svg>') 16 16, crosshair !important;
+    }
+
+    /* 3x3 洞穴网格 */
+    .grid-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 20px; width: 450px; height: 350px; margin: 50px auto 0 auto; transition: all 0.2s ease; }
+    .hole { position: relative; width: 120px; height: 90px; background: #3e2723; border-radius: 50% / 40%; overflow: hidden; box-shadow: inset 0 10px 20px rgba(0,0,0,0.8); border: 3px solid #2d1510; transition: all 0.2s ease; }
+    
+    /* 史莱姆怪物 */
+    .slime { position: absolute; width: 90px; height: 90px; left: 15px; bottom: -90px; background: #4caf50; border-radius: 50% 50% 30% 30%; transition: bottom 0.12s ease-out; display: flex; justify-content: center; align-items: center; font-family: Arial, sans-serif; font-size: 28px; font-weight: bold; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.6); box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2), inset 5px 5px 10px rgba(255,255,255,0.4); user-select: none; -webkit-user-select: none; }
+    .slime.up { bottom: 5px; }
+    
+    /* 史莱姆眼睛 */
+    .slime .eye { position: absolute; width: 10px; height: 10px; background: #000; border-radius: 50%; top: 25px; transition: all 0.2s; }
+    .slime .eye.left { left: 25px; }
+    .slime .eye.right { right: 25px; }
+    
+    /* 史莱姆腮红 */
+    .slime .blush { position: absolute; width: 12px; height: 6px; background: #ff8a80; border-radius: 50%; top: 38px; }
+    .slime .blush.left { left: 18px; }
+    .slime .blush.right { right: 60px; }
+
+    /* 游戏状态栏 */
+    .game-status { display: flex; justify-content: space-between; padding: 10px 20px; background: #3e2723; color: #fff; font-size: 16px; font-weight: bold; border-bottom: 4px solid #2d1510; }
+    .status-item { display: flex; align-items: center; }
+    .status-val { color: #ffeb3b; margin-left: 5px; font-family: monospace; font-size: 18px; }
+
+    /* 开始界面 */
+    #start-screen { padding: 30px; text-align: center; }
+    .start-title { font-size: 24px; font-weight: bold; color: #d35400; margin-bottom: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+    
+    /* 生动优美的介绍排版 */
+    .intro-container { max-width: 680px; margin: 0 auto 30px auto; background: #fff; border: 1px solid #e0d0b8; border-radius: 8px; padding: 25px; box-shadow: 0 4px 10px rgba(211,84,0,0.05); text-align: left; }
+    .intro-section { margin-bottom: 15px; }
+    .intro-section-title { font-size: 14px; font-weight: bold; color: #d35400; margin-bottom: 8px; display: flex; align-items: center; }
+    .intro-section-title::before { content: "◆"; margin-right: 6px; font-size: 12px; }
+    .intro-text { font-size: 13px; line-height: 1.8; color: #555; text-indent: 2em; margin: 0; }
+
+    .btn-start { background: #d35400; color: #fff; border: 1px solid #b34400; padding: 12px 50px; font-weight: bold; font-size: 16px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); transition: all 0.2s; letter-spacing: 2px; }
+    .btn-start:hover { background: #e67e22; transform: translateY(-2px); }
+
+    /* 击中飘字效果 */
+    .hit-score { position: absolute; color: #ffeb3b; font-size: 24px; font-weight: bold; font-family: Arial, sans-serif; pointer-events: none; animation: float-up 0.6s ease-out forwards; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); z-index: 100; }
+    @keyframes float-up {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+    }
+
+    /* ================= 红色警报 / 崩溃样式 ================= */
+    .glitch-mode { background-color: #3a0000 !important; }
+    .glitch-mode #wrapper { background: #1a0000 !important; border-color: #5a0000 !important; box-shadow: 0 0 30px rgba(255,0,0,0.5) !important; animation: screen-shake 0.1s infinite !important; }
+    .glitch-mode #header { background: #5a0000 !important; color: #ff3333 !important; border-bottom-color: #ff0000 !important; text-shadow: 0 0 10px #ff0000; }
+    .glitch-mode #nav { background: #ff0000 !important; }
+    .glitch-mode #nav li a:hover { background: #8b0000 !important; }
+    .glitch-mode .activity-box { background: #2a0000 !important; border-color: #5a0000 !important; }
+    .glitch-mode .box-title { color: #ff3333 !important; border-bottom-color: #ff3333 !important; text-shadow: 0 0 5px #ff0000; }
+    .glitch-mode #game-area { background: #5a0000 !important; border-color: #1a0000 !important; box-shadow: 0 0 20px rgba(255,0,0,0.8); }
+    .glitch-mode .game-status { background: #1a0000 !important; border-bottom-color: #ff0000 !important; }
+    .glitch-mode .status-val { color: #ff3333 !important; text-shadow: 0 0 8px #ff0000; }
+    .glitch-mode .hole { background: #120000 !important; border-color: #ff0000 !important; box-shadow: inset 0 10px 20px rgba(0,0,0,0.9); }
+    
+    /* 崩溃史莱姆 */
+    .slime.glitch { background: #3a3a3a !important; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.6), inset 5px 5px 10px rgba(255,0,0,0.5) !important; animation: slime-twitch 0.15s infinite; }
+    .slime.glitch .eye { background: #ff0000 !important; box-shadow: 0 0 10px #ff0000 !important; height: 12px; width: 12px; border-radius: 0; transform: rotate(45deg); }
+    .slime.glitch .blush { display: none; }
+
+    /* 屏幕抖动动画 */
+    @keyframes screen-shake {
+        0% { transform: translate(1px, 1px) rotate(0deg); }
+        10% { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(0px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(2px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(2px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+
+    /* 史莱姆抽搐动画 */
+    @keyframes slime-twitch {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(2px, -2px) scale(0.95); }
+        100% { transform: translate(-2px, 2px) scale(1.05); }
+    }
+
+    #footer { background: #efefef; border-top: 2px solid #d35400; text-align: center; padding: 20px 0; line-height: 2; color: #666; transition: all 0.3s ease; }
+    .glitch-mode #footer { background: #1a0000 !important; border-top-color: #ff0000 !important; color: #ff3333 !important; }
+    .clear { clear: both; }
+
+    /* ================= 胜利界面样式 ================= */
+    #success-screen { padding: 30px; text-align: center; display: none; }
+    .success-title { font-size: 26px; font-weight: bold; color: #27ae60; margin-bottom: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+    .success-box { max-width: 680px; margin: 0 auto 30px auto; background: #f4fbf7; border: 2px solid #2ecc71; border-radius: 8px; padding: 25px; box-shadow: 0 4px 15px rgba(46,204,113,0.1); text-align: left; }
+    .success-avatar { font-size: 45px; float: left; margin-right: 15px; }
+    .success-quote { font-size: 14px; line-height: 1.8; color: #2c3e50; }
+    .success-meta { border-top: 1px dashed #2ecc71; margin-top: 15px; padding-top: 10px; font-size: 11px; color: #7f8c8d; text-align: right; }
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+    <div id="header">《辉光勇者》2008暑期线上互动：莉亚的射击挑战</div>
+    <div id="nav">
+        <ul>
+            <li><a href="guanwang.html">返回官网首页</a></li>
+            <li><a href="news.html">新闻公告</a></li>
+            <li><a href="test.html">趣味性格测试</a></li>
+            <li><a href="forum.html">官方论坛</a></li>
+        </ul>
+        <div class="clear"></div>
+    </div>
+    
+    <div class="content">
+        <div class="activity-box">
+            <div class="box-title" id="activity-title">🎯 莉亚的射击挑战</div>
+            
+            <!-- 开始界面 -->
+            <div id="start-screen">
+                <div class="start-title">🏹 帮助莉亚进行射击训练！</div>
+                
+                <div class="intro-container">
+                    <div class="intro-section">
+                        <div class="intro-section-title">训练背景</div>
+                        <p class="intro-text">在遥远的光之大陆，精灵射手莉亚以百发百中的神技闻名。为了迎战即将复苏的魔王，莉亚每天都会在幽暗森林的边缘进行紧张的射击训练！</p>
+                    </div>
+                    
+                    <div class="intro-section">
+                        <div class="intro-section-title">挑战规则</div>
+                        <p class="intro-text">本次射击挑战期间会连续冒出许多只史莱姆，史莱姆身上的数字代表分数，请尽可能拿到高分吧ヾ(≧▽≦*)o</p>
+                    </div>
+                </div>
+                
+                <button class="btn-start" onclick="startGame()">开始挑战</button>
+            </div>
+
+            <!-- Flash 播放器外壳 -->
+            <div id="flash-player-wrapper">
+                <!-- Windows 经典标题栏 -->
+                <div class="flash-titlebar">
+                    <span>Adobe Flash Player 9 - [莉亚的射击挑战.swf]</span>
+                    <div class="flash-titlebar-btn">
+                        <div class="flash-btn">_</div>
+                        <div class="flash-btn" style="font-size: 8px;">▢</div>
+                        <div class="flash-btn" style="color: red; font-weight: bold;">X</div>
+                    </div>
+                </div>
+                <!-- 菜单栏 -->
+                <div class="flash-menubar">
+                    <span>文件(F)</span>
+                    <span>视图(V)</span>
+                    <span>控制(C)</span>
+                    <span>帮助(H)</span>
+                </div>
+                
+                <!-- 游戏界面 -->
+                <div id="game-area">
+                    <!-- 状态栏 -->
+                    <div class="game-status">
+                        <div class="status-item">
+                            <span>得分 (SCORE):</span>
+                            <span class="status-val" id="score-val">000</span>
+                        </div>
+                        <div class="status-item">
+                            <span>倒计时 (TIME):</span>
+                            <span class="status-val" id="timer-val">15s</span>
+                        </div>
+                    </div>
+
+                    <!-- 3x3 洞穴 -->
+                    <div class="grid-3x3" id="grid-element">
+                        <div class="hole" id="hole-1"><div class="slime" id="slime-1" onclick="hitSlime(1)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-2"><div class="slime" id="slime-2" onclick="hitSlime(2)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-3"><div class="slime" id="slime-3" onclick="hitSlime(3)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-4"><div class="slime" id="slime-4" onclick="hitSlime(4)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-5"><div class="slime" id="slime-5" onclick="hitSlime(5)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-6"><div class="slime" id="slime-6" onclick="hitSlime(6)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-7"><div class="slime" id="slime-7" onclick="hitSlime(7)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-8"><div class="slime" id="slime-8" onclick="hitSlime(8)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                        <div class="hole" id="hole-9"><div class="slime" id="slime-9" onclick="hitSlime(9)"><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><span class="num-txt">1</span></div></div>
+                    </div>
+                </div>
+                
+                <!-- 底部控制栏 -->
+                <div class="flash-controlbar">
+                    <div class="flash-controls-left">
+                        <div class="flash-play-icon" title="播放"></div>
+                        <div class="flash-stop-icon" title="停止"></div>
+                        <span style="font-size: 10px; color: #888;">|</span>
+                        <span>帧频: 30 fps</span>
+                    </div>
+                    <div>
+                        <span>缩放: 100%</span>
+                        <span style="margin-left: 10px;">品质: 高</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 胜利界面 -->
+            <div id="success-screen">
+                <div class="success-title">🎉 挑战成功！YOU WIN!</div>
+                <div class="success-box">
+                    <span class="success-avatar">🧝‍♀️</span>
+                    <div class="success-quote">
+                        <strong style="color: #27ae60; font-size: 14px;">精灵射手莉亚：</strong><br />
+                        “哇！太棒了！你真的太厉害啦，居然拿到了这么高的分数！我的弓箭训练多亏了有你帮忙呢ヾ(≧▽≦*)o”<br /><br />
+                        “不过呢，在冒险的旅途中，有时候怪物会跑得非常快，或者藏在一些很隐秘的地方。莉亚想悄悄告诉你一个小秘密哦：<b>当你发现找不到目标、陷入迷茫的时候，记得回头看看，说不定会有新的发现呢！只有保持希望，才能最终找到目标！</b> 让我们一起加油吧！”
+                    </div>
+                    <div class="success-meta">
+                        ※ 2008年暑期 · 应莉亚声优（李林晔）特别要求创建此活动
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div id="footer">
+        Copyright &copy; 2007-2008 Glow Legend Animation Studio.<br/>
+        辉光勇者动画制作委员会 版权所有 最佳分辨率 1024*768
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 16个史莱姆按顺序对应 "passwordisbreeze"
+    var passwordSequence = [
+        { pos: 7, num: 1, char: 'p' }, // p -> 7键第1次
+        { pos: 2, num: 1, char: 'a' }, // a -> 2键第1次
+        { pos: 7, num: 4, char: 's' }, // s -> 7键第4次
+        { pos: 7, num: 4, char: 's' }, // s -> 7键第4次
+        { pos: 9, num: 1, char: 'w' }, // w -> 9键第1次
+        { pos: 6, num: 3, char: 'o' }, // o -> 6键第3次
+        { pos: 7, num: 3, char: 'r' }, // r -> 7键第3次
+        { pos: 3, num: 1, char: 'd' }, // d -> 3键第1次
+        { pos: 4, num: 3, char: 'i' }, // i -> 4键第3次
+        { pos: 7, num: 4, char: 's' }, // s -> 7键第4次
+        { pos: 2, num: 2, char: 'b' }, // b -> 2键第2次
+        { pos: 7, num: 3, char: 'r' }, // r -> 7键第3次
+        { pos: 3, num: 2, char: 'e' }, // e -> 3键第2次
+        { pos: 3, num: 2, char: 'e' }, // e -> 3键第2次
+        { pos: 9, num: 4, char: 'z' }, // z -> 9键第4次
+        { pos: 3, num: 2, char: 'e' }  // e -> 3键第2次
+    ];
+
+    var score = 0;
+    var timeLeft = 15;
+    var currentIndex = 0;
+    var gameActive = false;
+    var glitchActive = false;
+    var isScattering = false; // 是否处于打散卡死状态
+    var timerInterval = null;
+    var slimeTimeout = null;
+    var currentUpHole = null;
+    var glitchInterval = null;
+    var glitchSpawnDelay = 350; // 崩溃史莱姆初始生成间隔
+
+    function startGame() {
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("flash-player-wrapper").style.display = "block";
+        document.getElementById("game-area").style.display = "block";
+        
+        score = 0;
+        timeLeft = 15;
+        currentIndex = 0;
+        gameActive = true;
+        glitchActive = false;
+        isScattering = false;
+        glitchSpawnDelay = 350;
+        
+        document.getElementById("score-val").innerText = "000";
+        document.getElementById("timer-val").innerText = "15s";
+
+        // 启动倒计时
+        timerInterval = setInterval(updateTimer, 1000);
+
+        // 启动史莱姆生成
+        spawnNextSlime();
+    }
+
+    function updateTimer() {
+        if (!gameActive || isScattering) return;
+
+        if (glitchActive) {
+            timeLeft--;
+            document.getElementById("timer-val").innerText = timeLeft + "s";
+        } else {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                timeLeft = 0;
+                document.getElementById("timer-val").innerText = "0s";
+                // 时间到了，结束游戏
+                handleGameEnd();
+            } else {
+                document.getElementById("timer-val").innerText = timeLeft + "s";
+            }
+        }
+    }
+
+    function spawnNextSlime() {
+        if (!gameActive || glitchActive || isScattering) return;
+
+        // 隐藏当前史莱姆
+        hideAllSlimes();
+
+        if (currentIndex >= passwordSequence.length) {
+            // 16个史莱姆全部打完，结束游戏
+            handleGameEnd();
+            return;
+        }
+
+        var currentSlimeData = passwordSequence[currentIndex];
+        var holeId = currentSlimeData.pos;
+        var num = currentSlimeData.num;
+
+        currentUpHole = holeId;
+        var slimeEl = document.querySelector("#slime-" + holeId);
+        var numTxtEl = slimeEl.querySelector(".num-txt");
+        
+        numTxtEl.innerText = num;
+        slimeEl.classList.add("up");
+
+        // 史莱姆停留 0.85 秒
+        slimeTimeout = setTimeout(function() {
+            if (gameActive && !glitchActive && !isScattering) {
+                currentIndex++;
+                spawnNextSlime();
+            }
+        }, 850);
+    }
+
+    function hitSlime(holeId) {
+        if (!gameActive || isScattering) return;
+        
+        // 崩溃模式下的点击
+        if (glitchActive) {
+            playGlitchHitEffect(holeId);
+            return;
+        }
+
+        if (holeId !== currentUpHole) return;
+
+        // 击中逻辑
+        clearTimeout(slimeTimeout);
+        
+        var currentSlimeData = passwordSequence[currentIndex];
+        var num = currentSlimeData.num;
+        
+        score += num;
+        document.getElementById("score-val").innerText = padScore(score);
+
+        // 飘字特效
+        showHitScore(holeId, "+" + num);
+
+        var slimeEl = document.querySelector("#slime-" + holeId);
+        slimeEl.classList.remove("up");
+        currentUpHole = null;
+
+        // 延迟 100ms 出现下一个
+        currentIndex++;
+        setTimeout(function() {
+            if (gameActive && !glitchActive && !isScattering) {
+                spawnNextSlime();
+            }
+        }, 100);
+    }
+
+    // 监听游戏区域的点击，如果玩家没有打到史莱姆，则扣除3分
+    document.getElementById("game-area").onclick = function(e) {
+        if (!gameActive || isScattering) return;
+        
+        // 检查点击的目标是否是当前升起的史莱姆
+        var target = e.target;
+        var isSlimeClicked = false;
+        while (target && target !== this) {
+            if (target.classList && target.classList.contains("slime")) {
+                isSlimeClicked = true;
+                break;
+            }
+            target = target.parentNode;
+        }
+
+        if (!isSlimeClicked) {
+            // 没点中史莱姆，扣除3分
+            score -= 3;
+            if (score <= 0) {
+                score = 0;
+                document.getElementById("score-val").innerText = "000";
+                handleGameEnd(true); // 分数归零，强制结束
+                return;
+            }
+            document.getElementById("score-val").innerText = padScore(score);
+            
+            // 在鼠标点击位置飘出 "-3"
+            showHitAtCursor(e, "-3");
+        }
+    };
+
+    function showHitAtCursor(e, text) {
+        var gameRect = document.getElementById("game-area").getBoundingClientRect();
+        var hitEl = document.createElement("div");
+        hitEl.className = "hit-score";
+        hitEl.style.color = "#ff3333";
+        hitEl.innerText = text;
+        
+        var x = e.clientX - gameRect.left - 15;
+        var y = e.clientY - gameRect.top - 20;
+        
+        hitEl.style.left = x + "px";
+        hitEl.style.top = y + "px";
+
+        document.getElementById("game-area").appendChild(hitEl);
+
+        setTimeout(function() {
+            hitEl.remove();
+        }, 600);
+    }
+
+    function hideAllSlimes() {
+        for (var i = 1; i <= 9; i++) {
+            document.querySelector("#slime-" + i).classList.remove("up");
+        }
+        currentUpHole = null;
+    }
+
+    function padScore(num) {
+        if (num < 0) return "000";
+        var s = num + "";
+        while (s.length < 3) s = "0" + s;
+        return s;
+    }
+
+    function showHitScore(holeId, text) {
+        var holeEl = document.getElementById("hole-" + holeId);
+        var rect = holeEl.getBoundingClientRect();
+        var gameRect = document.getElementById("game-area").getBoundingClientRect();
+
+        var hitEl = document.createElement("div");
+        hitEl.className = "hit-score";
+        hitEl.innerText = text;
+        
+        // 计算相对游戏区域的位置
+        var x = rect.left - gameRect.left + rect.width / 2 - 15;
+        var y = rect.top - gameRect.top + 10;
+        
+        hitEl.style.left = x + "px";
+        hitEl.style.top = y + "px";
+
+        document.getElementById("game-area").appendChild(hitEl);
+
+        setTimeout(function() {
+            hitEl.remove();
+        }, 600);
+    }
+
+    // ================= 核心逻辑：判断游戏结束走向 =================
+    function handleGameEnd(forceFail) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        clearTimeout(slimeTimeout);
+        hideAllSlimes();
+
+        var isAdminAccess = localStorage.getItem("admin_activity_access") === "true";
+
+        if (isAdminAccess && !forceFail) {
+            // 如果是从后台管理员入口进来的，且不是因为分数归零失败，则正常进入胜利界面
+            localStorage.removeItem("admin_activity_access"); // 清除标记
+            document.getElementById("flash-player-wrapper").style.display = "none";
+            document.getElementById("success-screen").style.display = "block";
+            document.getElementById("activity-title").innerText = "🎉 挑战成功：莉亚的射击挑战";
+        } else {
+            // 否则（正常前台访问，或者分数归零失败），触发原有的崩坏、打散、血红暴走崩溃逻辑
+            triggerScatterState();
+        }
+    }
+
+    // ================= 1. 触发打散卡死状态 (2秒) =================
+    function triggerScatterState() {
+        if (isScattering) return;
+        isScattering = true;
+
+        // 将网页各个元素打散，更加混乱，随机散布到不同地方，好像卡死的样子
+        var elementsToScatter = [
+            document.getElementById("wrapper"),
+            document.getElementById("header"),
+            document.getElementById("nav"),
+            document.getElementById("activity-title"),
+            document.getElementById("flash-player-wrapper"),
+            document.getElementById("footer")
+        ];
+        
+        // 加上所有的洞穴
+        var holes = document.querySelectorAll(".hole");
+        holes.forEach(function(hole) {
+            elementsToScatter.push(hole);
+        });
+
+        // 加上导航栏的所有链接
+        var navLinks = document.querySelectorAll("#nav li");
+        navLinks.forEach(function(link) {
+            elementsToScatter.push(link);
+        });
+
+        // 加上状态栏
+        var statusItems = document.querySelectorAll(".status-item");
+        statusItems.forEach(function(item) {
+            elementsToScatter.push(item);
+        });
+
+        elementsToScatter.forEach(function(el) {
+            if (!el) return;
+            // 随机位移、倾斜、缩放、旋转，散布到不同地方
+            var randomX = Math.floor(Math.random() * 160) - 80;
+            var randomY = Math.floor(Math.random() * 160) - 80;
+            var randomRot = Math.floor(Math.random() * 120) - 60;
+            var randomScale = (Math.random() * 0.5 + 0.7).toFixed(2);
+            var randomSkew = Math.floor(Math.random() * 40) - 20;
+            
+            el.style.transition = "all 0.1s ease";
+            el.style.transform = "translate(" + randomX + "px, " + randomY + "px) rotate(" + randomRot + "deg) scale(" + randomScale + ") skew(" + randomSkew + "deg)";
+            el.style.opacity = (Math.random() * 0.4 + 0.6).toFixed(2);
+            el.style.position = "relative";
+            el.style.zIndex = Math.floor(Math.random() * 100);
+        });
+
+        // 保持卡死状态 2 秒，然后进入血红崩溃暴走模式
+        setTimeout(function() {
+            triggerGlitchMode();
+        }, 2000);
+    }
+
+    // ================= 2. 触发血红崩溃模式 =================
+    var glitchTimeout = null;
+    function triggerGlitchMode() {
+        if (glitchActive) return;
+        glitchActive = true;
+        isScattering = false;
+        gameActive = true; // 重新激活游戏用于暴走
+
+        // 恢复打散的元素
+        var elementsToReset = [
+            document.getElementById("wrapper"),
+            document.getElementById("header"),
+            document.getElementById("nav"),
+            document.getElementById("activity-title"),
+            document.getElementById("flash-player-wrapper"),
+            document.getElementById("footer")
+        ];
+        document.querySelectorAll(".hole").forEach(function(hole) { elementsToReset.push(hole); });
+        document.querySelectorAll("#nav li").forEach(function(link) { elementsToReset.push(link); });
+        document.querySelectorAll(".status-item").forEach(function(item) { elementsToReset.push(item); });
+
+        elementsToReset.forEach(function(el) {
+            if (!el) return;
+            el.style.transform = "none";
+            el.style.opacity = "1";
+            el.style.zIndex = "auto";
+        });
+
+        // 恢复部分打散的畸变，但保持诡异的倾斜
+        document.getElementById("wrapper").style.transform = "rotate(0.5deg)";
+
+        // 页面变红，开启屏幕抖动
+        document.body.classList.add("glitch-mode");
+        document.getElementById("activity-title").innerText = "⚠️ SYSTEM ERROR: 莉亚的射击挑战";
+        
+        // 倒计时变成负的
+        timeLeft = -1;
+        document.getElementById("timer-val").innerText = timeLeft + "s";
+        document.getElementById("timer-val").style.color = "#ff0000";
+
+        // 重新启动负数倒计时
+        timerInterval = setInterval(function() {
+            timeLeft--;
+            document.getElementById("timer-val").innerText = timeLeft + "s";
+        }, 1000);
+
+        // 将所有史莱姆变成红色眼睛、灰色身体的崩溃状态
+        for (var i = 1; i <= 9; i++) {
+            var slimeEl = document.querySelector("#slime-" + i);
+            slimeEl.classList.add("glitch");
+            slimeEl.querySelector(".num-txt").innerText = "■";
+        }
+
+        // 启动崩溃史莱姆的循环生成
+        runGlitchSpawnLoop();
+
+        // 崩溃状态持续 3 秒后强制跳转到 gameover.html
+        glitchTimeout = setTimeout(function() {
+            gameOverRedirect();
+        }, 3000);
+    }
+
+    // 崩溃史莱姆暴走生成循环
+    function runGlitchSpawnLoop() {
+        if (!gameActive || !glitchActive) return;
+
+        spawnGlitchSlime();
+
+        if (glitchSpawnDelay > 80) {
+            glitchSpawnDelay -= 15;
+        }
+
+        glitchInterval = setTimeout(runGlitchSpawnLoop, glitchSpawnDelay);
+    }
+
+    function spawnGlitchSlime() {
+        if (!gameActive) return;
+        
+        var count = Math.floor(Math.random() * 3) + 1;
+        for (var k = 0; k < count; k++) {
+            var randomHole = Math.floor(Math.random() * 9) + 1;
+            var slimeEl = document.querySelector("#slime-" + randomHole);
+            
+            if (!slimeEl.classList.contains("up")) {
+                slimeEl.querySelector(".num-txt").innerText = ["■", "☠", "6", "6", "6", "ERR"][Math.floor(Math.random() * 6)];
+                slimeEl.classList.add("up");
+                
+                (function(el) {
+                    setTimeout(function() {
+                        el.classList.remove("up");
+                    }, 280);
+                })(slimeEl);
+            }
+        }
+    }
+
+    function playGlitchHitEffect(holeId) {
+        var penalty = Math.floor(Math.random() * 15) + 10;
+        score -= penalty;
+        
+        if (score <= 0) {
+            score = 0;
+            document.getElementById("score-val").innerText = "000";
+            gameOverRedirect();
+            return;
+        }
+
+        document.getElementById("score-val").innerText = padScore(score);
+        showHitScore(holeId, "-" + penalty);
+        
+        var wrapper = document.getElementById("wrapper");
+        wrapper.style.animation = "screen-shake 0.05s infinite";
+        setTimeout(function() {
+            if (glitchActive) {
+                wrapper.style.animation = "screen-shake 0.1s infinite";
+            }
+        }, 300);
+    }
+
+    function gameOverRedirect() {
+        gameActive = false;
+        clearInterval(timerInterval);
+        clearTimeout(glitchInterval);
+        clearTimeout(glitchTimeout);
+        window.location.href = "gameover.html";
+    }
+
+    // 如果该页面是打开的状态，当LocalStorage发生变化时强制进行刷新
+    window.addEventListener('storage', function(e) {
+        window.location.reload();
+    });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

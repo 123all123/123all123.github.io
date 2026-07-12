@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>oo邮箱 - 极简您的邮件生活</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f5f7f9;
+            color: #333;
+            transition: all 0.5s ease;
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 240px;
+            background-color: #ffffff;
+            border-right: 1px solid #e1e4e8;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            transition: all 0.5s ease;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a73e8;
+            padding: 0 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-compose {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            margin: 0 20px 20px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+
+        .btn-compose:hover {
+            background-color: #1557b0;
+        }
+
+        .menu-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #5f6368;
+            font-weight: 500;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: #f1f3f4;
+            color: #1a73e8;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .badge {
+            background-color: #f28b82;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        /* 主内容区 */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .header {
+            height: 64px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            justify-content: space-between;
+        }
+
+        .header h2 {
+            font-size: 18px;
+            color: #202124;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #ffffff;
+            margin: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            transition: all 0.5s ease;
+        }
+
+        /* 邮件列表样式 */
+        .email-list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            border-bottom: 1px solid #f1f3f4;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.1s;
+        }
+
+        .email-list-item:hover {
+            background-color: #f7f9fa;
+            box-shadow: inset 1px 0 0 #1a73e8;
+        }
+
+        .email-list-item.unread {
+            font-weight: bold;
+            background-color: #f8fafd;
+        }
+
+        .email-sender {
+            width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-subject {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #5f6368;
+        }
+
+        .email-list-item.unread .email-subject {
+            color: #202124;
+        }
+
+        .email-date {
+            width: 130px;
+            text-align: right;
+            color: #5f6368;
+            font-size: 12px;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #80868b;
+            cursor: pointer;
+            margin-left: 15px;
+            display: none;
+        }
+
+        .email-list-item:hover .btn-delete {
+            display: inline-block;
+        }
+
+        .btn-delete:hover {
+            color: #d93025;
+        }
+
+        /* 邮件详情样式 */
+        .email-detail, .compose-form {
+            padding: 24px;
+        }
+
+        .detail-header {
+            border-bottom: 1px solid #f1f3f4;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .detail-subject {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #202124;
+        }
+
+        .detail-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #5f6368;
+            font-size: 13px;
+        }
+
+        .detail-body {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+        }
+
+        .btn-back {
+            background: none;
+            border: 1px solid #dadce0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .btn-back:hover {
+            background-color: #f7f9fa;
+        }
+
+        /* 写信表单样式 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #202124;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 250px;
+            resize: vertical;
+        }
+
+        .btn-send {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #80868b;
+            margin-top: 100px;
+            font-size: 14px;
+        }
+
+        /* 剧烈震动动效 */
+        @keyframes shake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            10% { transform: translate(-8px, 5px) rotate(-1.5deg); }
+            20% { transform: translate(6px, -6px) rotate(2deg); }
+            30% { transform: translate(-9px, 2px) rotate(-1deg); }
+            40% { transform: translate(7px, -4px) rotate(1.5deg); }
+            50% { transform: translate(-6px, 8px) rotate(-2deg); }
+            60% { transform: translate(8px, -5px) rotate(1deg); }
+            70% { transform: translate(-7px, 3px) rotate(-1.5deg); }
+            80% { transform: translate(9px, -7px) rotate(2deg); }
+            90% { transform: translate(-5px, 6px) rotate(-1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* 散落动效 */
+        @keyframes scatter {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; filter: blur(15px); }
+        }
+
+        .shake-active {
+            animation: shake 0.15s infinite;
+            filter: invert(1) contrast(1.5); /* 网页变反色调 */
+        }
+
+        .scatter-active {
+            animation: scatter 2s forwards ease-in-out;
+        }
+
+        #oo-notify-toast {
+            display: none;
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 9999;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-left: 4px solid #1a73e8;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #202124;
+            cursor: pointer;
+            animation: oo-notify-in .35s ease;
+        }
+        #oo-notify-toast strong { color: #1a73e8; }
+        @keyframes oo-notify-in {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes oo-title-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+        body.oo-has-notify #view-title {
+            animation: oo-title-blink 1.2s ease-in-out infinite;
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左侧导航栏 -->
+    <div class="sidebar" id="sidebar-el">
+        <div class="logo">✉ oo邮箱</div>
+        <button class="btn-compose" onclick="switchView('compose')">✏ 写 信</button>
+        <div class="menu-item active" id="menu-inbox" onclick="switchView('inbox')">
+            <span>📥 收件箱</span>
+            <span class="badge" id="inbox-count">0</span>
+        </div>
+        <div class="menu-item" id="menu-sent" onclick="switchView('sent')">
+            <span>📤 已发送</span>
+        </div>
+        <div class="menu-item" id="menu-trash" onclick="switchView('trash')">
+            <span>🗑 垃圾箱</span>
+        </div>
+    </div>
+
+    <!-- 主展示区 -->
+    <div class="main-container" id="main-container-el">
+        <div class="header" id="header-el">
+            <h2 id="view-title">收件箱</h2>
+            <div style="display:flex; align-items:center; gap:18px;">
+                <div style="font-size: 12px; color: #80868b;" id="cookie-info"></div>
+                <div style="position:relative;" id="my-account-wrap">
+                    <span id="my-account-btn" style="font-size:13px; color:#1a73e8; cursor:pointer; font-weight:600; user-select:none;">👤 我的 ▾</span>
+                    <div id="my-account-panel" style="display:none; position:absolute; right:0; top:26px; background:#fff; border:1px solid #dadce0; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.15); padding:16px 18px; width:240px; z-index:50;">
+                        <div style="font-size:12px; color:#80868b; margin-bottom:6px;">当前登录账号</div>
+                        <div style="font-size:15px; font-weight:bold; color:#202124;">qwer1234@oo.com</div>
+                        <div style="border-top:1px solid #f1f3f4; margin:12px 0;"></div>
+                        <div style="font-size:12px; color:#5f6368; line-height:1.6;">昵称：oo 用户<br/>安全等级：中<br/>存储空间：已用 2%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-area" id="main-content">
+            <!-- 动态内容渲染区域 -->
+        </div>
+    </div>
+
+    <div id="oo-notify-toast" onclick="this.style.display='none'; switchView('inbox');">
+        <strong>✉ oo邮箱</strong><br/>您收到 1 条新消息，点击查看
+    </div>
+
+    <script>
+        // 获取或初始化首次访问时间
+        let firstVisitTime = localStorage.getItem('oo_first_visit');
+        if (!firstVisitTime) {
+            firstVisitTime = new Date().toISOString();
+            localStorage.setItem('oo_first_visit', firstVisitTime);
+        }
+        const baseDate = new Date(firstVisitTime);
+        
+        // 在网页右上角友情提示首次访问时间
+        document.getElementById('cookie-info').innerText = `首次打开本站时间: ${formatDateDisplay(baseDate)}`;
+
+        // --- 辅助工具函数 ---
+        function generatePastRandomDate(base, daysAgo) {
+            const target = new Date(base.getTime());
+            target.setDate(target.getDate() - daysAgo);
+            target.setHours(Math.floor(Math.random() * 24));
+            target.setMinutes(Math.floor(Math.random() * 60));
+            target.setSeconds(0);
+            return target;
+        }
+
+        function formatDateDisplay(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mm = String(date.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${d} ${hh}:${mm}`;
+        }
+
+        // --- 邮件数据初始化与持久化 ---
+        let currentView = 'inbox'; // 当前视图: inbox, sent, trash, compose, detail
+        let emails = [];
+
+        // 从 localStorage 恢复邮件数据，如果没有则初始化默认邮件
+        function initEmails() {
+            const stored = localStorage.getItem('oo_emails');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                // 恢复日期对象
+                emails = parsed.map(e => {
+                    e.date = new Date(e.date);
+                    return e;
+                });
+            } else {
+                emails = [
+                    {
+                        id: 1,
+                        sender: "【淘宝特惠中心】",
+                        subject: "⚡️ 您的专享独家神券已到账！全场商品1折起",
+                        content: "亲爱的oo邮箱用户：\n\n为了庆祝您成为oo邮箱新用户，淘宝特惠中心特别为您奉上大额优惠券！包含无门槛100元全场通用券，以及各品类满减红利。\n\n点击下方链接即可一键激活（此为模拟虚假广告）：\nhttp://fake-link.taobao.example.com\n\n祝您购物愉快！",
+                        date: generatePastRandomDate(baseDate, 12),
+                        folder: 'inbox',
+                        unread: true
+                    },
+                    {
+                        id: 2,
+                        sender: "【xx财富理财经理】",
+                        subject: "🔥 每日稳健投顾：手把手教你如何让资产翻倍！",
+                        content: "尊贵的用户：\n\n在这个充满机遇的时代，你不理财，财不理你。本期为您推荐稳健增值计划，历史年化收益率高达15%！\n\n新开户限时赠送 188 元理财体验金，保本保收益（投资有风险，本内容为模拟广告）。\n\n详情请回复咨询或登录理财专区。",
+                        date: generatePastRandomDate(baseDate, 6),
+                        folder: 'inbox',
+                        unread: true
+                    },
+                    {
+                        id: 3,
+                        sender: "【安全中心提示】",
+                        subject: "⚠️ 紧急通知：您的账户积分即将过期，请尽快兑换商品",
+                        content: "通知：\n\n系统检测到您的用户积分（当前累计8,450分）将于本月底全部清零。逾期将无法恢复。\n\n我们已为您开通绿色兑换通道，可免费兑换高档车载保温杯、智能蓝牙耳机等精美礼品。\n\n退订请回复TD。",
+                        date: generatePastRandomDate(baseDate, 2),
+                        folder: 'inbox',
+                        unread: true
+                    }
+                ];
+                saveEmails();
+            }
+        }
+
+        function saveEmails() {
+            localStorage.setItem('oo_emails', JSON.stringify(emails));
+        }
+
+        // --- 视图切换与渲染 ---
+        function switchView(view, emailId = null) {
+            currentView = view;
+            
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            if (['inbox', 'sent', 'trash'].includes(view)) {
+                const el = document.getElementById(`menu-${view}`);
+                if (el) el.classList.add('active');
+            }
+
+            const titleMap = { inbox: "收件箱", sent: "已发送", trash: "垃圾箱", compose: "新建邮件", detail: "邮件详情" };
+            document.getElementById('view-title').innerText = titleMap[view] || "oo邮箱";
+
+            const container = document.getElementById('main-content');
+            container.innerHTML = "";
+
+            if (['inbox', 'sent', 'trash'].includes(view)) {
+                renderEmailList(view, container);
+            } else if (view === 'compose') {
+                renderComposeForm(container);
+            } else if (view === 'detail' && emailId) {
+                renderEmailDetail(emailId, container);
+            }
+
+            updateUnreadCount();
+        }
+
+        // 渲染邮件列表
+        function renderEmailList(folder, container) {
+            const filtered = emails.filter(e => e.folder === folder)
+                                  .sort((a, b) => b.date - a.date);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state">这里空空如也~</div>`;
+                return;
+            }
+
+            filtered.forEach(email => {
+                const item = document.createElement('div');
+                item.className = `email-list-item ${email.unread ? 'unread' : ''}`;
+                item.onclick = () => {
+                    email.unread = false;
+                    saveEmails();
+                    switchView('detail', email.id);
+                };
+
+                const senderHtml = folder === 'sent'
+                    ? `<div class="email-sender">收件人: ${email.recipient || ''}</div>`
+                    : `<div class="email-sender">${email.sender}</div>`;
+
+                item.innerHTML = `
+                    ${senderHtml}
+                    <div class="email-subject">${email.subject}</div>
+                    <div class="email-date">${formatDateDisplay(email.date)}</div>
+                    ${folder !== 'trash' ? `<button class="btn-delete" onclick="deleteEmail(event, ${email.id})">🗑 删除</button>` : `<button class="btn-delete" onclick="permanentlyDelete(event, ${email.id})" style="color:red">❌ 彻底删除</button>`}
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 渲染邮件详情
+        function renderEmailDetail(id, container) {
+            const email = emails.find(e => e.id === id);
+            if (!email) return;
+
+            const metaHtml = email.folder === 'sent'
+                ? `<div class="detail-meta">
+                        <div>发件人：<strong>${email.sender}</strong></div>
+                        <div>收件人：<strong>${email.recipient}</strong></div>
+                        <div>时间：${formatDateDisplay(email.date)}</div>
+                   </div>`
+                : `<div class="detail-meta">
+                        <div>发件人：<strong>${email.sender}</strong></div>
+                        <div>时间：${formatDateDisplay(email.date)}</div>
+                   </div>`;
+
+            container.innerHTML = `
+                <div class="email-detail">
+                    <button class="btn-back" onclick="switchView('${email.folder}')">← 返回</button>
+                    <div class="detail-header">
+                        <div class="detail-subject">${email.subject}</div>
+                        ${metaHtml}
+                    </div>
+                    <div class="detail-body">${email.content}</div>
+                </div>
+            `;
+        }
+
+        // 渲染写信表单
+        function renderComposeForm(container) {
+            container.innerHTML = `
+                <div class="compose-form">
+                    <div class="form-group">
+                        <label>收件人</label>
+                        <input type="email" id="form-to" placeholder="例如: test@oo.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>主题</label>
+                        <input type="text" id="form-subject" placeholder="请输入邮件主题" required>
+                    </div>
+                    <div class="form-group">
+                        <label>正文</label>
+                        <textarea id="form-content" placeholder="请输入邮件正文内容..."></textarea>
+                    </div>
+                    <button class="btn-send" onclick="sendEmail()">发送邮件</button>
+                </div>
+            `;
+        }
+
+        // --- 核心业务操作 ---
+        function sendEmail() {
+            const to = document.getElementById('form-to').value.trim();
+            const subject = document.getElementById('form-subject').value.trim();
+            const content = document.getElementById('form-content').value.trim();
+
+            if (!to || !subject) {
+                alert("请填写收件人和主题！");
+                return;
+            }
+
+            const myEmail = localStorage.getItem('player_email') || 'qwer1234@oo.com';
+
+            const newEmail = {
+                id: Date.now(),
+                sender: myEmail,
+                recipient: to,
+                subject: subject,
+                content: content,
+                date: new Date(),
+                folder: 'sent',
+                unread: false
+            };
+
+            emails.push(newEmail);
+            saveEmails();
+            alert("邮件发送成功！已存入‘已发送’箱。");
+            switchView('sent');
+
+            const isSupportMail = to.toLowerCase() === 'hgyz0715@oo.com';
+            const isPlus99 = content === '+99' || subject === '+99';
+
+            if (isSupportMail && isPlus99) {
+                setTimeout(() => {
+                    const replyEmail = {
+                        id: Date.now() + 1,
+                        sender: "《辉光勇者》官网技术支持 <hgyz0715@oo.com>",
+                        subject: "【自动回复】您的反馈我们已收到",
+                        content: "您好：\n\n感谢您对《辉光勇者》官方网站的关注与反馈。\n\n您提交的关于页面异常/资源丢失的问题，我们已经收到并记录在案。稍后会安排技术人员进行排查与处理，请您耐心等待。\n\n（本邮件为系统自动回复，请勿直接回复本邮件。）\n\n—— 辉光勇者官网技术支持",
+                        date: new Date(),
+                        folder: 'inbox',
+                        unread: true
+                    };
+                    emails.push(replyEmail);
+                    saveEmails();
+
+                    localStorage.setItem("site_collapsed", "true");
+                    localStorage.setItem("site_closed_year", "2012");
+                    localStorage.setItem('oo_emails_trigger', Date.now());
+                    switchView(currentView);
+
+                    if (currentView === 'inbox') {
+                        updateUnreadCount();
+                    }
+                }, 10000);
+            }
+        }
+
+        function deleteEmail(event, id) {
+            event.stopPropagation();
+            const email = emails.find(e => e.id === id);
+            if (email) {
+                email.folder = 'trash';
+                saveEmails();
+                switchView(currentView);
+            }
+        }
+
+        function permanentlyDelete(event, id) {
+            event.stopPropagation();
+            if(confirm("确定要永久删除这封邮件吗？此操作无法撤销。")) {
+                emails = emails.filter(e => e.id !== id);
+                saveEmails();
+                switchView('trash');
+            }
+        }
+
+        function updateUnreadCount() {
+            const unreadInboxes = emails.filter(e => e.folder === 'inbox' && e.unread).length;
+            const badge = document.getElementById('inbox-count');
+            if (badge) {
+                badge.innerText = unreadInboxes;
+                badge.style.display = unreadInboxes === 0 ? 'none' : 'inline-block';
+            }
+        }
+
+        function showOoInboxNotify() {
+            if (localStorage.getItem("oo_inbox_notify_shown") === "true") return;
+            localStorage.setItem("oo_inbox_notify_shown", "true");
+            var toast = document.getElementById("oo-notify-toast");
+            if (toast) toast.style.display = "block";
+            document.body.classList.add("oo-has-notify");
+            var origTitle = document.title;
+            var blink = setInterval(function () {
+                document.title = document.title === origTitle ? "【新消息】oo邮箱" : origTitle;
+            }, 1200);
+            document.addEventListener("visibilitychange", function onVis() {
+                if (!document.hidden) {
+                    clearInterval(blink);
+                    document.title = origTitle;
+                    document.removeEventListener("visibilitychange", onVis);
+                }
+            });
+        }
+
+        function checkOoInboxNotify() {
+            if (localStorage.getItem("oo_inbox_notify") && localStorage.getItem("oo_inbox_notify_shown") !== "true") {
+                showOoInboxNotify();
+            }
+        }
+
+        // 第四阶段：玩家进入过备份网站/看过"勇者已死"后，运维改用七七聊天联系
+        function checkAndTriggerQiqiEmail() {
+            var reached = localStorage.getItem("entered_backup_site") === "true"
+                       || localStorage.getItem("visited_backup_hero") === "true";
+            if (reached && !localStorage.getItem("qiqi_email_sent")) {
+                const mail = {
+                    id: Date.now() + 5,
+                    sender: "（未署名） <hgyz0715@oo.com>",
+                    subject: "别在邮箱里说了",
+                    content: "是我。\n\n刚才看到你发来的那封邮件，我就意识到——事情不对劲了。\n\n有些话，在邮箱里说不太方便，这里可能也不安全。为了保险起见，我们换个地方聊。用「七七聊天」找我吧。\n\n为了避免被它盯上，我的号码不直接写明文，你自己想一想：\n\n    I Wait For You.\n\n把它变成房间号，四位数字。你是聪明人，应该知道该怎么按。\n\n进来之后我再慢慢跟你说。\n\n—— 一个还没被完全抹去的人",
+                    date: new Date(),
+                    folder: 'inbox',
+                    unread: true
+                };
+                emails.push(mail);
+                saveEmails();
+                localStorage.setItem("qiqi_email_sent", "true");
+                switchView(currentView);
+            }
+        }
+
+        // "我的"账号面板开关
+        (function () {
+            var btn = document.getElementById("my-account-btn");
+            var panel = document.getElementById("my-account-panel");
+            if (btn) {
+                btn.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    panel.style.display = panel.style.display === "block" ? "none" : "block";
+                });
+                document.addEventListener("click", function () { panel.style.display = "none"; });
+            }
+        })();
+
+        // 页面初始化
+        initEmails();
+        checkOoInboxNotify();
+        checkAndTriggerQiqiEmail();
+        switchView('inbox');
+
+        // 如果该页面是打开的状态，当LocalStorage发生变化时强制进行刷新
+        window.addEventListener('storage', function(e) {
+            if (e.key === "oo_inbox_notify") {
+                checkOoInboxNotify();
+            }
+            initEmails();
+            checkAndTriggerQiqiEmail();
+            switchView(currentView);
+        });
+    </script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/source-guard.js"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>音频隐写分析工具</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI","Microsoft YaHei",Arial,sans-serif; background: #101418; color: #d7dde3; padding: 28px 16px; }
+    .wrap { max-width: 860px; margin: 0 auto; }
+    h1 { color: #59d0c0; font-size: 22px; margin-bottom: 6px; }
+  h1 .title-en { font-size: 14px; font-weight: normal; color: #6a9a90; margin-left: 10px; letter-spacing: 0.5px; }
+  h1 .title-en .mark-x { color: #3ecf6e; font-weight: bold; }
+    .sub { color: #8a949e; font-size: 13px; margin-bottom: 22px; }
+    .card { background: #191f26; border: 1px solid #2a333d; border-radius: 10px; padding: 20px; margin-bottom: 18px; }
+    .btn { cursor: pointer; border: none; border-radius: 6px; padding: 10px 16px; font-size: 14px; font-weight: 600; background: #17a294; color: #fff; display: inline-block; }
+    .btn:disabled { opacity: .55; cursor: wait; }
+    .btn.ghost { background: #232c36; color: #bcd; border: 1px solid #35404c; }
+    .player { display: flex; align-items: center; gap: 12px; margin: 8px 0 14px; color: #8a949e; font-size: 13px; }
+    .player .bar { flex: 1; height: 6px; background: #2a333d; border-radius: 3px; overflow: hidden; }
+    .player .bar i { display: block; height: 100%; width: 0; background: #59d0c0; transition: width .1s linear; }
+    .controls-row { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; margin-top: 12px; }
+    .control-label { font-size: 13px; color: #8a949e; display: flex; align-items: center; gap: 6px; }
+    input[type="range"] { accent-color: #17a294; width: 110px; }
+    .spec-wrapper { margin-top: 16px; }
+    .spec-scroll { overflow-x: auto; background: #05080a; border-radius: 8px; }
+    canvas { display: block; background: #05080a; }
+    .spec-label { color: #8a949e; font-size: 12px; margin-top: 8px; min-height: 1.4em; }
+    .tip { background: #141a20; border-left: 3px solid #17a294; padding: 12px 14px; border-radius: 0 6px 6px 0; color: #8a949e; font-size: 12px; line-height: 1.8; margin-top: 8px; }
+    code { background: #232c36; padding: 1px 5px; border-radius: 3px; color: #9fe; }
+    a { color: #59d0c0; }
+    .colorbar { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px; color: #8a949e; }
+    .gradient-bar { width: 180px; height: 10px; background: linear-gradient(to right, #000, #005, #808, #f00, #ff0); border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎵 音频隐写分析工具<span class="title-en">Spectrogram E<span class="mark-x">x</span>traction</span></h1>
+  <div class="sub">从一段音频的「频谱图」里，读出波形上看不到的隐藏文字</div>
+
+  <!-- 教程卡片 -->
+  <div class="card">
+    <b style="color:#cfe;">什么是音频隐写？</b>
+    <div class="tip">
+      有一种常见隐写手法：把文字按"频率 × 时间"画进声音里。平时听只是一段普通旋律，但转换成<b>频谱图</b>（横轴时间、纵轴频率、亮度代表能量）后，文字就会像写在示波器上一样显现。<br/>
+      选择一段音频，点击“生成频谱图”试试。如果看不清，可以拖动<code>范围下限</code>滑块，让高能量字符更突出。
+    </div>
+  </div>
+
+  <!-- 操作卡片 -->
+  <div class="card">
+    <label class="btn">选择音频文件<input type="file" id="file" accept="audio/*" style="display:none" /></label>
+    <div class="player" id="player" style="display:none;">
+      <span id="pname">audio</span>
+      <div class="bar"><i id="pbar"></i></div>
+      <button class="btn ghost" id="pbtn" onclick="togglePlay()">▶ 播放</button>
+    </div>
+    
+    <div style="margin-top:12px;">
+      <button class="btn" id="gen-btn" onclick="genSpectrogram()">🔍 生成频谱图</button>
+    </div>
+
+    <!-- 频谱控制：缩放 + 动态范围 -->
+    <div class="controls-row" id="spec-controls" style="display:none;">
+      <label class="control-label">缩放 <input type="range" id="zoom-slider" min="0.2" max="5" step="0.1" value="1"></label>
+      <label class="control-label">范围下限 <input type="range" id="range-slider" min="-80" max="-10" step="1" value="-60"></label>
+      <span style="font-size:12px; color:#8a949e;" id="range-db">-60 dB</span>
+    </div>
+
+    <!-- 频谱图容器（可横向滚动） -->
+    <div class="spec-wrapper">
+      <div class="spec-scroll" id="scroll-container">
+        <canvas id="spec" height="320"></canvas>
+      </div>
+    </div>
+    <div class="spec-label" id="spec-label">（频谱图将显示在此处）</div>
+    <div class="colorbar">
+      <span>低</span>
+      <div class="gradient-bar"></div>
+      <span>高</span>
+      <span id="color-range-text">-60 dB → 0 dB</span>
+    </div>
+  </div>
+
+  <div class="tip">
+    <a href="find.html">&larr; 返回智搜</a>
+  </div>
+</div>
+
+<audio id="audio" preload="auto"></audio>
+
+<script>
+  // --------------------- 音频播放控制 ---------------------
+  var audio = document.getElementById("audio");
+  var audioFile = null;
+  var audioBufferCache = null;
+  var decodeCtx = null;
+
+  document.getElementById("file").addEventListener("change", function(e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    audioFile = f;
+    audioBufferCache = null;
+    if (audio.src && audio.src.startsWith("blob:")) URL.revokeObjectURL(audio.src);
+    audio.src = URL.createObjectURL(f);
+    document.getElementById("pname").textContent = f.name;
+    document.getElementById("player").style.display = "flex";
+    document.getElementById("spec-label").textContent = "（频谱图将显示在此处）";
+  });
+
+  function togglePlay() {
+    var btn = document.getElementById("pbtn");
+    if (audio.paused) { audio.play().catch(function(){}); btn.textContent = "⏸ 暂停"; }
+    else { audio.pause(); btn.textContent = "▶ 播放"; }
+  }
+
+  audio.addEventListener("timeupdate", function() {
+    if (audio.duration) document.getElementById("pbar").style.width = (audio.currentTime / audio.duration * 100) + "%";
+  });
+  audio.addEventListener("ended", function() { document.getElementById("pbtn").textContent = "▶ 播放"; });
+
+  // --------------------- 频谱计算与绘制 ---------------------
+  function hann(i, n) { return 0.5 * (1 - Math.cos((2 * Math.PI * i) / (n - 1))); }
+
+  // 原地 FFT
+  function fftInPlace(re, im) {
+    var n = re.length, i, j, k, m, len, tRe, tIm, uRe, uIm, wRe, wIm, ang;
+    j = 0;
+    for (i = 1; i < n; i++) {
+      var bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) { tRe = re[i]; re[i] = re[j]; re[j] = tRe; tIm = im[i]; im[i] = im[j]; im[j] = tIm; }
+    }
+    for (len = 2; len <= n; len <<= 1) {
+      ang = -2 * Math.PI / len; wRe = Math.cos(ang); wIm = Math.sin(ang);
+      for (i = 0; i < n; i += len) {
+        uRe = 1; uIm = 0;
+        for (j = 0; j < len / 2; j++) {
+          k = i + j + len / 2;
+          tRe = uRe * re[k] - uIm * im[k]; tIm = uRe * im[k] + uIm * re[k];
+          re[k] = re[i + j] - tRe; im[k] = im[i + j] - tIm;
+          re[i + j] += tRe; im[i + j] += tIm;
+          m = uRe * wRe - uIm * wIm; uIm = uRe * wIm + uIm * wRe; uRe = m;
+        }
+      }
+    }
+  }
+
+  // 计算一帧的幅度谱（低频 bin 在前）
+  function magnitudeColumn(signal, offset, fftSize) {
+    var re = new Float32Array(fftSize);
+    var im = new Float32Array(fftSize);
+    for (var i = 0; i < fftSize; i++) {
+      re[i] = (signal[offset + i] || 0) * hann(i, fftSize);
+      im[i] = 0;
+    }
+    fftInPlace(re, im);
+    var bins = fftSize >> 1;  // fftSize/2 个 bin
+    var mags = new Float32Array(bins);
+    for (i = 0; i < bins; i++) {
+      mags[i] = Math.sqrt(re[i] * re[i] + im[i] * im[i]);
+    }
+    return mags;
+  }
+
+  // Audacity 风格彩色映射：黑 → 蓝 → 品红 → 红 → 黄
+  function colorMap(t) {
+    if (t <= 0) return [0,0,0];
+    if (t >= 1) return [255,255,0];
+    var stops = [
+      { pos:0.0, r:0,   g:0,   b:0 },
+      { pos:0.25, r:0,  g:0,   b:180 },
+      { pos:0.5,  r:180,g:0,   b:180 },
+      { pos:0.75, r:255,g:0,   b:0 },
+      { pos:1.0,  r:255,g:255, b:0 }
+    ];
+    for (var i = 0; i < stops.length-1; i++) {
+      if (t >= stops[i].pos && t <= stops[i+1].pos) {
+        var t2 = (t - stops[i].pos) / (stops[i+1].pos - stops[i].pos);
+        var r = Math.round(stops[i].r + (stops[i+1].r - stops[i].r) * t2);
+        var g = Math.round(stops[i].g + (stops[i+1].g - stops[i].g) * t2);
+        var b = Math.round(stops[i].b + (stops[i+1].b - stops[i].b) * t2);
+        return [r,g,b];
+      }
+    }
+    return [255,255,0];
+  }
+
+  // 解码音频文件为 AudioBuffer
+  function loadAudioBuffer() {
+    if (audioBufferCache) return Promise.resolve(audioBufferCache);
+    if (!audioFile) return Promise.reject(new Error("请先选择音频文件"));
+    if (!decodeCtx) decodeCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return fetch(audio.src)
+      .then(function(r) { return r.arrayBuffer(); })
+      .then(function(ab) { return decodeCtx.decodeAudioData(ab); })
+      .then(function(buf) { audioBufferCache = buf; return buf; });
+  }
+
+  // 全局变量，用于重绘
+  var spectrogramImageData = null;   // [numFrames][freqBins] dB 矩阵
+  var specNumFrames = 0, specFreqBins = 0;
+  var specSampleRate = 0;
+  var currentZoom = 1.0;
+
+  // 生成并绘制频谱
+  function genSpectrogram() {
+    if (!audioFile) { alert("请先选择一段音频文件。"); return; }
+    var btn = document.getElementById("gen-btn");
+    var label = document.getElementById("spec-label");
+    btn.disabled = true;
+    label.textContent = "正在分析音频频谱…";
+    loadAudioBuffer()
+      .then(function(buffer) {
+        // 计算整个频谱矩阵（幅度 → dB）
+        var data = buffer.getChannelData(0);
+        var fftSize = 1024;
+        var hopSize = 256;           // 与 Audacity 类似的重叠
+        var bins = fftSize / 2;      // 频率 bin 数
+        var frames = Math.floor((data.length - fftSize) / hopSize) + 1;
+        var spec = new Float32Array(frames * bins);
+
+        for (var f = 0; f < frames; f++) {
+          var offset = f * hopSize;
+          var mags = magnitudeColumn(data, offset, fftSize);
+          var base = f * bins;
+          for (var b = 0; b < bins; b++) {
+            var db = 20 * Math.log10(mags[b] + 1e-12);
+            if (db < -100) db = -100;
+            spec[base + b] = db;
+          }
+        }
+
+        // 保存全局数据
+        spectrogramImageData = spec;
+        specNumFrames = frames;
+        specFreqBins = bins;
+        specSampleRate = buffer.sampleRate;
+
+        // 显示控件
+        document.getElementById("spec-controls").style.display = "flex";
+        // 重置缩放
+        document.getElementById("zoom-slider").value = 1;
+        currentZoom = 1;
+        document.getElementById("range-slider").value = -60;
+        document.getElementById("range-db").textContent = "-60 dB";
+        document.getElementById("color-range-text").textContent = "-60 dB → 0 dB";
+
+        drawSpectrogramFromMatrix();
+        label.textContent = "✔ 频谱分析完成（" + Math.round(buffer.duration) + " 秒 · " + buffer.sampleRate + " Hz）";
+      })
+      .catch(function(err) {
+        label.textContent = "分析失败，请换用常见格式（MP3 / WAV）重试。";
+        console.error(err);
+      })
+      .then(function() { btn.disabled = false; });
+  }
+
+  // 根据当前 zoom 和范围下限绘制频谱到 canvas
+  function drawSpectrogramFromMatrix() {
+    if (!spectrogramImageData) return;
+
+    var canvas = document.getElementById("spec");
+    var scrollDiv = document.getElementById("scroll-container");
+    var rangeMin = parseInt(document.getElementById("range-slider").value, 10);
+    document.getElementById("range-db").textContent = rangeMin + " dB";
+    document.getElementById("color-range-text").textContent = rangeMin + " dB → 0 dB";
+
+    var zoom = currentZoom;
+    var canvasHeight = 320;
+    var specHeight = 280;  // 给时间轴留出空间
+    var canvasWidth = Math.round(specNumFrames * zoom);
+    // 防止 canvas 过宽导致性能问题
+    var MAX_WIDTH = 6000;
+    if (canvasWidth > MAX_WIDTH) {
+      canvasWidth = MAX_WIDTH;
+      zoom = canvasWidth / specNumFrames;
+      document.getElementById("zoom-slider").value = zoom.toFixed(1);
+      currentZoom = zoom;
+    }
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    var ctx = canvas.getContext("2d");
+    var img = ctx.createImageData(canvasWidth, specHeight);
+    var px = img.data;
+
+    var maxDB = 0;
+    var minDB = rangeMin;
+
+    // 逐像素绘制
+    for (var y = 0; y < specHeight; y++) {
+      // 频率 bin 映射：底部是低频，顶部是高频
+      var fracY = (specHeight - 1 - y) / specHeight;
+      var binFloat = fracY * (specFreqBins - 1);
+      var binLow = Math.floor(binFloat);
+      var binHigh = Math.ceil(binFloat);
+
+      for (var x = 0; x < canvasWidth; x++) {
+        var frameFloat = x / zoom;
+        var frameLow = Math.floor(frameFloat);
+        var frameHigh = Math.ceil(frameFloat);
+
+        var sum = 0, count = 0;
+        for (var f = frameLow; f <= frameHigh; f++) {
+          if (f < 0 || f >= specNumFrames) continue;
+          var base = f * specFreqBins;
+          for (var b = binLow; b <= binHigh; b++) {
+            if (b < 0 || b >= specFreqBins) continue;
+            sum += spectrogramImageData[base + b];
+            count++;
+          }
+        }
+        if (count === 0) {
+          var idx = (y * canvasWidth + x) * 4;
+          px[idx] = 0; px[idx+1] = 0; px[idx+2] = 0; px[idx+3] = 255;
+          continue;
+        }
+        var avgDB = sum / count;
+        if (avgDB < minDB) avgDB = minDB;
+        if (avgDB > maxDB) avgDB = maxDB;
+        var t = (avgDB - minDB) / (maxDB - minDB);
+        var rgb = colorMap(t);
+        var idx = (y * canvasWidth + x) * 4;
+        px[idx] = rgb[0]; px[idx+1] = rgb[1]; px[idx+2] = rgb[2]; px[idx+3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+
+    // 绘制时间轴刻度
+    ctx.fillStyle = "#8a949e";
+    ctx.font = "11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "#2a333d";
+    ctx.lineWidth = 1;
+    var totalDuration = specNumFrames * 256 / specSampleRate;  // hopSize=256
+    var intervals = [0.5, 1, 2, 5, 10, 30];
+    var step = intervals[0];
+    for (var i = 0; i < intervals.length; i++) {
+      if (totalDuration / intervals[i] < 15) { step = intervals[i]; break; }
+    }
+    for (var t = 0; t <= totalDuration; t += step) {
+      var x = t / totalDuration * canvasWidth;
+      if (x > canvasWidth) continue;
+      ctx.beginPath();
+      ctx.moveTo(x, specHeight);
+      ctx.lineTo(x, specHeight + 10);
+      ctx.stroke();
+      var mm = Math.floor(t / 60), ss = Math.floor(t % 60);
+      ctx.fillText(mm + ":" + (ss<10?"0":"") + ss, x, specHeight + 25);
+    }
+  }
+
+  // --------------------- 滑块事件 ---------------------
+  document.getElementById("zoom-slider").addEventListener("input", function() {
+    currentZoom = parseFloat(this.value);
+    drawSpectrogramFromMatrix();
+  });
+
+  document.getElementById("range-slider").addEventListener("input", function() {
+    drawSpectrogramFromMatrix();
+  });
+
+  // 窗口大小改变时自动适配（如果需要）
+  window.addEventListener("resize", function() {
+    if (spectrogramImageData) drawSpectrogramFromMatrix();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>技术文档 - DreamCMS 梦想建站系统 | 专业的开源内容管理系统</title>
+<style type="text/css">
+    body { margin: 0; padding: 0; background-color: #f0f4f8; font-family: "宋体", SimSun, Arial; font-size: 12px; color: #333; }
+    a { color: #004499; text-decoration: none; }
+    a:hover { color: #ff6600; text-decoration: underline; }
+    
+    #wrapper { width: 980px; margin: 10px auto; background-color: #fff; border: 1px solid #b0c4de; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    
+    /* 顶栏 */
+    #topbar { height: 30px; background-color: #f7f9fc; border-bottom: 1px solid #e1e8ed; line-height: 30px; padding: 0 15px; font-size: 11px; color: #666; }
+    .top-left { float: left; }
+    .top-right { float: right; }
+    
+    /* 头部 */
+    #header { height: 70px; background: linear-gradient(to right, #1e5799 0%, #2989d8 50%, #207cca 100%); color: #fff; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+    .logo-area { display: flex; align-items: center; }
+    .logo-icon { font-size: 28px; margin-right: 10px; }
+    .logo-text { font-family: "Microsoft YaHei", "黑体", sans-serif; }
+    .logo-main { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+    .logo-sub { font-size: 10px; opacity: 0.8; }
+    
+    /* 导航栏 */
+    #nav { height: 35px; background-color: #1c5080; border-bottom: 2px solid #0f365c; }
+    #nav ul { margin: 0; padding: 0; list-style: none; }
+    #nav li { float: left; line-height: 35px; font-size: 13px; font-weight: bold; }
+    #nav li a { display: block; padding: 0 20px; color: #fff; }
+    #nav li a:hover, #nav li.active a { background-color: #0f365c; }
+    
+    /* 主体内容 */
+    #content { padding: 20px; overflow: hidden; }
+    
+    /* 左侧菜单 */
+    .sidebar-left { width: 200px; float: left; border-right: 1px solid #e1e8ed; padding-right: 15px; min-height: 500px; }
+    .menu-group { margin-bottom: 20px; }
+    .menu-group-title { font-size: 13px; font-weight: bold; color: #1c5080; border-bottom: 2px solid #1c5080; padding-bottom: 6px; margin-bottom: 10px; }
+    .menu-list { margin: 0; padding: 0; list-style: none; }
+    .menu-list li { height: 28px; line-height: 28px; border-bottom: 1px dashed #eee; padding-left: 5px; }
+    .menu-list li a { display: block; color: #555; }
+    .menu-list li a:hover, .menu-list li.active a { color: #ff6600; font-weight: bold; }
+    
+    /* 右侧文档内容 */
+    .doc-main { width: 720px; float: right; line-height: 1.8; font-size: 13px; }
+    .doc-section { display: none; }
+    .doc-section.active-section { display: block; }
+    .doc-title { font-size: 18px; font-weight: bold; color: #1c5080; border-bottom: 1px solid #b0c4de; padding-bottom: 8px; margin-bottom: 20px; font-family: "Microsoft YaHei", sans-serif; }
+    
+    .doc-subtitle { font-size: 14px; font-weight: bold; color: #2989d8; margin: 20px 0 10px 0; border-left: 4px solid #2989d8; padding-left: 8px; }
+    .doc-text { color: #444; margin-bottom: 15px; text-indent: 2em; }
+    .doc-list { margin: 10px 0 15px 20px; padding: 0; }
+    .doc-list li { margin-bottom: 8px; }
+    
+    /* 代码块 */
+    .code-box { background-color: #f5f8fa; border: 1px solid #d4e0ee; padding: 12px; border-radius: 4px; font-family: Consolas, Courier, monospace; font-size: 12px; color: #006600; margin: 15px 0; overflow-x: auto; white-space: pre; line-height: 1.5; }
+    
+    /* 警告框 */
+    .tip-box { background-color: #fff9e6; border-left: 4px solid #f39c12; padding: 12px; border-radius: 0 4px 4px 0; margin: 15px 0; color: #666; font-size: 12px; }
+    .tip-box-title { font-weight: bold; color: #e67e22; margin-bottom: 5px; }
+    
+    /* 页脚 */
+    #footer { background-color: #2c3e50; color: #ccc; text-align: center; padding: 25px 0; line-height: 2; font-size: 11px; border-top: 3px solid #1c5080; margin-top: 30px; }
+    #footer a { color: #fff; }
+    #footer a:hover { color: #ff6600; }
+    
+    .clear { clear: both; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+    <div class="top-left">DreamCMS 官方技术文档中心 - 助力站长轻松建站</div>
+    <div class="top-right">
+        <a href="dreamcms.html">返回官网首页</a> | 
+        <a href="#">官方论坛</a>
+    </div>
+    <div class="clear"></div>
+</div>
+
+<div id="wrapper">
+    <!-- 头部 -->
+    <div id="header">
+        <div class="logo-area">
+            <span class="logo-icon">📚</span>
+            <div class="logo-text">
+                <div class="logo-main">DreamCMS 技术文档</div>
+                <div class="logo-sub">Version 2.0.x 官方权威开发手册</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导航栏 -->
+    <div id="nav">
+        <ul>
+            <li><a href="dreamcms.html">官网首页</a></li>
+            <li><a href="#">产品介绍</a></li>
+            <li class="active"><a href="dreamcms_doc.html">技术文档</a></li>
+            <li><a href="#">模版下载</a></li>
+            <li><a href="#">官方论坛</a></li>
+        </ul>
+        <div class="clear"></div>
+    </div>
+    
+    <!-- 主体内容 -->
+    <div id="content">
+        <!-- 左侧菜单 -->
+        <div class="sidebar-left">
+            <div class="menu-group">
+                <div class="menu-group-title">🚀 快速入门</div>
+                <ul class="menu-list">
+                    <li id="menu-install"><a href="javascript:switchDoc('install');">1. 系统安装教程</a></li>
+                    <li id="menu-faq"><a href="javascript:switchDoc('faq');">2. 常见问题解答</a></li>
+                </ul>
+            </div>
+            <div class="menu-group">
+                <div class="menu-group-title">🛠️ 模版开发</div>
+                <ul class="menu-list">
+                    <li id="menu-tags"><a href="javascript:switchDoc('tags');">3. 常用模版标签</a></li>
+                    <li id="menu-api"><a href="javascript:switchDoc('api');">4. 常用 API 接口</a></li>
+                </ul>
+            </div>
+            <div class="menu-group">
+                <div class="menu-group-title">🔒 安全与维护</div>
+                <ul class="menu-list">
+                    <li id="menu-admin" class="active"><a href="javascript:switchDoc('admin');">5. 管理员界面与安全</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 右侧文档内容 -->
+        <div class="doc-main">
+            <!-- 1. 系统安装教程 -->
+            <div id="doc-install" class="doc-section">
+                <div class="doc-title">DreamCMS 系统安装教程</div>
+                <p class="doc-text">DreamCMS 采用业界主流的 PHP + MySQL 架构开发，安装过程极其简单，仅需 3 分钟即可完成部署。以下是详细的安装步骤：</p>
+                
+                <div class="doc-subtitle">一、运行环境要求</div>
+                <ul class="doc-list">
+                    <li>操作系统：Linux / Unix / Windows Server</li>
+                    <li>Web 服务器：Apache / Nginx / IIS 6.0+</li>
+                    <li>PHP 版本：PHP 5.2.x - PHP 5.4.x（推荐 PHP 5.3）</li>
+                    <li>MySQL 版本：MySQL 5.0.x - MySQL 5.6.x</li>
+                </ul>
+                
+                <div class="doc-subtitle">二、安装步骤</div>
+                <ol class="doc-list">
+                    <li><b>下载并解压</b>：从 DreamCMS 官网下载最新的安装包，并解压到本地。</li>
+                    <li><b>上传文件</b>：使用 FTP 工具（如 FlashFXP）将解压后的所有文件上传至您的网站根目录。</li>
+                    <li><b>设置文件权限</b>：若您使用的是 Linux 服务器，请确保以下目录及其子目录具有可写权限（777）：
+                        <div class="code-box">/data/
+/uploads/
+/html/
+/install/</div>
+                    </li>
+                    <li><b>运行安装向导</b>：在浏览器中输入您的网站域名，系统会自动跳转至安装界面。若未自动跳转，请手动访问 <code>http://您的域名/install/index.php</code>。</li>
+                    <li><b>填写配置信息</b>：按照页面提示，同意授权协议，检测环境通过后，填写您的 MySQL 数据库连接信息（主机地址、数据库名、用户名、密码）以及管理员初始账号和密码。</li>
+                    <li><b>完成安装</b>：点击“开始安装”，等待系统写入数据库表。安装完成后，请务必**删除目录下的 <code>/install/</code> 文件夹**，以防被他人恶意重新安装。</li>
+                </ol>
+            </div>
+            
+            <!-- 2. 常见问题解答 -->
+            <div id="doc-faq" class="doc-section">
+                <div class="doc-title">常见问题解答 (FAQ)</div>
+                
+                <div class="doc-subtitle">Q1：安装完成后，访问首页显示空白怎么办？</div>
+                <p class="doc-text">A：这通常是由于模版缓存目录无写入权限导致的。请检查 <code>/data/tplcache/</code> 目录是否具有 777 写入权限。如果是 Windows 系统，请确保 IIS 匿名用户或 Users 组对该文件夹具有写入权限。</p>
+                
+                <div class="doc-subtitle">Q2：如何开启伪静态 (URL Rewrite) 功能？</div>
+                <p class="doc-text">A：登录后台，进入“系统设置” -> “核心设置”，将“运行模式”修改为“伪静态模式”。然后根据您的 Web 服务器类型，将官方提供的 <code>.htaccess</code> (Apache) 或 <code>nginx.conf</code> (Nginx) 规则文件部署到网站根目录下。</p>
+                
+                <div class="doc-subtitle">Q3：后台登录验证码不显示，或者提示验证码错误？</div>
+                <p class="doc-text">A：请确保您的 PHP 环境已开启 GD 库支持。您可以通过查看 <code>phpinfo()</code> 确认 GD 库状态。如果已开启但仍不显示，请检查文件编码是否为带 BOM 的 UTF-8 格式，BOM 头会导致页面输出多余字符从而破坏验证码图片的生成。</p>
+            </div>
+            
+            <!-- 3. 常用模版标签 -->
+            <div id="doc-tags" class="doc-section">
+                <div class="doc-title">常用模版标签手册</div>
+                <p class="doc-text">DreamCMS 拥有强大而直观的标签调用系统，无需任何 PHP 基础，即可轻松调用网站数据。标签格式统一为 <code>{dream:标签名 参数='值'}...{/dream:标签名}</code>。</p>
+                
+                <div class="doc-subtitle">1. 栏目导航标签 (channel)</div>
+                <p class="doc-text">用于调用网站的栏目分类导航，支持高亮当前栏目。</p>
+                <div class="code-box">{dream:channel type='top' row='10'}
+    &lt;li&gt;&lt;a href="[field:typelink/]"&gt;[field:typename/]&lt;/a&gt;&lt;/li&gt;
+{/dream:channel}</div>
+                
+                <div class="doc-subtitle">2. 文档列表标签 (arclist)</div>
+                <p class="doc-text">用于在首页或列表页调用指定栏目的文章列表，支持按时间、点击量排序。</p>
+                <div class="code-box">{dream:arclist typeid='1' row='8' titlelen='40' orderby='pubdate'}
+    &lt;li&gt;
+        &lt;span class="date"&gt;[field:pubdate function="MyDate('Y-m-d',@me)"/]&lt;/span&gt;
+        &lt;a href="[field:arclink/]"&gt;[field:title/]&lt;/a&gt;
+    &lt;/li&gt;
+{/dream:arclist}</div>
+                
+                <div class="doc-subtitle">3. 全局配置标签 (global)</div>
+                <p class="doc-text">用于调用系统全局变量，如网站名称、备案号、统计代码等。</p>
+                <div class="code-box">网站名称：{dream:global name='cfg_webname'/}
+备案号：{dream:global name='cfg_beian'/}</div>
+            </div>
+            
+            <!-- 4. 常用 API 接口 -->
+            <div id="doc-api" class="doc-section">
+                <div class="doc-title">常用 API 接口说明</div>
+                <p class="doc-text">DreamCMS v2.0 引入了轻量级的 RESTful API 接口，方便开发者进行二次开发，或将网站数据对接至移动端 App、微信小程序等第三方平台。</p>
+                
+                <div class="doc-subtitle">1. 获取文章列表 API</div>
+                <p class="doc-text"><b>接口地址</b>：<code>/api/v1/get_articles.php</code><br />
+                   <b>请求方式</b>：GET<br />
+                   <b>请求参数</b>：</p>
+                <ul class="doc-list">
+                    <li><code>typeid</code> (int)：栏目 ID，默认为 0（获取全站）</li>
+                    <li><code>limit</code> (int)：获取数量，默认 10</li>
+                    <li><code>page</code> (int)：当前页码，默认 1</li>
+                </ul>
+                <p class="doc-text"><b>返回格式</b>：JSON</p>
+                <div class="code-box">{
+    "code": 200,
+    "msg": "success",
+    "data": [
+        {
+            "id": 105,
+            "title": "DreamCMS v2.0 正式版发布",
+            "pubdate": "1224057600",
+            "click": 1420,
+            "writer": "admin"
+        }
+    ]
+}</div>
+            </div>
+            
+            <!-- 5. 管理员界面与安全 -->
+            <div id="doc-admin" class="doc-section active-section">
+                <div class="doc-title">管理员界面与安全配置</div>
+                <p class="doc-text">保障后台管理界面的安全是网站防黑客、防篡改的重中之重。DreamCMS 提供了灵活的后台管理入口配置以及多重安全加固手段。</p>
+                
+                <div class="doc-subtitle">一、如何进入管理员界面</div>
+                <p class="doc-text">在本地静态环境下，请<b>直接访问同目录下的 <code>admin.html</code></b>，该页面即为 DreamCMS 管理员界面登录入口。</p>
+                <p class="doc-text"><strong>为了安全，运维界面和管理员账户都可以从管理员界面登录，但是会进入独立的两个后台。</strong></p>
+                <p class="doc-text">进入后台后，可在左侧菜单选择「官方内容管理」，对新闻公告、角色介绍等页面内容进行查看、编辑与发布。修改完成后点击保存，全站静态缓存将自动更新。</p>
+                
+                <div class="tip-box">
+                    <div class="tip-box-title">🔒 默认管理员凭证说明</div>
+                    <p style="margin:0; line-height:1.6;">系统在首次安装成功后，默认生成的管理员账号为<b>站长或管理员的注册电子邮箱</b>，系统初始默认密码为 <b><code>dreamCMS</code></b>。请在首次登录后台后，立即前往“系统设置” -> “管理员管理”中修改您的初始密码，以保障系统安全。</p>
+                </div>
+                
+                <div class="doc-subtitle">二、后台登录保护配置</div>
+                <p class="doc-text">DreamCMS 后台登录界面内置了以下安全防护特性：</p>
+                <ul class="doc-list">
+                    <li><b>验证码机制</b>：默认开启 GD 库图形验证码，防止机器人使用字典进行暴力破解。</li>
+                    <li><b>登录尝试限制</b>：如果连续输入密码错误超过 5 次，系统将自动锁定该管理员账号及登录 IP，锁定时间为 30 分钟。</li>
+                    <li><b>操作日志审计</b>：系统会自动记录每一位管理员的登录时间、登录 IP 以及执行的所有后台操作（如发布文章、修改配置、删除用户等），方便站长随时审计安全状况。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    
+    <!-- 页脚 -->
+    <div id="footer">
+        <a href="#">关于我们</a> | <a href="#">服务条款</a> | <a href="#">广告合作</a> | <a href="#">联系我们</a> | <a href="dreamcms_doc.html">技术文档</a><br />
+        Copyright &copy; 2005-2008 DreamCMS Software Co., Ltd. All Rights Reserved.<br />
+        梦想软件工作室 版权所有 京ICP备08012345号-1
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 切换文档
+    function switchDoc(docId) {
+        if (docId !== "admin") {
+            return;
+        }
+
+        var sections = document.querySelectorAll(".doc-section");
+        sections.forEach(function(sec) {
+            sec.classList.remove("active-section");
+        });
+        
+        // 取消所有菜单激活状态
+        var menuItems = document.querySelectorAll(".menu-list li");
+        menuItems.forEach(function(item) {
+            item.classList.remove("active");
+        });
+        
+        // 激活当前文档和菜单
+        document.getElementById("doc-" + docId).classList.add("active-section");
+        document.getElementById("menu-" + docId).classList.add("active");
+        
+        // 滚动到顶部
+        window.scrollTo(0, 0);
+    }
+    
+    // 如果该页面是打开的状态，当LocalStorage发生变化时强制进行刷新
+    window.addEventListener('storage', function(e) {
+        window.location.reload();
+    });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

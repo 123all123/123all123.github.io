@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="《辉光勇者》中文官方网站 · 系统物理备份存档。" />
+<title>《辉光勇者》中文官方网站 · 备份存档 - Glow Legend</title>
+<style type="text/css">
+  body { margin:0; padding:0; font-family:"宋体",SimSun,Arial; font-size:12px; color:#333; background:#f7f1e3; transition:background 1.2s ease, color 1.2s ease; }
+  a { color:#cc3300; text-decoration:none; } a:hover { color:#ff6600; text-decoration:underline; }
+  ul,li { list-style:none; margin:0; padding:0; }
+  #topbar { height:25px; line-height:25px; background:#efefef; border-bottom:1px solid #ccc; text-align:right; padding-right:20px; }
+  #wrapper { width:960px; margin:0 auto; background:#fff; border:1px solid #d4c4a8; box-shadow:0 0 5px rgba(0,0,0,.1); }
+  #header { width:960px; overflow:hidden; background:#ffeaa7; }
+  #header img { display:block; width:960px; height:auto; }
+  #nav { height:35px; background:#d35400; border-bottom:3px solid #e67e22; }
+  #nav li { float:left; line-height:35px; font-size:14px; font-weight:bold; } #nav li a { display:block; padding:0 25px; color:#fff; }
+  #nav li a:hover { background:#e67e22; }
+  #notice { height:30px; line-height:30px; background:#fff9e6; border-bottom:1px dashed #ccc; padding:0 10px; color:#e74c3c; }
+  #content { padding:15px; overflow:hidden; }
+  .main-left { width:660px; float:left; }
+  .box-title { height:30px; line-height:30px; background:#fcece5; border-left:5px solid #d35400; font-size:14px; font-weight:bold; padding-left:10px; margin-bottom:15px; color:#d35400; }
+  .synopsis-box { border:1px solid #e0e0e0; padding:10px; margin-bottom:20px; background:#fafafa; line-height:1.8; font-size:13px; }
+  .info-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+  .info-table th,.info-table td { border:1px solid #ddd; padding:8px; line-height:1.5; }
+  .info-table th { background:#f5f5f5; width:120px; text-align:right; color:#666; font-weight:normal; }
+  .sidebar-right { width:250px; float:right; }
+  .side-box { border:1px solid #e0e0e0; margin-bottom:15px; }
+  .side-box-title { height:28px; line-height:28px; background:#f5f5f5; border-bottom:1px solid #e0e0e0; padding-left:10px; font-weight:bold; }
+  .side-box-content { padding:10px; line-height:1.8; }
+  #footer { background:#efefef; border-top:2px solid #d35400; text-align:center; padding:20px 0; line-height:2; color:#666; }
+  .clear { clear:both; }
+  .gallery { text-align:center; display:flex; justify-content:center; gap:15px; }
+  .gallery .g { text-align:center; cursor:pointer; }
+  .gallery img { width:130px; height:130px; border:2px solid #ccc; }
+  .gallery .gname { font-weight:bold; color:#666; display:inline-block; margin-top:5px; }
+  /* 血红崩坏态 */
+  body.red { background:#4a0000; color:#ff9999; }
+  body.red #wrapper { background:#1a0000; border-color:#5a0000; box-shadow:0 0 30px rgba(255,0,0,.4); }
+  body.red #notice { background:#2a0000; color:#ff4d4d; border-bottom-color:#7a0000; }
+  body.red .box-title { background:#2a0000; color:#ff4d4d; border-left-color:#ff0000; }
+  body.red .synopsis-box { background:#160000; border-color:#5a0000; color:#ff9999; }
+  body.red .info-table th { background:#2a0000; color:#ff9999; } body.red .info-table td { color:#ffb3b3; }
+  body.red .side-box { border-color:#5a0000; } body.red .side-box-title { background:#2a0000; color:#ff9999; border-bottom-color:#5a0000; }
+  body.red #footer { background:#2a0000; color:#ff6666; border-top-color:#ff0000; }
+  body.red .gallery img { border-color:#ff0000; filter:hue-rotate(18deg) contrast(1.75) saturate(1.6) blur(0.4px); }
+  body.red .gallery .gname { color:#ff9999 !important; }
+  .hero-thumb { width:130px; height:130px; margin:0 auto; display:flex; align-items:center; justify-content:center; }
+  .hero-thumb img { width:130px; height:130px; border:2px dashed #d4a017; object-fit:cover; object-position:center top; }
+  body.red .hero-thumb { width:130px; height:130px; border:2px dashed #7a0000; background:#2a0000; }
+  body.red .hero-thumb img { display:none; }
+  @keyframes char-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(28deg); opacity: 0; }
+  }
+  .gallery .g.falling { animation: char-fall 1.4s forwards ease-in; pointer-events: none; }
+  .gallery .g.fallen { display: none; }
+  #oo-toast {
+    display: none;
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-left: 4px solid #1a73e8;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    padding: 14px 18px;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+    color: #202124;
+    cursor: pointer;
+    max-width: 280px;
+    animation: oo-toast-in .35s ease;
+  }
+  #oo-toast strong { color: #1a73e8; }
+  @keyframes oo-toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div id="topbar">
+  <a href="backup_404.html">加入收藏</a> | <a href="backup_404.html">官方论坛</a>
+</div>
+<div id="wrapper">
+  <div id="header"><img id="banner" src="images/henfut.png" width="960" height="150" alt="辉光勇者 备份存档横幅" /></div>
+  <div id="nav"><ul>
+    <li><a href="backup_guanwang.html">官网首页</a></li>
+    <li><a href="backup_404.html">新闻公告</a></li>
+    <li><a href="backup_404.html">趣味性格测试</a></li>
+    <li><a href="backup_404.html">官方论坛</a></li>
+  </ul><div class="clear"></div></div>
+  <div id="notice"><b>【存档提示】</b> 您正在浏览的是本站的物理备份快照，部分数据可能不完整或已损坏。</div>
+  <div id="content">
+    <div class="main-left">
+      <div class="box-title">◆ 动画故事简介</div>
+      <div class="synopsis-box">
+        <div style="line-height:20px;font-size:13px;">
+          在遥远的光之大陆，流传着神秘"辉光"的古老传说。传闻中，当黑暗再次笼罩大地，魔王即将复苏，只有获得辉光之剑的勇者，才拥有净化黑暗的力量。<br/><br/>
+          冷面法师法恩、冒失的精灵射手莉亚、会说话却不会治疗的小牧师小满，以及那位手持辉光之剑的少年，组成了冒险小队，踏上讨伐魔王的旅途……
+        </div>
+      </div>
+            <div class="box-title">◆ 主题曲下载</div>
+      <div class="synopsis-box" style="padding:16px 18px;">
+        <p style="margin:0 0 10px;line-height:1.9;">备份快照中仍保留主题曲<strong>《辉光仍在》</strong>原始音频文件。</p>
+        <a href="audio/辉光仍在.wav" download="辉光仍在.wav" style="display:inline-block;padding:8px 18px;background:#d35400;color:#fff;font-weight:bold;border-radius:4px;">♫ 点击下载《辉光仍在》主题曲 (.wav)</a>
+      </div>
+      <div class="box-title">◆ 详细放送情报</div>
+      <table class="info-table">
+        <tr><th>导演：</th><td><strong>林光明</strong></td><th>编剧：</th><td><strong>林光明</strong></td></tr>
+        <tr><th>主演声优：</th><td colspan="3">沈法（饰 法恩） / 李林晔（饰 莉亚） / 冯骅（饰 小满）</td></tr>
+        <tr><th>首播：</th><td>2007-07-15</td><th>集数：</th><td>10（未完）</td></tr>
+      </table>
+      <div class="box-title">◆ 角色图册 (Gallery)</div>
+      <div class="gallery">
+        <div class="g" id="g-faen" onclick="location.href='backup_faen.html'"><img id="img-faen" src="images/char_faen.png" alt="法恩" /><br/><span class="gname">法恩</span></div>
+        <div class="g" id="g-liya" onclick="location.href='backup_liya.html'"><img id="img-liya" src="images/char_liya.png" alt="莉亚" /><br/><span class="gname">莉亚</span></div>
+        <div class="g" id="g-xiaoman" onclick="location.href='backup_xiaoman.html'"><img id="img-xiaoman" src="images/char_xiaoman.png" alt="小满" /><br/><span class="gname">小满</span></div>
+        <div class="g" id="g-hero" onclick="location.href='backup_hero.html'"><div class="hero-thumb" id="hero-thumb"><img src="images/char_ag.png" alt="勇者阿光" /></div><br/><span class="gname" style="color:#d35400;">勇者 阿光</span></div>
+      </div>
+    </div>
+    <div class="sidebar-right">
+      <div class="side-box">
+        <div class="side-box-title">最新动态 News</div>
+        <ul class="side-box-content">
+          <li style="border-bottom:1px dashed #eee;padding:4px 0;"><a href="backup_news_interview.html">【独家专访】导演林光明谈角色设计来源</a></li>
+          <li style="padding:4px 0;color:#888;"><del>DVD全集发售！（数据已损坏）</del></li>
+        </ul>
+      </div>
+      <div class="side-box">
+        <div class="side-box-title">在线观看 Watch</div>
+        <ul class="side-box-content">
+          <li style="padding:4px 0;"><a href="feidie.html">飞碟动漫网 · 搜索「辉光勇者」</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div id="footer">Backup Archive &copy; 2007-2008 Glow Legend Animation Studio.<br/>物理备份快照 · 只读</div>
+</div>
+
+<div id="oo-toast" onclick="window.open('youxiang.html','_blank')">
+  <strong>✉ oo邮箱</strong><br/>您收到 1 条新消息
+</div>
+
+<script type="text/javascript">
+  var visitedHero = localStorage.getItem("visited_backup_hero") === "true";
+
+  function applyRedState() {
+    document.body.classList.add("red");
+    var b = document.getElementById("banner");
+    b.src = "images/henfu3.png";
+    b.alt = "辉光勇者 血红崩坏横幅 henfu3";
+    document.getElementById("notice").innerHTML = "<b>【？？？】</b> 你不该看到这些的。它们的真面目，藏在每个人的心底。";
+    var syn = document.querySelector(".synopsis-box div");
+    if (syn) syn.innerHTML = "在遥远的光之大陆……不，已经没有大陆了。<br/><br/>冷面法师法恩、精灵射手莉亚、见习牧师小满——他们仍在备份里微笑，可那把辉光之剑的位置，只剩下一个空洞。";
+    document.getElementById("img-faen").src = "images/faen_error.png";
+    document.getElementById("img-liya").src = "images/liya_error.png";
+    document.getElementById("img-xiaoman").src = "images/xiaoman_error.png";
+    applyFallenChars();
+  }
+
+  function applyFallenChars() {
+    ["faen", "liya", "xiaoman"].forEach(function (id) {
+      var el = document.getElementById("g-" + id);
+      if (!el) return;
+      if (localStorage.getItem("backup_char_fallen_" + id) === "true") {
+        el.classList.add("fallen");
+        return;
+      }
+      if (localStorage.getItem("backup_char_viewed_" + id) === "true") {
+        el.classList.add("falling");
+        el.addEventListener("animationend", function () {
+          el.classList.remove("falling");
+          el.classList.add("fallen");
+          localStorage.setItem("backup_char_fallen_" + id, "true");
+        }, { once: true });
+      }
+    });
+  }
+
+  function maybeShowOoToast() {
+    if (!visitedHero) return;
+    if (localStorage.getItem("oo_hero_notify_shown") === "true") return;
+    localStorage.setItem("oo_hero_notify_shown", "true");
+    localStorage.setItem("oo_inbox_notify", String(Date.now()));
+    var toast = document.getElementById("oo-toast");
+    if (toast) toast.style.display = "block";
+  }
+
+  if (visitedHero) { applyRedState(); }
+  setTimeout(maybeShowOoToast, 5000);
+
+  window.addEventListener('storage', function(){ location.reload(); });
+</script>
+<script src="js/placeholder.js"></script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

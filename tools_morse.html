@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="摩斯密码解码工具：将点划序列解码为英文字母，字母之间用空格分隔。" />
+<title>摩斯密码解码工具 - 智搜工具</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI","Microsoft YaHei",Arial,sans-serif; background: #141820; color: #d7dde3; padding: 28px 16px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { color: #c9b8ff; font-size: 22px; margin-bottom: 6px; }
+  .sub { color: #8a949e; font-size: 13px; margin-bottom: 22px; line-height: 1.7; }
+  .card { background: #1c2230; border: 1px solid #2e3648; border-radius: 10px; padding: 20px; margin-bottom: 18px; }
+  label { display: block; font-size: 13px; color: #9fb2cc; margin-bottom: 8px; }
+  textarea { width: 100%; min-height: 120px; padding: 12px; background: #0f141a; border: 1px solid #2a333d; border-radius: 6px; color: #eaf2ff; font-family: Consolas, "Microsoft YaHei", monospace; font-size: 14px; line-height: 1.8; resize: vertical; }
+  textarea:focus { outline: none; border-color: #9b8cff; }
+  .btn { cursor: pointer; border: none; border-radius: 6px; padding: 11px 18px; font-size: 14px; font-weight: 600; background: #5a4a9b; color: #fff; margin-top: 14px; margin-right: 8px; }
+  .btn.ghost { background: #232c36; color: #bcd; border: 1px solid #35404c; }
+  .result { background: #121a28; border: 1px solid #2a3a5a; border-radius: 8px; padding: 16px; margin-top: 16px; display: none; }
+  .result .k { color: #7d8ba3; font-size: 12px; margin-bottom: 6px; }
+  .result .txt { font-family: Consolas, monospace; color: #b8a8ff; font-size: 18px; letter-spacing: 2px; word-break: break-all; }
+  .err { color: #ff7676; font-size: 13px; margin-top: 12px; display: none; }
+  .tip { background: #141a20; border-left: 3px solid #9b8cff; padding: 12px 14px; border-radius: 0 6px 6px 0; color: #8a949e; font-size: 12px; line-height: 1.8; margin-top: 8px; }
+  a { color: #9b8cff; font-size: 13px; }
+  code { background: #232c36; padding: 1px 5px; border-radius: 3px; color: #cde; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📡 摩斯密码解码工具</h1>
+  <div class="sub">将摩斯点划序列解码为英文字母。每个字母的编码之间用<b>空格</b>分隔；多个英文单词之间同样用空格分隔。</div>
+
+  <div class="card">
+    <label>摩斯码输入</label>
+    <textarea id="input" placeholder="输入摩斯码，字母之间用空格分隔" autocomplete="off"></textarea>
+    <button class="btn" onclick="decode()">解码</button>
+    <button class="btn ghost" onclick="clearAll()">清空</button>
+    <div class="err" id="err"></div>
+    <div class="result" id="result">
+      <div class="k">解码结果：</div>
+      <div class="txt" id="out"></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <a href="tools_hub.html">&larr; 返回工具中心</a> · <a href="find.html">智搜首页</a>
+  </div>
+</div>
+<script>
+  var MORSE = {
+    ".-": "A", "-...": "B", "-.-.": "C", "-..": "D", ".": "E",
+    "..-.": "F", "--.": "G", "....": "H", "..": "I", ".---": "J",
+    "-.-": "K", ".-..": "L", "--": "M", "-.": "N", "---": "O",
+    ".--.": "P", "--.-": "Q", ".-.": "R", "...": "S", "-": "T",
+    "..-": "U", "...-": "V", ".--": "W", "-..-": "X", "-.--": "Y",
+    "--..": "Z"
+  };
+
+  function normalizeToken(tok) {
+    var s = (tok || "").trim();
+    if (!s) return "";
+    s = s.replace(/■■/g, "-").replace(/■/g, ".");
+    s = s.replace(/[—_]/g, "-").replace(/·/g, ".");
+    return s.replace(/[^.\-]/g, "");
+  }
+
+  function decode() {
+    var raw = document.getElementById("input").value.trim();
+    var err = document.getElementById("err");
+    var res = document.getElementById("result");
+    err.style.display = "none";
+    res.style.display = "none";
+    if (!raw) {
+      err.textContent = "✖ 请先输入摩斯码。";
+      err.style.display = "block";
+      return;
+    }
+    var words = raw.split(/\s+/).filter(function (w) { return w.length; });
+    var out = [];
+    var bad = false;
+    words.forEach(function (w) {
+      var code = normalizeToken(w);
+      if (!code) return;
+      if (MORSE[code]) out.push(MORSE[code]);
+      else bad = true;
+    });
+    if (!out.length) {
+      err.textContent = "✖ 未识别到有效摩斯码，请检查格式与空格。";
+      err.style.display = "block";
+      return;
+    }
+    document.getElementById("out").textContent = out.join("");
+    res.style.display = "block";
+    if (bad) {
+      err.textContent = "⚠ 部分片段无法识别，已跳过无效段。";
+      err.style.display = "block";
+    }
+  }
+
+  function clearAll() {
+    document.getElementById("input").value = "";
+    document.getElementById("err").style.display = "none";
+    document.getElementById("result").style.display = "none";
+  }
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

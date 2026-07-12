@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="在线异或(XOR)计算器：支持多个十六进制字符串按位异或，输出十六进制结果。" />
+<title>在线异或(XOR)计算器 - 十六进制按位异或</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif; background: #0f1420; color: #d6e2f0; padding: 30px 16px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #6cc4ff; margin-bottom: 6px; }
+  .sub { color: #7d8ba3; font-size: 13px; margin-bottom: 24px; }
+  .card { background: #171e2e; border: 1px solid #26314a; border-radius: 10px; padding: 22px; margin-bottom: 20px; }
+  label { display: block; font-size: 13px; color: #9fb2cc; margin: 12px 0 6px; }
+  input[type=text] { width: 100%; padding: 11px 12px; background: #0f1626; border: 1px solid #2c3a57; border-radius: 6px; color: #eaf2ff; font-family: Consolas, monospace; font-size: 14px; letter-spacing: 1px; }
+  input:focus { outline: none; border-color: #4a90e2; }
+  .row-add { text-align: right; margin-top: 8px; }
+  button { cursor: pointer; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; }
+  .btn-calc { width: 100%; padding: 13px; background: linear-gradient(180deg,#4a90e2,#2f6dc0); color: #fff; margin-top: 18px; letter-spacing: 2px; }
+  .btn-add { background: #223052; color: #8fb6ee; padding: 6px 14px; font-size: 12px; }
+  .result { background: #0d1a12; border: 1px solid #1f4a2e; border-radius: 8px; padding: 18px; margin-top: 18px; display: none; }
+  .result .k { color: #7d8ba3; font-size: 12px; }
+  .result .hex { font-family: Consolas, monospace; color: #6effa0; font-size: 16px; word-break: break-all; margin: 4px 0; }
+  .err { color: #ff7676; font-size: 13px; margin-top: 10px; display: none; }
+  .tip { background: #141b2b; border-left: 3px solid #4a90e2; padding: 12px 14px; border-radius: 0 6px 6px 0; color: #9fb2cc; font-size: 12px; line-height: 1.7; margin-top: 18px; }
+  code { background: #223052; padding: 1px 5px; border-radius: 3px; color: #b9d4ff; }
+  a { color: #6cc4ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⊕ 在线异或 (XOR) 计算器</h1>
+  <div class="sub">多个十六进制字符串按位异或（左对齐，短的补 0x00），输出十六进制结果。</div>
+
+  <div class="card">
+    <div id="inputs">
+      <label>十六进制串 1</label>
+      <input type="text" class="hex-in" autocomplete="off" />
+      <label>十六进制串 2</label>
+      <input type="text" class="hex-in" autocomplete="off" />
+      <label>十六进制串 3</label>
+      <input type="text" class="hex-in" autocomplete="off" />
+    </div>
+    <div class="row-add"><button class="btn-add" onclick="addInput()">+ 增加一个输入框</button></div>
+    <button class="btn-calc" onclick="calc()">计 算 异 或</button>
+    <div class="err" id="err">✖ 输入包含非十六进制字符，或长度为奇数，请检查。</div>
+    <div class="result" id="result">
+      <div class="k">异或结果（十六进制）：</div>
+      <div class="hex" id="out-hex"></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <b>小提示</b>：异或运算满足 <code>A ⊕ B ⊕ C</code> 与顺序无关，且 <code>X ⊕ X = 0</code>。<br/>
+    如果三段密钥分别由不同的人保管，只有把它们全部凑齐并异或，才能还原出最终隐藏的十六进制信息。
+  </div>
+  <p style="margin-top:18px;"><a href="tools_hub.html">&larr; 返回工具中心</a> · <a href="find.html">智搜首页</a></p>
+</div>
+
+<script src="js/keys.js"></script>
+<script>
+  function addInput() {
+    var box = document.getElementById("inputs");
+    var n = box.querySelectorAll(".hex-in").length + 1;
+    var lab = document.createElement("label"); lab.textContent = "十六进制串 " + n;
+    var inp = document.createElement("input"); inp.type = "text"; inp.className = "hex-in"; inp.autocomplete = "off";
+    box.appendChild(lab); box.appendChild(inp);
+  }
+  function calc() {
+    var ins = document.querySelectorAll(".hex-in");
+    var args = [];
+    for (var i = 0; i < ins.length; i++) {
+      var v = ins[i].value.trim();
+      if (v) args.push(v);
+    }
+    var err = document.getElementById("err"), res = document.getElementById("result");
+    err.style.display = "none"; res.style.display = "none";
+    if (args.length < 2) { err.textContent = "✖ 请至少填写两个十六进制串。"; err.style.display = "block"; return; }
+    var outHex = ARGKeys.xorHex.apply(null, args);
+    if (outHex === null) { err.textContent = "✖ 输入包含非十六进制字符，或长度为奇数，请检查。"; err.style.display = "block"; return; }
+    document.getElementById("out-hex").textContent = outHex;
+    res.style.display = "block";
+  }
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

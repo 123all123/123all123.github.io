@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="一纸江湖 - 原创小说与短篇在线阅读。" />
+<title>一纸江湖 - 原创小说在线阅读</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei", "宋体", serif; background: #f4f0e8; color: #333; }
+  a { color: #8b4513; text-decoration: none; } a:hover { text-decoration: underline; }
+  .top { background: #5c3d2e; color: #f5e6d3; padding: 18px 24px; }
+  .top h1 { font-size: 26px; letter-spacing: 6px; }
+  .top p { font-size: 12px; opacity: .85; margin-top: 6px; }
+  .wrap { max-width: 880px; margin: 24px auto; padding: 0 16px 48px; }
+  .nav { font-size: 12px; color: #888; margin-bottom: 20px; }
+  .sec-title { font-size: 16px; font-weight: bold; color: #5c3d2e; border-bottom: 2px solid #c9b89a; padding-bottom: 8px; margin: 28px 0 16px; }
+  .sec-title:first-of-type { margin-top: 0; }
+  .book-list { list-style: none; }
+  .book-list li { background: #fff; border: 1px solid #e0d5c5; border-radius: 6px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .book-list li:hover { border-color: #c9a87c; }
+  .book-list .info h3 { font-size: 15px; color: #333; margin-bottom: 4px; }
+  .book-list .info .meta { font-size: 12px; color: #888; }
+  .book-list .tag { font-size: 11px; color: #8b6914; background: #faf3e0; padding: 2px 8px; border-radius: 3px; margin-right: 6px; }
+  .book-list .read { font-size: 13px; font-weight: bold; color: #8b4513; cursor: pointer; }
+  .book-list .read:hover { text-decoration: underline; }
+  .foot { text-align: center; font-size: 11px; color: #999; margin-top: 32px; }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>一纸江湖</h1>
+  <p>原创小说与短篇故事 · 用文字记录人间烟火</p>
+</div>
+<div class="wrap">
+  <div class="nav"><a href="find.html">智搜</a> &gt; 一纸江湖</div>
+
+  <div class="sec-title">长篇连载</div>
+  <ul class="book-list">
+    <li>
+      <div class="info">
+        <h3><span class="tag">奇幻</span>星落无声</h3>
+        <div class="meta">作者：墨染青城 · 已完结</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">言情</span>南风知我意</h3>
+        <div class="meta">作者：浅夏微凉 · 连载中</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">悬疑</span>第七层阁楼</h3>
+        <div class="meta">作者：夜半钟声 · 已完结</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">武侠</span>孤城一剑</h3>
+        <div class="meta">作者：江上客 · 已完结</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+  </ul>
+
+  <div class="sec-title">短篇小故事</div>
+  <ul class="book-list">
+    <li>
+      <div class="info">
+        <h3><span class="tag">童话</span>悬崖边的四只小动物</h3>
+        <div class="meta">作者：冯骅 · 短篇</div>
+      </div>
+      <span class="read" onclick="go('story_fenghua_animals.html')">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">随笔</span>影</h3>
+        <div class="meta">作者：冯骅 · 短篇</div>
+      </div>
+      <span class="read" onclick="go('story_fenghua_ying.html')">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">青春</span>操场边的梧桐</h3>
+        <div class="meta">作者：小鹿不吃草 · 短篇</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">日常</span>夜班公交车</h3>
+        <div class="meta">作者：城南旧事 · 短篇</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">幻想</span>信箱里没有人</h3>
+        <div class="meta">作者：未署名 · 短篇</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+    <li>
+      <div class="info">
+        <h3><span class="tag">治愈</span>雨停之前</h3>
+        <div class="meta">作者：浅茶 · 短篇</div>
+      </div>
+      <span class="read" onclick="noop()">开始阅读</span>
+    </li>
+  </ul>
+
+  <div class="foot">Copyright &copy; 一纸江湖 · 本站作品均为网友原创投稿</div>
+</div>
+<script>
+  function go(url) { window.location.href = url; }
+  function noop() { return false; }
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

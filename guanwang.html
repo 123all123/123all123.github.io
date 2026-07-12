@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<script type="text/javascript">
+    if (window.location.href.toLowerCase().indexOf('/admin') !== -1 || window.location.href.toLowerCase().indexOf('guanwang/admin') !== -1) {
+        window.location.href = "admin.html";
+    } else if (localStorage.getItem("site_collapsed") === "true" && location.search.indexOf("ep_preview=1") === -1) {
+        window.location.href = "error.html";
+    }
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="《辉光勇者》（辉光勇者）2007年国产热血奇幻动画官方网站。冷面法师法恩、精灵射手莉亚、迷糊牧师小满的冒险之旅。" />
+<link id="site-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ffeaa7'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23d35400'%3E%E2%98%80%3C/text%3E%3C/svg%3E" />
+<title>《辉光勇者》中文官方网站 - Glow Legend</title>
+<style type="text/css">
+    body { margin: 0; padding: 0; font-family: "宋体", SimSun, Arial; font-size: 12px; color: #333; background-color: #f7f1e3; }
+    a { color: #cc3300; text-decoration: none; }
+    a:hover { color: #ff6600; text-decoration: underline; }
+    ul, li { list-style: none; margin: 0; padding: 0; }
+    #topbar { height: 25px; line-height: 25px; background: #efefef; border-bottom: 1px solid #ccc; text-align: right; padding-right: 20px; }
+    #wrapper { width: 960px; margin: 0 auto; background: #fff; border: 1px solid #d4c4a8; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    #header { width: 960px; height: 200px; background: #ffeaa7; position: relative; }
+    #nav { height: 35px; background: #d35400; border-bottom: 3px solid #e67e22; }
+    #nav li { float: left; line-height: 35px; font-size: 14px; font-weight: bold; }
+    #nav li a { display: block; padding: 0 25px; color: #fff; }
+    #nav li a:hover { background: #e67e22; }
+    #notice { height: 30px; line-height: 30px; background: #fff9e6; border-bottom: 1px dashed #ccc; padding: 0 10px; color: #e74c3c; }
+    #content { padding: 15px; overflow: hidden; }
+    .main-left { width: 660px; float: left; }
+    .box-title { height: 30px; line-height: 30px; background: #fcece5; border-left: 5px solid #d35400; font-size: 14px; font-weight: bold; padding-left: 10px; margin-bottom: 15px; color: #d35400; }
+    .synopsis-box { border: 1px solid #e0e0e0; padding: 10px; margin-bottom: 20px; background: #fafafa; line-height: 1.8; font-size: 13px; text-indent: 2em; }
+    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .info-table th, .info-table td { border: 1px solid #ddd; padding: 8px; line-height: 1.5; }
+    .info-table th { background: #f5f5f5; width: 120px; text-align: right; color: #666; font-weight: normal; }
+    .sidebar-right { width: 250px; float: right; }
+    .side-box { border: 1px solid #e0e0e0; margin-bottom: 15px; }
+    .side-box-title { height: 28px; line-height: 28px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; padding-left: 10px; font-weight: bold; }
+    .side-box-content { padding: 10px; line-height: 1.8; }
+    .side-box-content li { border-bottom: 1px dashed #eee; }
+    #footer { background: #efefef; border-top: 2px solid #d35400; text-align: center; padding: 20px 0; line-height: 2; color: #666; }
+    .clear { clear: both; }
+    #exception-notice { margin-top: 10px; color: #cc3300; font-weight: bold; font-size: 12px; display: none; }
+    #exception-notice .blink-hint { color: #ff0000; animation: exception-blink 1s step-end infinite; }
+    @keyframes exception-blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.2; }
+    }
+</style>
+</head>
+<body>
+<div id="topbar">
+    <a href="404.html">加入收藏</a> | 
+    <a href="forum.html" target="_blank">官方论坛</a>
+</div>
+<div id="wrapper">
+    <div id="header" style="width: 960px; height: auto; overflow: hidden; background: #ffeaa7;">
+        <a href="guanwang.html">
+            <img id="henfu-img" src="./images/henfu.png" alt="辉光勇者" border="0" style="display: block; width: 960px; height: auto;" onerror="this.src='https://via.placeholder.com/960x150/ffeaa7/d35400?text=Glow+Legend';" />
+        </a>
+    </div>
+    <div id="nav">
+        <ul>
+            <li><a href="guanwang.html">官网首页</a></li>
+            <li><a href="news.html">新闻公告</a></li>
+            <li><a href="test.html">趣味性格测试</a></li>
+            <li><a href="forum.html">官方论坛</a></li>
+        </ul>
+        <div class="clear"></div>
+    </div>
+    <div id="notice">
+        <b>【系统公告】</b> <marquee id="notice-marquee" scrollamount="3" width="850">热烈庆祝2007年度大作《辉光勇者》动画热播！冷面法师与迷糊牧师的奇幻之旅正在展开！</marquee>
+    </div>
+    <div id="victory-banner" style="display: none; background: linear-gradient(to right, #ffd700, #ffae00); border: 2px solid #d35400; padding: 15px; margin: 15px; border-radius: 6px; text-align: center; color: #3a0a0a; font-family: 'Microsoft YaHei', sans-serif; font-size: 14px; font-weight: bold; box-shadow: 0 4px 10px rgba(211,84,0,0.25);">
+        🎉 恭喜您成功通关！勇者阿光与他的同伴们已成功击败魔王，光之大陆迎来了真正的和平与曙光！感谢您拯救了《辉光勇者》的世界！
+    </div>
+    <div id="content">
+        <div class="main-left">
+            <div class="box-title">◆ 动画故事简介</div>
+            <div class="synopsis-box">
+                <img src="./images/haibao.png" alt="海报" style="float: left; width: 150px; max-width: 90%; margin: 5px 20px 15px 0; border: 1px solid #999; padding: 2px; background: #fff;" onerror="this.style.display='none';" />
+                
+                <div style="line-height: 20px; font-size: 13px; color: #333; text-indent: 0;">
+                    在遥远的光之大陆，流传着神秘“辉光”的古老传说。传闻中，当<span id="revival-date"></span>黑暗再次笼罩大地，魔王即将复苏，只有获得辉光之剑的勇者，才拥有着净化黑暗的力量。<br /><br />
+                    冷面法师法恩、冒失的精灵射手莉亚、以及会说话却不会治疗的小牧师小满，在机缘巧合之下与性格迥异的几人组成了冒险小队。怀揣着各自的信念，他们一路收集散落的辉光碎片，穿越幽暗的森林与荒芜的沙漠，前往魔王城挑战传说中的魔王。在光与暗的抉择中，命运的轮盘已经开始转动……
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="box-title">◆ 主题曲下载</div>
+            <div class="synopsis-box" style="text-indent:0;padding:16px 18px;">
+                <p style="margin:0 0 10px;line-height:1.9;">动画超人气主题曲<strong>《辉光仍在》</strong>现已开放官网直链下载。演唱：李林晔、沈法；作词：林光明。</p>
+                <a href="audio/辉光仍在.wav" download="辉光仍在.wav" style="display:inline-block;padding:8px 18px;background:#d35400;color:#fff;font-weight:bold;border-radius:4px;">♫ 点击下载《辉光仍在》主题曲 (.wav)</a>
+            </div>
+            <div class="box-title">◆ 详细放送情报</div>
+            <table class="info-table">
+                <tr><th>导演：</th><td><strong>林光明</strong></td><th>编剧：</th><td><strong>林光明</strong></td></tr>
+                <tr><th>主演声优：</th><td colspan="3"><strong>沈法</strong>（饰 法恩） / <strong>李林晔</strong>（饰 莉亚） / <strong>冯骅</strong>（饰 小满）</td></tr>
+                <tr><th>类型：</th><td>冒险 / 热血 / 奇幻</td><th>制片国家/地区：</th><td>中国大陆</td></tr>
+                <tr><th>语言：</th><td>汉语普通话</td><th>首播：</th><td>2007-07-15</td></tr>
+                <tr><th>集数：</th><td>10</td><th>单集片长：</th><td>22分钟</td></tr>
+                <tr><th>又名：</th><td colspan="3">Glow Brave / 光之传承</td></tr>
+            </table>
+            <div class="box-title">◆ 角色图册 (Gallery) <span style="font-weight:normal;font-size:11px;color:#999;">（点击头像查看角色档案）</span></div>
+            <div style="text-align: center;">
+                <a href="faen.html"><img src="images/char_faen.png" width="150" height="150" alt="法恩" style="border: 2px solid #ccc; margin: 0 10px;" /></a>
+                <a href="liya.html"><img src="images/char_liya.png" width="150" height="150" alt="莉亚" style="border: 2px solid #ccc; margin: 0 10px;" /></a>
+                <a href="xiaoman_intro.html"><img src="images/char_xiaoman.png" width="150" height="150" alt="小满" style="border: 2px solid #ccc; margin: 0 10px;" /></a>
+            </div>
+        </div>
+        <div class="sidebar-right">
+            <div class="side-box">
+                <div class="side-box-title">最新动态 News</div>
+                <ul class="side-box-content">
+                    <li><a href="news_dvd.html">《辉光勇者》DVD全集发售！</a></li>
+                    <li><a href="news_ost.html">主题曲《辉光仍在》下载开通</a></li>
+                    <li><a href="news_seiyuu.html">声优沈法、李林晔、冯骅线下见面会实录</a></li>
+                </ul>
+            </div>
+            <div class="side-box">
+                <div class="side-box-title">在线观看 Watch</div>
+                <div class="side-box-content" style="text-align: center;">
+                    <a href="feidie.html" style="font-weight: bold; color: #d35400; font-size: 13px; text-decoration: underline; display: block; padding: 5px 0;">★ [点击进入] 飞碟动漫网在线播放</a>
+                    <p style="color: #666; font-size: 11px; margin-top: 5px; line-height: 1.4;">搜索「辉光勇者」即可观看动画正片</p>
+                </div>
+            </div>
+            <div class="side-box">
+                <div class="side-box-title">互动专区 Interactive</div>
+                <div class="side-box-content" style="text-align: center;">
+                    <a href="test.html" style="font-weight: bold; color: #d35400; font-size: 13px; text-decoration: underline; display: block; padding: 5px 0;">★ [点击进入] 动漫人物性格测试</a>
+                    <p style="color: #666; font-size: 11px; margin-top: 5px; line-height: 1.4;">测测在辉光勇者的世界中，你代表了冒险队中的谁？</p>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div id="footer">
+        Copyright &copy; 2007-2008 Glow Legend Animation Studio.<br/>
+        辉光勇者动画制作委员会 版权所有 最佳分辨率 1024*768
+        <div id="exception-notice">网站异常请发送<span class="blink-hint">+99</span>至<span class="blink-hint">hgyz0715@oo.com</span></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 在页面载入时执行
+    window.onload = function() {
+        var firstVisit = localStorage.getItem("guanwang_first_visit");
+        if (!firstVisit) {
+            var ooFirst = localStorage.getItem("oo_first_visit");
+            if (ooFirst) {
+                var ooDate = new Date(ooFirst);
+                var y = ooDate.getFullYear();
+                var m = ooDate.getMonth() + 1;
+                var d = ooDate.getDate();
+                firstVisit = y + "年" + m + "月" + d + "日";
+            } else {
+                var today = new Date();
+                var y = today.getFullYear();
+                var m = today.getMonth() + 1;
+                var d = today.getDate();
+                firstVisit = y + "年" + m + "月" + d + "日";
+                localStorage.setItem("oo_first_visit", today.toISOString());
+            }
+            localStorage.setItem("guanwang_first_visit", firstVisit);
+        }
+        
+        var dateEl = document.getElementById("revival-date");
+        if (dateEl) {
+            dateEl.innerText = firstVisit;
+        }
+
+        // 检查是否通关大结局
+        if (localStorage.getItem("game_completed") === "true") {
+            var victoryBanner = document.getElementById("victory-banner");
+            if (victoryBanner) {
+                victoryBanner.style.display = "block";
+            }
+            var marqueeEl = document.getElementById("notice-marquee");
+            if (marqueeEl) {
+                marqueeEl.innerText = "🎉 恭喜您成功通关！勇者阿光与他的同伴们已成功击败魔王，光之大陆迎来了真正的和平与曙光！感谢您拯救了《辉光勇者》的世界！";
+            }
+        }
+
+        var testResult = localStorage.getItem("test_result");
+        if (testResult) {
+            localStorage.setItem("guanwang_seen_after_test", "1");
+
+            var exceptionNotice = document.getElementById("exception-notice");
+            if (exceptionNotice) {
+                exceptionNotice.style.display = "block";
+            }
+
+            var fav = document.getElementById("site-favicon");
+            if (fav) {
+                fav.setAttribute("href", "data:image/svg+xml," + encodeURIComponent(
+                    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='#1a0000'/><ellipse cx='16' cy='16' rx='13' ry='8' fill='#fff'/><circle cx='16' cy='16' r='5' fill='#c0392b'/><circle cx='16' cy='16' r='2' fill='#000'/></svg>"));
+            }
+
+            var henfuImg = document.getElementById("henfu-img");
+            if (henfuImg) {
+                henfuImg.src = "./images/henfu2.png";
+                henfuImg.onerror = function() {
+                    this.src = 'https://via.placeholder.com/960x150/e74c3c/fff?text=GLITCH+DETECTED';
+                };
+            }
+        }
+    };
+
+    // 如果该页面是打开的状态，当LocalStorage发生变化时强制进行刷新
+    window.addEventListener('storage', function(e) {
+        window.location.reload();
+    });
+</script>
+<script src="js/placeholder.js"></script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

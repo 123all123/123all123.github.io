@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="在线图像 RGB 颜色通道分离工具：上传图片即可查看红、绿、蓝三个颜色通道，常用于图像分析与隐写研究。" />
+<title>图像 RGB 颜色通道分离工具 - 红/绿/蓝单通道查看</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI","Microsoft YaHei",Arial,sans-serif; background: #16181d; color: #e6e6e6; padding: 28px 16px; }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 22px; color: #ff8a5c; margin-bottom: 6px; }
+  h1 .title-en { font-size: 14px; font-weight: normal; color: #b07050; margin-left: 10px; letter-spacing: 0.5px; }
+  h1 .title-en .mark-o { color: #4a9eff; font-weight: bold; }
+  .sub { color: #9aa0a6; font-size: 13px; margin-bottom: 22px; }
+  .toolbar { background: #20232a; border: 1px solid #333; border-radius: 10px; padding: 18px; margin-bottom: 20px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .btn { cursor: pointer; border: none; border-radius: 6px; padding: 10px 16px; font-size: 14px; font-weight: 600; background: #ff6b35; color: #fff; }
+  .btn.ghost { background: #2c313c; color: #cbd3df; border: 1px solid #3c4454; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+  .panel { background: #20232a; border: 1px solid #333; border-radius: 10px; padding: 12px; text-align: center; }
+  .panel h3 { font-size: 13px; margin-bottom: 8px; }
+  .r h3 { color: #ff6b6b; } .g h3 { color: #63e6a1; } .b h3 { color: #6cc4ff; } .src h3 { color: #ddd; }
+  canvas { max-width: 100%; background: #000; border-radius: 6px; }
+  .tip { background: #1b1e24; border-left: 3px solid #ff6b35; padding: 12px 14px; border-radius: 0 6px 6px 0; color: #9aa0a6; font-size: 12px; line-height: 1.7; margin-top: 20px; }
+  a { color: #ff8a5c; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎨 图像 RGB 颜色通道分离工具<span class="title-en">RGB C<span class="mark-o">o</span>lor Split</span></h1>
+  <div class="sub">上传图片，分别查看红(R)、绿(G)、蓝(B)三个颜色通道的灰度分布。</div>
+
+  <div class="toolbar">
+    <label class="btn">选择图片上传<input type="file" id="file" accept="image/*" style="display:none" /></label>
+  </div>
+
+  <div class="grid">
+    <div class="panel src"><h3>原图 (RGB)</h3><canvas id="c-src" width="256" height="256"></canvas></div>
+    <div class="panel r"><h3>红色通道 R</h3><canvas id="c-r" width="256" height="256"></canvas></div>
+    <div class="panel g"><h3>绿色通道 G</h3><canvas id="c-g" width="256" height="256"></canvas></div>
+    <div class="panel b"><h3>蓝色通道 B</h3><canvas id="c-b" width="256" height="256"></canvas></div>
+  </div>
+
+  <div class="tip">
+    <b>隐写原理</b>：把信息只写进某一个颜色通道，在彩色全图里它会被其它通道的颜色"盖住"而难以察觉；
+    一旦把三个通道单独拿出来看（本工具所做的），隐藏的内容就会在对应的那个通道里显现出来。<br/>
+    试试把三个通道里各自显现的字母按 R→G→B 顺序连起来读。
+  </div>
+  <p style="margin-top:18px;"><a href="tools_hub.html">&larr; 返回工具中心</a> · <a href="find.html">智搜首页</a></p>
+</div>
+
+<script>
+  var SIZE = 256;
+  var srcCanvas = document.getElementById("c-src");
+  var sctx = srcCanvas.getContext("2d");
+
+  function splitChannels() {
+    var img = sctx.getImageData(0, 0, SIZE, SIZE);
+    var d = img.data;
+    ["r", "g", "b"].forEach(function (ch, idx) {
+      var cv = document.getElementById("c-" + ch);
+      var ctx = cv.getContext("2d");
+      var out = ctx.createImageData(SIZE, SIZE);
+      for (var i = 0; i < d.length; i += 4) {
+        var v = d[i + idx];        // 该通道强度
+        out.data[i] = v; out.data[i + 1] = v; out.data[i + 2] = v; out.data[i + 3] = 255;
+      }
+      ctx.putImageData(out, 0, 0);
+    });
+  }
+
+  document.getElementById("file").addEventListener("change", function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var url = URL.createObjectURL(f);
+    var im = new Image();
+    im.onload = function () {
+      sctx.clearRect(0, 0, SIZE, SIZE);
+      sctx.drawImage(im, 0, 0, SIZE, SIZE);
+      splitChannels();
+      URL.revokeObjectURL(url);
+    };
+    im.src = url;
+  });
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

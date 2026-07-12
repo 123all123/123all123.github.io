@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞碟动漫网 - 免费在线动漫视频分享平台</title>
+    <style>
+        /* ================= 基础重置 ================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        a { text-decoration: none; color: #333; }
+        a:hover { color: #ff5c38; }
+        .hide { display: none !important; }
+
+        /* ================= 顶栏样式 ================= */
+        .topbar {
+            background-color: #1f2129;
+            color: #ccc;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo-icon {
+            font-size: 28px;
+            color: #ff5c38;
+        }
+        .logo-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .search-area {
+            display: flex;
+            width: 450px;
+        }
+        .search-input {
+            flex: 1;
+            height: 36px;
+            padding: 0 15px;
+            font-size: 14px;
+            border: 1px solid #444;
+            background-color: #2b2d36;
+            color: #fff;
+            border-radius: 18px 0 0 18px;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: #ff5c38;
+        }
+        .search-btn {
+            width: 80px;
+            height: 36px;
+            background-color: #ff5c38;
+            color: #fff;
+            font-size: 14px;
+            border: none;
+            border-radius: 0 18px 18px 0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .search-btn:hover {
+            background-color: #e04a28;
+        }
+        .top-nav {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        .top-nav a { color: #ccc; }
+        .top-nav a:hover { color: #fff; }
+
+        /* ================= 主体布局 ================= */
+        .main-content {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* ================= 首页/搜索结果页 ================= */
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff5c38;
+            padding-left: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .anime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .anime-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .anime-card:hover {
+            transform: translateY(-5px);
+        }
+        .cover-wrapper {
+            width: 100%;
+            height: 240px;
+            background-color: #ddd;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-weight: bold;
+        }
+        .cover-tag {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 2px 6px;
+            font-size: 11px;
+            border-radius: 3px;
+        }
+        .anime-info {
+            padding: 12px;
+        }
+        .anime-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .anime-desc {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.4;
+            height: 34px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* ================= 播放详情页 ================= */
+        .play-container {
+            display: flex;
+            gap: 25px;
+        }
+        .player-left {
+            flex: 1;
+        }
+        .player-right {
+            width: 340px;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        .video-player-box {
+            width: 100%;
+            min-height: 480px;
+            background-color: #111;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: center;
+            color: #aaa;
+            position: relative;
+            overflow: hidden;
+        }
+        .video-screen {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .video-player-box.playing .video-screen {
+            border-radius: 8px 8px 0 0;
+        }
+        .video-screen video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            background: #000;
+            display: none;
+        }
+        .video-player-box.playing .video-screen video { display: block; }
+        .video-player-box.playing .lost-panel { display: none; }
+        .video-toolbar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #1a1a1a;
+            border-radius: 0 0 8px 8px;
+        }
+        .video-player-box.playing .video-toolbar { display: flex; }
+        .video-toolbar .vt-play {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #ff5c38;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .video-toolbar .vt-play:hover { background: #e04a28; }
+        .video-toolbar .vt-seek {
+            flex: 1;
+            height: 6px;
+            accent-color: #ff5c38;
+            cursor: pointer;
+        }
+        .video-toolbar .vt-time {
+            font-size: 12px;
+            color: #aaa;
+            white-space: nowrap;
+            min-width: 90px;
+            text-align: right;
+        }
+        .lost-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .lost-icon {
+            font-size: 64px;
+            color: #ff5c38;
+            margin-bottom: 15px;
+        }
+        .lost-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .lost-desc {
+            font-size: 13px;
+            color: #888;
+        }
+        .video-title-bar {
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+        .video-title-bar h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .video-meta {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* 选集面板 */
+        .episode-panel-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .episode-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .episode-btn {
+            height: 36px;
+            background-color: #f5f7fa;
+            border: 1px solid #e4e7ed;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .episode-btn:hover {
+            color: #ff5c38;
+            border-color: #ff5c38;
+            background-color: #fff5f2;
+        }
+        .episode-btn.active {
+            background-color: #ff5c38;
+            color: #fff;
+            border-color: #ff5c38;
+            font-weight: bold;
+        }
+        .episode-btn.disabled {
+            color: #bbb;
+            background-color: #f0f0f0;
+            border-color: #e8e8e8;
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+        .episode-btn.disabled:hover {
+            color: #bbb;
+            border-color: #e8e8e8;
+            background-color: #f0f0f0;
+        }
+
+        /* 剧情简介面板 */
+        .synopsis-panel {
+            background-color: #f9fafc;
+            border: 1px solid #e8ecf0;
+            border-radius: 6px;
+            padding: 15px;
+            line-height: 1.6;
+        }
+        .synopsis-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff5c38;
+            margin-bottom: 8px;
+        }
+        .synopsis-text {
+            font-size: 13px;
+            color: #555;
+            text-indent: 2em;
+        }
+
+        /* 底部版权 */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航顶栏 -->
+    <div class="topbar">
+        <div class="logo-area" onclick="goHome()">
+            <span class="logo-icon">🛸</span>
+            <span class="logo-text">飞碟动漫网</span>
+        </div>
+        <div class="search-area">
+            <input type="text" id="search-input" class="search-input" placeholder="输入动漫名称，如：星际追风少年..." autocomplete="off">
+            <button class="search-btn" onclick="executeSearch()">搜 索</button>
+        </div>
+        <div class="top-nav">
+            <a href="javascript:goHome();">首页</a>
+            <a href="#">连载动漫</a>
+            <a href="#">完结剧场</a>
+            <a href="#">动漫资讯</a>
+        </div>
+    </div>
+
+    <!-- 主体区域 -->
+    <div class="main-content">
+        
+        <!-- 1. 首页视图 (辉光勇者已被移除，必须搜索才出现，丰富了其他热门推荐) -->
+        <div id="view-home">
+            <div class="section-title">
+                <span>🔥 今日热门推荐</span>
+            </div>
+            <div class="anime-grid">
+                <!-- 热门1 -->
+                <div class="anime-card" onclick="alert('视频源已失效！')">
+                    <div class="cover-wrapper" style="background: #a8e6cf;">
+                        <span style="color: #fff; font-size: 16px;">星际追风少年</span>
+                        <span class="cover-tag">完结</span>
+                    </div>
+                    <div class="anime-info">
+                        <div class="anime-title">星际追风少年</div>
+                        <div class="anime-desc">热血机甲变形，星际决战！</div>
+                    </div>
+                </div>
+                <!-- 热门2 -->
+                <div class="anime-card" onclick="alert('视频源已失效！')">
+                    <div class="cover-wrapper" style="background: #ffd3b6;">
+                        <span style="color: #fff; font-size: 16px;">咕噜小仙子</span>
+                        <span class="cover-tag">完结</span>
+                    </div>
+                    <div class="anime-info">
+                        <div class="anime-title">咕噜小仙子</div>
+                        <div class="anime-desc">经典魔法少女变身，童年回忆！</div>
+                    </div>
+                </div>
+                <!-- 热门3 -->
+                <div class="anime-card" onclick="alert('视频源已失效！')">
+                    <div class="cover-wrapper" style="background: #ffaaa5;">
+                        <span style="color: #fff; font-size: 16px;">百变怪兽饲养员</span>
+                        <span class="cover-tag">完结</span>
+                    </div>
+                    <div class="anime-info">
+                        <div class="anime-title">百变怪兽饲养员</div>
+                        <div class="anime-desc">扫描宠物，进入数码怪兽世界！</div>
+                    </div>
+                </div>
+                <!-- 热门4 -->
+                <div class="anime-card" onclick="alert('视频源已失效！')">
+                    <div class="cover-wrapper" style="background: #d4a5a5;">
+                        <span style="color: #fff; font-size: 16px;">深渊幻影</span>
+                        <span class="cover-tag">完结</span>
+                    </div>
+                    <div class="anime-info">
+                        <div class="anime-title">深渊幻影 (2005)</div>
+                        <div class="anime-desc">硬核科幻，脑电波消灭梦魇，EVA风格神作！</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 搜索结果视图 -->
+        <div id="view-search" class="hide">
+            <div class="section-title">
+                <span id="search-stats-title">搜索结果</span>
+                <a href="javascript:goHome();" style="font-size: 13px; color: #ff5c38;">返回首页 &gt;</a>
+            </div>
+            <div class="anime-grid" id="search-results-grid">
+                <!-- 动态渲染搜索结果 -->
+            </div>
+        </div>
+
+        <!-- 3. 播放详情页视图 -->
+        <div id="view-play" class="hide">
+            <div class="play-container">
+                <!-- 播放器左侧 -->
+                <div class="player-left">
+                    <div class="video-player-box" id="video-player-box">
+                        <div class="video-screen">
+                            <video id="anime-video" preload="metadata" playsinline>
+                                <source src="audio/辉光勇者.mp4" type="video/mp4" />
+                                您的浏览器不支持 HTML5 视频播放。
+                            </video>
+                            <div class="lost-panel" id="lost-panel">
+                            <div class="lost-icon">🚫</div>
+                            <div class="lost-title">很抱歉，该视频文件已走丢！</div>
+                            <div class="lost-desc">由于版权保护或源文件服务器老化损毁，该选集视频暂时无法播放。</div>
+                            </div>
+                        </div>
+                        <div class="video-toolbar" id="video-toolbar">
+                            <button type="button" class="vt-play" id="vt-play" title="播放/暂停">▶</button>
+                            <input type="range" class="vt-seek" id="vt-seek" value="0" min="0" max="1000" step="0.1">
+                            <span class="vt-time" id="vt-time">0:00 / 0:00</span>
+                        </div>
+                    </div>
+                    <div class="video-title-bar">
+                        <h1 id="play-anime-title">辉光勇者</h1>
+                        <div class="video-meta" id="play-video-meta">
+                            <span>分类：热血冒险</span> | 
+                            <span>年代：2007</span> | 
+                            <span>播放量：12.5万次</span> | 
+                            <span id="play-source-tag" style="color: #4caf50; font-weight: bold;">[可播放]</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 播放器右侧选集面板 -->
+                <div class="player-right">
+                    <div class="episode-panel-title">🎬 选集列表 (全10集)</div>
+                    <div class="episode-grid" id="episode-btn-grid">
+                        <!-- 10集按钮 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 底部版权 -->
+    <div class="footer">
+        飞碟动漫网 (feidie.html) - 仅供童年动漫爱好者交流与试听，视频资源均抓取自第三方网络备份。<br>
+        如有侵权请联系管理员，我们将于24小时内删除相关失效索引。
+    </div>
+
+    <script type="text/javascript">
+        // 10集辉光勇者详细剧情简介 (剧情中加入了勇者的存在，但“勇者”二字全部被改成了“■■”)
+        const episodesData = [
+            {
+                ep: 1,
+                title: "第一集：破碎的辉光与■■的诞生",
+                desc: "在遥远而祥和的光之大陆，古老的黑暗封印突然松动，预言中魔王复苏的阴影笼罩了大地。冷面法师法恩在翻阅星穹法术古籍时，推算出唯有集齐散落各地的“辉光碎片”并重铸辉光之剑，才能彻底净化黑暗。在幽暗森林的边缘，法恩偶遇了因追逐松鼠而迷路的冒失精灵射手莉亚。就在他们遭遇低阶魔兽袭击、命悬一线的危急时刻，一位手持断剑、性格阳光中二的少年挺身而出。他自称是命中注定要拯救世界的■■，并用那柄残破的武器施展出令人惊叹的剑技。三人合力击退魔兽，■■正式加入队伍，踏上了寻找辉光碎片的漫长旅途。"
+            },
+            {
+                ep: 2,
+                title: "第二集：未绽放的圣光与■■的誓言",
+                desc: "冒险小队来到了一座被黑雾笼罩的荒废村庄。在这里，他们遇到了被魔兽围攻的小牧师小满。小满虽然身为牧师，却因为胆小和资质不足，无法施展任何圣光治疗法术，只能挥舞着一柄沉重的钉头锤进行物理防卫。在小满即将支持不住时，■■高喊着中二的口号，用断剑死死护住小满。小满哭诉自己的导师失踪，自己因为害怕被丢下而极度缺乏安全感。■■以■■的名义向她立下誓言，承诺绝不会丢下任何一个同伴。小满被■■的真诚所打动，决定加入队伍。四人在村庄的祭坛废墟中，找到了第一枚闪烁着微弱光芒的“辉光碎片”。"
+            },
+            {
+                ep: 3,
+                title: "第三集：流浪的巨盾与■■的共鸣",
+                desc: "冒险小队在翻越险峻的碎石山脉时，遭遇了突如其来的滚石塌方。一块巨大的山岩眼看就要砸向吓呆的小满，千钧一发之际，一名身披残破铠甲的流浪骑士格雷特挺身而出，用身体和一柄锈迹斑斑的巨盾死死挡住了滚石。格雷特失去了全部记忆，不知道自己是谁、来自何方。在随后的宿营中，■■主动找格雷特聊天，试图用自己中二的热情帮他找回记忆。格雷特虽然依旧沉默寡言，但当他握住■■的断剑时，巨盾上隐约有辉光流转，似乎与■■的信念产生了强烈的共鸣。格雷特决定加入队伍，成为小队最可靠的护盾。"
+            },
+            {
+                ep: 4,
+                title: "第四集：镜中的虚饰与■■的直觉",
+                desc: "队伍来到了一座繁华却透着诡异的“不夜城”。城中居民人人沉迷于虚幻的赞美与美貌，对外界的危机视而不见。很快，魔王麾下的幻术师萨利耶优雅登场。他手持魔镜，用华丽的幻术制造出各种社会性死亡的尴尬场景，将莉亚和小满戏耍得团团转。萨利耶嘲讽冒险小队是一群没有主角的乌合之众。法恩试图用理智分析幻术的破绽，而■■则凭借纯粹的直觉和对同伴的信任，一眼看穿了萨利耶的真身所在，一剑击碎了萨利耶的魔镜幻影。萨利耶气急败坏地撤退，城中居民也终于从虚饰的梦境中清醒过来。"
+            },
+            {
+                ep: 5,
+                title: "第五集：幽暗森林的试炼与■■的断剑",
+                desc: "为了寻找第二枚辉光碎片，小队深入了连阳光都无法穿透的幽暗森林。森林中弥漫着能唤醒内心最深处恐惧的迷雾。法恩在迷雾中看到了自己无数次法术失败的幻象；格雷特则看到了自己化为冰冷墓碑的无声场景。小队成员因恐惧和焦虑开始互相猜忌、激烈争吵。就在队伍即将分崩离析时，■■高高举起手中的断剑，断剑上散发出的微弱光芒虽然无法照亮整片森林，却温暖了每个人的心。■■用他那近乎愚蠢的乐观和坚定，唤醒了大家对彼此的信任。小满也用圣光驱散了迷雾。在森林最深处，他们成功拿到了第二枚辉光碎片。"
+            },
+            {
+                ep: 6,
+                title: "第六集：荒芜沙漠的绿洲与■■的坚持",
+                desc: "小队顶着烈日穿越无边无际的荒芜沙漠。在极度缺水、体力濒临极限时，莉亚凭借敏锐的直觉在一片沙丘背后找到了一处隐藏的清澈绿洲。然而，这片绿洲实际上是萨利耶设下的流沙陷阱。格雷特毫不犹豫地将巨盾插入流沙，用自己的身体搭建起一座生命之桥，而■■则站在流沙边缘，顶着狂风和沙暴，用绳索一个个将同伴们拉了上来。在沙底的古老神庙中，■■的断剑与神庙中央的石碑产生了强烈的共鸣，指引法恩破解了机关，获得了第三枚辉光碎片。格雷特似乎对壁画上描绘的“■■之剑”产生了一丝记忆共鸣。"
+            },
+            {
+                ep: 7,
+                title: "第七集：萨利耶的华丽谢幕与■■的宽容",
+                desc: "萨利耶在前往魔王城的必经峡谷设下了最宏大的幻术舞台，将整座峡谷变成了华丽的歌剧院。他绑架了附近村庄的孩童作为观众，逼迫冒险小队与他进行一场“华丽的决斗”。战斗中，萨利耶的攻势虽然凌厉，但■■在对决中发现他每次出手都会故意避开人质，本质上只是个极度孤独、渴望被关注的傲娇。在击败萨利耶后，■■并没有痛下杀手，反而大笑着邀请萨利耶加入他们的冒险。萨利耶愣住了，随后傲娇地哼了一声，留下了前往魔王城结界的钥匙，化为漫天花瓣华丽退场。"
+            },
+            {
+                ep: 8,
+                title: "第八集：重铸的信念与■■之剑",
+                desc: "小队终于来到了魔王城外围的圣坛。他们将收集到的三枚辉光碎片放入圣坛，圣坛瞬间爆发出冲天的金色光芒。在神圣的光芒中，■■那柄残破的断剑终于与碎片融合，重铸成了传说中拥有净化黑暗力量的“■■之剑”！当■■握住重铸的圣剑时，整片大陆的黑暗迷雾都被驱散了一角。法恩、莉亚、小满和格雷特看着闪耀着神圣光辉的■■，心中充满了必胜的信念。他们看着彼此一路上留下的伤痕与欢笑，毅然推开了魔王城沉重的大门，准备迎接最终的决战。"
+            },
+            {
+                ep: 9,
+                title: "第九集：决战前夜的微光与■■的约定",
+                desc: "魔王城内充斥着令人窒息的黑暗压迫感。在决战前夜，小队在城堡废墟的角落里生起了一小堆篝火。这或许是他们人生中最后一顿晚餐，大家围坐在篝火旁，谈论着胜利后想去过什么样的生活。■■大笑着和每个人定下约定：他要带法恩去最热闹的集市，带莉亚去风最大的山谷，带小满去吃最甜的糖果，帮格雷特找到他的家乡。■■那充满感染力的笑容照亮了每个人温柔而坚毅的脸庞。在黑暗最深处，魔王恐怖的咆哮声隐隐传来，命运的终局之战，即将在黎明破晓时分打响。"
+            },
+            {
+                ep: 10,
+                title: "第十集：决战前夕的誓言与羁绊",
+                desc: "黎明破晓，魔王城外围的圣光法阵已经完全激发，整片大陆的命运都在此一役。小队成员在圣坛前做着最后的决战准备。法恩在反复校准星穹守护结界，莉亚细心擦拭着风之长弓，小满紧紧握着钉头锤默默祈祷，格雷特则在巨盾上刻下同伴们名字的缩写。■■将“■■之剑”高高举起，圣剑的光芒与每个人心中的信念交相辉映。他们互相看着彼此，眼中没有恐惧，只有无畏的决绝。他们立下誓言，无论面对怎样的黑暗，都要并肩战斗到最后一刻。在魔王城大门缓缓推开的轰鸣声中，本集落下帷幕，为后续的大决战做好了全部准备。"
+            }
+        ];
+
+        let currentAnime = '';
+        let currentEp = 1;
+
+        // 路由控制
+        function goHome() {
+            document.getElementById('view-home').classList.remove('hide');
+            document.getElementById('view-search').classList.add('hide');
+            document.getElementById('view-play').classList.add('hide');
+            document.getElementById('search-input').value = '';
+        }
+
+        function executeSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+
+            document.getElementById('view-home').classList.add('hide');
+            document.getElementById('view-play').classList.add('hide');
+            document.getElementById('view-search').classList.remove('hide');
+
+            const resultsGrid = document.getElementById('search-results-grid');
+            resultsGrid.innerHTML = '';
+
+            if (query.includes('辉光') || query.includes('勇者')) {
+                document.getElementById('search-stats-title').innerHTML = `关于“<span style="color:#ff5c38;">${query}</span>”的搜索结果：`;
+                resultsGrid.innerHTML = `
+                    <div class="anime-card" onclick="playAnime('辉光勇者')">
+                        <div class="cover-wrapper" style="background: linear-gradient(135deg, #7abcff 0%, #60abf8 100%);">
+                            <span style="color: #fff; font-size: 18px; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">辉光勇者</span>
+                            <span class="cover-tag">全10集</span>
+                        </div>
+                        <div class="anime-info">
+                            <div class="anime-title">辉光勇者 (2007)</div>
+                            <div class="anime-desc">冷面法师法恩、冒失射手莉亚、迷糊牧师小满的奇幻冒险大作！</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('search-stats-title').innerHTML = `关于“<span style="color:#ff5c38;">${query}</span>”的搜索结果：`;
+                resultsGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999; font-size: 14px;">抱歉，未找到相关动漫资源。建议尝试搜索“辉光勇者”</div>`;
+            }
+        }
+
+        // 播放动漫
+        function playAnime(animeName) {
+            if (animeName !== '辉光勇者') return;
+            currentAnime = animeName;
+
+            document.getElementById('view-home').classList.add('hide');
+            document.getElementById('view-search').classList.add('hide');
+            document.getElementById('view-play').classList.remove('hide');
+
+            document.getElementById('play-anime-title').innerText = '辉光勇者 (2007)';
+
+            // 触发 localStorage 状态标记：玩家进入了飞碟动漫网的辉光勇者播放页
+            localStorage.setItem("feidie_play_triggered", "true");
+
+            // 渲染选集按钮
+            const btnGrid = document.getElementById('episode-btn-grid');
+            btnGrid.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('div');
+                const isOp = i === 1;
+                btn.className = 'episode-btn' + (i === currentEp ? ' active' : '') + (isOp ? '' : ' disabled');
+                btn.innerText = isOp ? 'OP' : String(i);
+                if (isOp) {
+                    btn.onclick = () => selectEpisode(1);
+                }
+                btnGrid.appendChild(btn);
+            }
+
+            selectEpisode(1);
+        }
+
+        // 选择集数（仅 OP 可播放）
+        function formatVideoTime(sec) {
+            if (!isFinite(sec) || sec < 0) return '0:00';
+            var m = Math.floor(sec / 60);
+            var s = Math.floor(sec % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        var videoToolbarReady = false;
+        function setupVideoToolbar() {
+            if (videoToolbarReady) return;
+            videoToolbarReady = true;
+            const video = document.getElementById('anime-video');
+            const seek = document.getElementById('vt-seek');
+            const playBtn = document.getElementById('vt-play');
+            const timeEl = document.getElementById('vt-time');
+            if (!video || !seek || !playBtn || !timeEl) return;
+
+            function refreshTime() {
+                var cur = video.currentTime || 0;
+                var dur = video.duration || 0;
+                timeEl.textContent = formatVideoTime(cur) + ' / ' + formatVideoTime(dur);
+                if (dur > 0) seek.value = String((cur / dur) * 1000);
+            }
+
+            playBtn.addEventListener('click', function () {
+                if (video.paused) {
+                    video.play();
+                    playBtn.textContent = '❚❚';
+                } else {
+                    video.pause();
+                    playBtn.textContent = '▶';
+                }
+            });
+            video.addEventListener('play', function () { playBtn.textContent = '❚❚'; });
+            video.addEventListener('pause', function () { playBtn.textContent = '▶'; });
+            video.addEventListener('timeupdate', refreshTime);
+            video.addEventListener('loadedmetadata', function () {
+                refreshTime();
+            });
+            video.addEventListener('ended', function () {
+                playBtn.textContent = '▶';
+                refreshTime();
+            });
+            seek.addEventListener('input', function () {
+                var dur = video.duration;
+                if (dur > 0) video.currentTime = (parseFloat(seek.value) / 1000) * dur;
+                refreshTime();
+            });
+        }
+
+        function selectEpisode(epNum) {
+            if (epNum !== 1) return;
+            currentEp = 1;
+            const box = document.getElementById('video-player-box');
+            const video = document.getElementById('anime-video');
+            const tag = document.getElementById('play-source-tag');
+
+            // 更新按钮激活状态
+            const btns = document.querySelectorAll('.episode-btn');
+            btns.forEach((btn, idx) => {
+                if (idx === 0) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            box.classList.add('playing');
+            setupVideoToolbar();
+            if (tag) {
+                tag.style.color = '#4caf50';
+                tag.textContent = '[可播放]';
+            }
+            if (video) {
+                video.currentTime = 0;
+                video.load();
+            }
+        }
+
+        // 绑定输入框回车
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') executeSearch();
+        });
+
+        // 首次载入检查
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('play') === 'huiguang') {
+                playAnime('辉光勇者');
+                return;
+            }
+            const query = document.getElementById('search-input').value.trim();
+            if (query) executeSearch();
+        };
+
+        // 如果该页面是打开的状态，当LocalStorage发生变化时强制进行刷新
+        window.addEventListener('storage', function(e) {
+            window.location.reload();
+        });
+    </script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <title>智搜 - 懂你所搜</title>
+    <style>
+        /* ================= 基础重置 ================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #ffffff;
+            color: #222;
+        }
+        a { text-decoration: none; }
+        .hide { display: none !important; }
+
+        /* ================= 主页样式 ================= */
+        #home-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            padding-top: 15vh;
+            position: relative;
+        }
+        /* 清除数据按钮样式 */
+        .home-topbar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tools-btn {
+            padding: 6px 14px;
+            font-size: 12px;
+            color: #3385ff;
+            background-color: #eef4ff;
+            border: 1px solid #c5d9ff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .tools-btn:hover {
+            color: #fff;
+            background-color: #3385ff;
+            border-color: #3385ff;
+        }
+        .tools-btn.void-tools-hint,
+        .header-tools.void-tools-hint {
+            color: #fff !important;
+            background: linear-gradient(135deg, #3385ff, #5eb8ff) !important;
+            border-color: #5eb8ff !important;
+            box-shadow: 0 0 0 2px rgba(94, 184, 255, 0.45), 0 0 18px rgba(51, 133, 255, 0.55);
+            animation: voidToolsPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes voidToolsPulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(94, 184, 255, 0.45), 0 0 14px rgba(51, 133, 255, 0.45); transform: scale(1); }
+            50% { box-shadow: 0 0 0 4px rgba(94, 184, 255, 0.65), 0 0 26px rgba(51, 133, 255, 0.75); transform: scale(1.04); }
+        }
+        .clear-db-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #666;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .clear-db-btn:hover {
+            color: #fff;
+            background-color: #ff5c38;
+            border-color: #ff5c38;
+        }
+        .home-logo {
+            font-size: 72px;
+            font-weight: bold;
+            color: #3385ff;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+        .search-container {
+            display: flex;
+            width: 100%;
+            max-width: 654px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            height: 44px;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 2px solid #c4c7ce;
+            border-radius: 10px 0 0 10px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: #3385ff;
+        }
+        .search-btn {
+            width: 108px;
+            height: 44px;
+            background-color: #3385ff;
+            color: white;
+            font-size: 17px;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: background-color 0.2s;
+        }
+        .search-btn:hover {
+            background-color: #317ef3;
+        }
+        .history-box {
+            width: 100%;
+            max-width: 654px;
+            margin-top: 32px;
+        }
+        .history-hd {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+        .history-list {
+            list-style: none;
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid #ebebeb;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .history-list li a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #0000cc;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+        }
+        .history-list li:last-child a { border-bottom: none; }
+        .history-list li a:hover { background: #f0f4ff; text-decoration: underline; }
+        .history-list .hist-title {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .history-list .hist-time {
+            flex-shrink: 0;
+            font-size: 11px;
+            color: #999;
+        }
+        .history-empty {
+            font-size: 13px;
+            color: #aaa;
+            padding: 16px 14px;
+            border: 1px dashed #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            background: #fafafa;
+        }
+        .results-history {
+            margin-bottom: 24px;
+            max-width: 100%;
+        }
+
+        /* ================= 结果页样式 ================= */
+        #results-page {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ebebeb;
+            background-color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3385ff;
+            margin-right: 40px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .header-tools {
+            font-size: 13px;
+            color: #3385ff;
+            margin-right: 16px;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+        .header-tools:hover { text-decoration: underline; }
+        .header-search-container {
+            display: flex;
+            width: 600px;
+        }
+        .results-container {
+            padding: 20px 20px 40px 140px;
+            max-width: 800px;
+        }
+        .search-stats {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 20px;
+            user-select: none;
+        }
+        
+        /* 搜索结果条目 */
+        .result-item {
+            margin-bottom: 28px;
+        }
+        .result-title {
+            font-size: 18px;
+            color: #0000cc;
+            line-height: 1.5;
+            margin-bottom: 6px;
+            display: inline-block;
+            font-weight: 400;
+        }
+        .result-title:hover {
+            text-decoration: underline;
+        }
+        .result-title em, .result-desc em {
+            color: #c00;
+            font-style: normal;
+        }
+        .result-desc {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .no-results {
+            font-size: 14px;
+            color: #333;
+            margin-top: 20px;
+        }
+        .result-title.disabled {
+            color: #666;
+            cursor: default;
+            pointer-events: none;
+        }
+        .result-title.disabled:hover {
+            text-decoration: none;
+        }
+        .result-url {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 主页视图 -->
+    <div id="home-page">
+        <div class="home-topbar">
+            <a class="tools-btn" href="tools_hub.html">智搜工具</a>
+            <button class="clear-db-btn" onclick="clearAllData()">清除所有数据</button>
+        </div>
+        <div class="home-logo">智搜</div>
+        <div class="search-container">
+            <input type="text" id="main-search-input" class="search-input" autocomplete="off" placeholder="">
+            <button id="main-search-btn" class="search-btn">智搜一下</button>
+        </div>
+        <div class="history-box" id="home-history">
+            <div class="history-hd">浏览历史</div>
+            <ul class="history-list" id="home-history-list"></ul>
+            <p class="history-empty hide" id="home-history-empty">暂无浏览记录，从搜索结果进入的页面会显示在这里</p>
+        </div>
+    </div>
+
+    <!-- 搜索结果页视图 -->
+    <div id="results-page" class="hide">
+        <div class="header">
+            <a class="header-tools" href="tools_hub.html">智搜工具</a>
+            <div class="header-logo" id="back-to-home">智搜</div>
+            <div class="header-search-container">
+                <input type="text" id="header-search-input" class="search-input" autocomplete="off">
+                <button id="header-search-btn" class="search-btn">智搜一下</button>
+            </div>
+        </div>
+
+        <div class="results-container">
+            <div class="history-box results-history" id="results-history">
+                <div class="history-hd">浏览历史</div>
+                <ul class="history-list" id="results-history-list"></ul>
+                <p class="history-empty hide" id="results-history-empty">暂无浏览记录</p>
+            </div>
+            <div class="search-stats" id="search-stats"></div>
+            <div id="results-list"></div>
+        </div>
+    </div>
+
+    <script src="js/browse-history.js"></script>
+    <script src="js/link-new-tab.js"></script>
+    <script>
+        // ================= 模拟数据库 =================
+        const searchData = [
+            {
+                keywords: ["辉光"],
+                title: "辉光（物理现象）",
+                url: "https://wapbaike.baidu.com/item/%E8%BE%89%E5%85%89/5208679",
+                desc: "辉光是一种低压气体中产生的放电现象，属于气体放电类型，放电时在阴极附近形成亮区和暗区交替分布的发光效应，具有电流强度小（约几毫安）、温度不高的特点。详情"
+            },
+            {
+                keywords: ["辉光"],
+                title: "辉光放电",
+                url: "https://wapbaike.baidu.com/item/%E8%BE%89%E5%85%89%E6%94%BE%E7%94%B5",
+                desc: "辉光放电是种低气压放电现象，工作压力一般都低于10 mbar，其基本构造是在封闭的容器内放置两个平行的电极板，利用产生的电子将中性原子或分子激发，被激发的粒子由激发态降回基态时会以光的形式释放出能量。详情"
+            },
+            {
+                keywords: ["勇者"],
+                title: "勇者（日式RPG及动漫中的虚构角色）",
+                url: "https://baike.baidu.com/item/%E5%8B%87%E8%80%85/4520063",
+                desc: "勇者是日式角色扮演游戏及其衍生作品中的核心角色，经典使命是“打怪”并拯救世界，如为救公主而打倒龙王。随着作品演变，勇者与魔王的关系从单纯的敌对拓展出战友、父子、情侣等多种形态。详情"
+            },
+            {
+                keywords: ["勇者"],
+                title: "勇者大冒险（豆瓣剧评）",
+                url: "https://movie.douban.com/review/7658971/",
+                desc: "豆瓣用户“宋天师聊动漫”发表剧评《勇者大冒险：当尼罗河落满辉光》：“近日，追完了腾讯动漫推出的网络动漫《勇者大冒险》第一季，满眼浮现出片尾曲《黄昏尼罗河》所描写的‘当尼罗河落满辉光’的夕照场景……”"
+            },
+            {
+                keywords: ["勇者不再"],
+                title: "英雄不再（Wii动作游戏评测）",
+                url: "https://tvgame.zol.com.cn/96/962819.html",
+                desc: "《英雄不再》是在Wii平台上推出的一款风格极其独特的动作游戏。游戏制作人须田刚一以“赞颂青春之歌”来形容这款作品的主题。游戏男主角“特拉维斯”是一位痴迷动画的御宅族，为了争取杀手排行榜榜首的荣耀而战斗。"
+            },
+            {
+                keywords: ["勇者不再"],
+                title: "英雄不再（百度百科）",
+                url: "https://wapbaike.baidu.com/item/%E8%8B%B1%E9%9B%84%E4%B8%8D%E5%86%8D",
+                desc: "《英雄不再》是以特拉维斯·塔奇为主角，他是美国杀手协会（UAA）第11位被认定的杀手，为了登上排行榜顶端而战斗的动作冒险游戏。详情"
+            },
+            {
+                keywords: ["曼德拉效应 动画", "曼德拉效应", "动画"],
+                title: "集体失忆or平行宇宙？谁篡改了动画观众的记忆？",
+                url: "https://www.sohu.com/a/481207234_121019412",
+                desc: "网络上存在大量因“现实与记忆不符”而引发的争吵帖或求助帖，这些现象大多触发了曼德拉效应。导致这种现象的原因大体可分为三类：第一种是由于大脑运作机制而导致的错误记忆，第二种是由于某些技术原因导致产生了错误的印象……"
+            },
+            {
+                keywords: ["动画 2003 停播", "动画", "2003", "停播"],
+                title: "韩国动画史上著名失败案例留下的启示（晴空战士）",
+                url: "https://chii.in/subject/topic/34295",
+                desc: "据说《晴空战士》是韩国动画史上最著名的失败案例，以126亿韩元的大投资、7年漫长制作周期拉高观众预期，最后却落得票房惨败。主要问题在于导演痴迷视觉效果而忽略叙事重要性，再加上缺乏负责项目管理的人才导致成本失控。"
+            },
+            {
+                keywords: ["动画 2003 停播", "动画", "2003", "停播"],
+                title: "这七部国产动画都被禁播了（白鸽岛）",
+                url: "https://www.163.com/dy/article/F8R6FLO605484YIG.html",
+                desc: "网易号文章列举了七部曾被禁播的国产动画，其中第一部《白鸽岛》于2003年上映，共有50多集，结局居然是“团灭”，讲述了非常多关于人类自私、爱情等品质特点的内容。"
+            },
+            {
+                keywords: ["黑童话"],
+                title: "豆瓣评分8.8，一部细思恐极“毁童年”的成人童话（《焚舟纪》）",
+                url: "https://mp.weixin.qq.com/s?__biz=...",
+                desc: "安吉拉·卡特的《焚舟纪》共收录了42篇暗黑童话，每个故事都取材自耳熟能详的美好童话，但每一个都被改写得比现实世界还要邪恶和残酷。"
+            },
+            {
+                keywords: ["光之勇者"],
+                title: "光之勇者 里昂",
+                url: "https://warcraft.huijiwiki.com/wiki/%E5%85%89%E4%B9%8B%E5%8B%87%E8%80%85_%E9%87%8C%E6%98%82",
+                desc: "圣光降临后向他下达在邪恶来临时拯救世界的重大使命。当里昂与邪恶对抗时，会有圣光之力围绕在他身旁，使邪恶无法侵犯他。他的光明对邪恶者来说是畏惧的对象，对人类却是救世主的象征，于是里昂就被人们称为勇者里昂。"
+            },
+            {
+                keywords: ["光之勇者"],
+                title: "光之魔法與勇者大人（萌娘百科）",
+                url: "https://zh.moegirl.tw/%E5%85%89%E4%B9%8B%E9%AD%94%E6%B3%95%E8%88%87%E5%8B%87%E8%80%85%E5%A4%A7%E4%BA%BA",
+                desc: "故事主要讲述的是一位具有罕见光系魔法的平民少女，在一所贵族学校中与三位可攻略的贵族子弟之间发生的互动恋爱故事，以及魔王复活降临后主角少女和同伴们并肩作战、击败魔王和隐藏BOSS的故事。"
+            },
+            {
+                keywords: ["辉光勇者"],
+                title: "【闲聊】有没有什么好的童年动漫，大家来分享一下_白云吧_百度贴吧",
+                url: "tieba.html",
+                desc: "有没有什么好的童年动漫，大家来分享一下。最近好无聊，想重温一下童年的感觉…… 追忆流年：<em>《辉光勇者》</em>很好看，但是好像电视上都没有播完就停播了。资源分享小能手：网盘链接：www.test.com，全集高清都有……"
+            },
+            {
+                keywords: ["oo邮箱", "邮箱", "youxiang"],
+                title: "oo邮箱 - 极简您的邮件生活",
+                url: "youxiang.html",
+                desc: "oo邮箱致力于提供极简、安全、稳定的电子邮件服务。支持写信、收件箱、垃圾箱以及多账号管理。您的邮件生活，从这里开始。"
+            },
+            {
+                keywords: ["飞碟动漫网", "飞碟动漫", "feidie"],
+                title: "飞碟动漫网 - 免费在线动漫视频分享平台",
+                url: "feidie.html",
+                desc: "飞碟动漫网（feidie.html）是国内领先的免费动漫在线分享平台，提供最新连载动漫、经典完结剧场及动漫资讯。支持多线路极速播放。"
+            },
+            {
+                keywords: ["莉亚的射击挑战", "射击挑战", "活动", "huodong"],
+                title: "【官方活动】莉亚的射击挑战 - 《辉光勇者》",
+                url: "huodong.html",
+                desc: "《辉光勇者》2008暑期线上互动：莉亚的射击挑战（huodong.html）。精灵射手莉亚的射击训练，帮助莉亚击退不断冒出来的史莱姆，赢取高分奖励！"
+            },
+            {
+                keywords: ["dreamcms", "dream", "cms"],
+                title: "DreamCMS - 梦想建站系统 | 专业的开源内容管理系统",
+                url: "dreamcms.html",
+                desc: "DreamCMS 是一款基于 PHP+MySQL 架构开发的专业级开源内容管理系统。以安全、稳定、高效、易用著称，提供海量标签调用、强大的自定义模型、完善的技术文档与 API 支持，是中小企业和个人站长快速建站的理想选择。"
+            },
+            {
+                keywords: ["admin", "guanwang/admin", "dream/admin", "admin.html", "后台", "管理员界面"],
+                title: "DreamCMS 系统后台管理登录入口",
+                url: "admin.html",
+                desc: "《辉光勇者》中文官方网站后台管理系统登录入口（admin.html）。管理员可通过此页面登录系统后台，进行全局参数配置、官方内容管理、官方活动设置及数据库备份恢复。登录需要管理员邮箱账号与默认密码。"
+            },
+            {
+                keywords: ["李林晔", "莉亚声优", "莉亚配音", "李林晔 百科", "seiyuu"],
+                title: "李林晔（中国内地女性配音演员）_智搜百科",
+                url: "seiyuu_lilinye.html",
+                desc: "李林晔，中国内地女性配音演员。自2004年起正式进入配音行业，其嗓音甜美清脆、富有朝气，擅长演绎活泼可爱的少女、精灵以及聪慧的小男孩角色。代表作品有《星际追风少年》《咕噜小仙子》等。"
+            },
+            {
+                keywords: ["林光明 火灾", "工作室火灾", "火灾", "林光明去世", "林光明死亡", "工作室失火", "新闻 火灾", "林光明 事故", "林光明 离世", "林光明"],
+                title: "痛惜！青年动画导演林光明遭遇工作室火灾不幸离世_智搜新闻",
+                url: "news_fire.html",
+                desc: "2009年，青年动画导演林光明在其个人工作室的一场突发火灾中不幸罹难，年仅37岁。据悉其未完成的动画企划也随之搁置。详情"
+            },
+            {
+                keywords: ["林光明", "导演林光明", "林光明 百科"],
+                title: "林光明（中国内地动画导演、编剧）_智搜百科",
+                url: "baike_linguangming.html",
+                desc: "林光明（1972—2009），中国内地独立动画导演、编剧。早年怀抱制作高水准国产动画的理想，创办个人动画工作室。业内评价其才华横溢却命途多舛。详情"
+            },
+            {
+                keywords: ["沈法", "沈法 百科", "法恩声优", "星空绘画"],
+                title: "沈法（配音演员、插画作者）_智搜百科",
+                url: "baike_shenfa.html",
+                desc: "沈法，中国内地配音演员，同时在绘画方面颇具天赋，尤其擅长绘制星空题材。设有个人作品集网站，收录其多年画作。详情"
+            },
+            {
+                keywords: ["冯骅", "冯骅 百科", "小满声优"],
+                title: "冯骅（配音演员、小说作者）_智搜百科",
+                url: "baike_fenghua.html",
+                desc: "冯骅，中国内地配音演员，声线温柔亲和，擅长儿童及少年角色配音。性格随和内敛，工作之余热爱写作与配音创作。详情"
+            },
+            {
+                keywords: ["一纸江湖", "FH_一纸江湖", "小说阅读", "冯骅 小说", "网络小说", "小说网站"],
+                title: "一纸江湖 - 原创小说与短篇在线阅读",
+                url: "wxs_yizhi.html",
+                desc: "一纸江湖原创阅读站，收录长篇连载与短篇小故事，冯骅等作者在此发表作品。"
+            },
+            {
+                keywords: ["七七聊天", "七七", "qiqi", "聊天软件", "匿名聊天"],
+                title: "七七聊天 - 轻量匿名即时通讯 · 输入房间号即可畅聊",
+                url: "qiqi.html",
+                desc: "七七聊天是一款无需注册、输入四位房间号即可加入的轻量级匿名聊天工具。绿色小巧，保护隐私，适合临时、私密的一对一沟通。"
+            },
+            {
+                keywords: ["快聊", "一道光", "kuailiao", "社交", "动态"],
+                title: "快聊 - 记录生活的社交空间 | 用户主页：一道光",
+                url: "kuailiao_linguangming.html",
+                desc: "快聊是一个记录日常、分享心情的社交平台。用户「一道光」的个人主页，记录了从2003年到2012年的点滴生活动态。"
+            },
+            {
+                keywords: ["智搜工具", "工具", "工具中心", "tools"],
+                title: "智搜工具中心 - 图像/音频/编码小工具集合",
+                url: "tools_hub.html",
+                desc: "智搜工具中心：音频频谱查看、RGB 通道分离、摩斯密码解码、Base64 解码、十六进制转字符串等实用小工具；部分工具需搜索关键词后可见。"
+            },
+            {
+                keywords: ["base64", "base64解码", "解码", "base64 解码"],
+                title: "Base64 解码工具 - 智搜工具",
+                url: "tools_base64.html",
+                desc: "在线 Base64 解码工具：将 Base64 编码字符串解码为 UTF-8 可读文本，自动忽略空格与换行。"
+            },
+            {
+                keywords: ["十六进制转字符串", "hex转字符串", "hex转文字", "十六进制 字符串", "hex decode"],
+                title: "十六进制转字符串工具 - 智搜工具",
+                url: "tools_hexstr.html",
+                desc: "将十六进制字节序列按 UTF-8 解码为可读字符串，常用于阅读密钥片段与密文信息。"
+            },
+            {
+                keywords: ["摩斯", "摩斯密码", "morse", "点划", "电报码"],
+                title: "摩斯密码解码工具 - 智搜工具",
+                url: "tools_morse.html",
+                desc: "将摩斯点划序列解码为英文字母，字母与单词之间均以空格分隔。支持 . - 与实心方块表示。"
+            },
+            {
+                keywords: ["零宽", "零宽隐写", "零宽字符", "zwsp", "不可见字符", "隐写 文本"],
+                title: "零宽隐写提取工具 - 从文本中读出隐藏信息",
+                url: "tools_zwsp.html",
+                desc: "粘贴完整文本，扫描零宽空格等不可见字符，提取其中按二进制编码隐藏的 UTF-8 秘密信息。"
+            },
+            {
+                keywords: ["星空法师"],
+                title: "沈法的私人画廊 · Studio SF",
+                url: "shenfa_gallery.html",
+                desc: "沈法（网名：星空法师）的个人作品集网站，收录其多年星空题材画作与私人创作。"
+            },
+            {
+                keywords: ["林间微风"],
+                title: "林间微风的个人博客 - Sin Blog",
+                url: "blog_lilinye.html",
+                desc: "李林晔（网名：林间微风）的个人博客，记录生活随笔、工作点滴与私密日志。"
+            },
+            {
+                keywords: ["异或", "xor", "异或计算", "异或运算", "十六进制异或"],
+                title: "在线异或(XOR)计算器 - 十六进制按位异或与UTF-8解码",
+                url: "tools_xor.html",
+                desc: "支持多个十六进制字符串按位异或(XOR)运算，并可将结果按 UTF-8 解码为可读文本。程序员/密码学爱好者常用小工具。"
+            },
+            {
+                keywords: ["颜色", "颜色通道", "rgb", "通道", "通道分离", "红绿蓝", "图像通道", "滤镜", "隐写", "图片", "图像"],
+                title: "在线图像 RGB 颜色通道分离工具 - 红/绿/蓝单通道查看",
+                url: "tools_rgb.html",
+                desc: "上传任意图片，一键分离并查看图像的红色(R)、绿色(G)、蓝色(B)三个颜色通道，常用于图像分析与隐写术研究。"
+            },
+            {
+                keywords: ["音频", "歌声", "隐写", "音频隐写", "频谱", "声音隐藏", "spectrogram", "分析"],
+                title: "音频隐写分析工具与教程 - 从声音频谱中读出隐藏信息",
+                url: "tools_audio.html",
+                desc: "上传音频或视频文件，自动从视频提取音轨并生成频谱图(Spectrogram)，从声音中读出被隐藏的文字信息。"
+            },
+        ];
+
+        // ================= 交互控制中心 =================
+        const homePage = document.getElementById('home-page');
+        const resultsPage = document.getElementById('results-page');
+        const mainSearchInput = document.getElementById('main-search-input');
+        const mainSearchBtn = document.getElementById('main-search-btn');
+        const headerSearchInput = document.getElementById('header-search-input');
+        const headerSearchBtn = document.getElementById('header-search-btn');
+        const backToHome = document.getElementById('back-to-home');
+        const searchStats = document.getElementById('search-stats');
+        const resultsList = document.getElementById('results-list');
+
+        // 动态关键词高亮引擎
+        function highlightKeyword(text, keyword) {
+            if (!keyword) return text;
+            const keys = keyword.split(' ').filter(k => k.trim() !== '');
+            let highlightedText = text;
+            keys.forEach(key => {
+                if(key.length > 0) {
+                    const regex = new RegExp(`(${key})`, 'gi');
+                    highlightedText = highlightedText.replace(regex, '<em>$1</em>');
+                }
+            });
+            return highlightedText;
+        }
+
+        function normalizeQuery(s) {
+            return (s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function isExactKeywordMatch(query, kw) {
+            return normalizeQuery(query) === normalizeQuery(kw);
+        }
+
+        function isLocalPage(url) {
+            if (!url) return false;
+            if (/^https?:\/\//i.test(url)) return false;
+            if (url.indexOf("javascript:") === 0) return false;
+            return /\.html/i.test(url);
+        }
+
+        function formatHistoryTime(ts) {
+            if (!ts) return "";
+            var d = new Date(ts);
+            var pad = function (n) { return n < 10 ? "0" + n : "" + n; };
+            return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+        }
+
+        function renderBrowseHistory() {
+            var list = (window.ARGBrowseHistory && ARGBrowseHistory.load()) || [];
+            var pairs = [
+                { ul: document.getElementById("home-history-list"), empty: document.getElementById("home-history-empty") },
+                { ul: document.getElementById("results-history-list"), empty: document.getElementById("results-history-empty") }
+            ];
+            pairs.forEach(function (pair) {
+                if (!pair.ul) return;
+                pair.ul.innerHTML = "";
+                if (!list.length) {
+                    if (pair.empty) pair.empty.classList.remove("hide");
+                    return;
+                }
+                if (pair.empty) pair.empty.classList.add("hide");
+                list.forEach(function (item) {
+                    var li = document.createElement("li");
+                    var a = document.createElement("a");
+                    a.href = item.url;
+                    a.target = "_blank";
+                    a.rel = "noopener noreferrer";
+                    var title = document.createElement("span");
+                    title.className = "hist-title";
+                    title.textContent = item.title || item.url;
+                    var time = document.createElement("span");
+                    time.className = "hist-time";
+                    time.textContent = formatHistoryTime(item.time);
+                    a.appendChild(title);
+                    a.appendChild(time);
+                    li.appendChild(a);
+                    pair.ul.appendChild(li);
+                });
+            });
+        }
+
+        // 核心搜索执行逻辑（精准匹配关键词）
+        function doSearch(keyword) {
+            keyword = keyword.trim();
+            if (!keyword) return;
+            
+            homePage.classList.add('hide');
+            resultsPage.classList.remove('hide');
+            headerSearchInput.value = keyword;
+            
+            const matchedResults = searchData.filter(item =>
+                item.keywords.some(kw => isExactKeywordMatch(keyword, kw))
+            );
+
+            const mockCount = matchedResults.length > 0 ? matchedResults.length : 0;
+            searchStats.innerHTML = mockCount > 0
+                ? `智搜为您精准匹配“<span style="color:#c00;">${keyword}</span>”共 ${mockCount} 条结果`
+                : `未找到与“<span style="color:#c00;">${keyword}</span>”完全匹配的结果`;
+
+            resultsList.innerHTML = '';
+            if (matchedResults.length > 0) {
+                matchedResults.forEach(item => {
+                    const titleHtml = highlightKeyword(item.title, keyword);
+                    const descHtml = highlightKeyword(item.desc, keyword);
+                    const wrap = document.createElement('div');
+                    wrap.className = 'result-item';
+                    const local = isLocalPage(item.url);
+
+                    if (local) {
+                        const link = document.createElement('a');
+                        link.href = item.url;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.className = 'result-title';
+                        link.innerHTML = titleHtml;
+                        wrap.appendChild(link);
+                    } else {
+                        const title = document.createElement('span');
+                        title.className = 'result-title disabled';
+                        title.innerHTML = titleHtml;
+                        wrap.appendChild(title);
+                        const urlLine = document.createElement('div');
+                        urlLine.className = 'result-url';
+                        urlLine.textContent = item.url;
+                        wrap.appendChild(urlLine);
+                    }
+
+                    const desc = document.createElement('p');
+                    desc.className = 'result-desc';
+                    desc.innerHTML = descHtml;
+                    wrap.appendChild(desc);
+                    resultsList.appendChild(wrap);
+                });
+            } else {
+                resultsList.innerHTML = `
+                    <div class="no-results">
+                        <p>抱歉，没有找到与“<em>${keyword}</em>”完全匹配的网页。</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ================= 事件指令绑定 =================
+        mainSearchBtn.addEventListener('click', () => doSearch(mainSearchInput.value));
+        mainSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doSearch(mainSearchInput.value);
+        });
+
+        headerSearchBtn.addEventListener('click', () => doSearch(headerSearchInput.value));
+        headerSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doSearch(headerSearchInput.value);
+        });
+
+        backToHome.addEventListener('click', () => {
+            resultsPage.classList.add('hide');
+            homePage.classList.remove('hide');
+            mainSearchInput.value = '';
+            renderBrowseHistory();
+            mainSearchInput.focus();
+        });
+
+        window.onload = () => {
+            renderBrowseHistory();
+            mainSearchInput.focus();
+            applyVoidToolsHint();
+        };
+
+        function applyVoidToolsHint() {
+            var on = localStorage.getItem("arg_void_trap") === "active";
+            document.querySelectorAll(".tools-btn, .header-tools").forEach(function (el) {
+                if (on) el.classList.add("void-tools-hint");
+                else el.classList.remove("void-tools-hint");
+            });
+        }
+
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                renderBrowseHistory();
+                applyVoidToolsHint();
+            }
+        });
+
+        // 清除所有本地存储数据并刷新
+        function clearAllData() {
+            if (confirm("确定要清除所有的游戏进度和本地存储数据吗？")) {
+                localStorage.clear();
+                alert("本地存储数据已清空，游戏进度已重置。");
+                window.location.reload();
+            }
+        }
+
+        // 跨标签页同步游戏状态
+        window.addEventListener('storage', function() {
+            window.location.reload();
+        });
+    </script>
+<script src="js/disclaimer.js"></script>
+</body>
+</html>

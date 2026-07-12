@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="《勇者不再》—— 好结局。" />
+<title>真正的勇者 · 是你自己</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; background: radial-gradient(circle at 50% 35%, #fffef5 0%, #ffeaa7 45%, #f5d78e 100%);
+    font-family: "Microsoft YaHei","Songti SC",serif; color: #3a2a10;
+    display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+  }
+  .box { max-width: 680px; text-align: center; animation: rise 2.5s ease; }
+  .sun { font-size: 56px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(255,200,80,.6)); }
+  h1 { font-size: 28px; letter-spacing: 6px; color: #d35400; margin-bottom: 24px; font-weight: bold; }
+  .hero-line { font-size: 22px; color: #e0a800; font-weight: bold; letter-spacing: 4px; text-shadow: 0 2px 12px rgba(224,168,0,.35); margin: 28px 0; line-height: 1.8; }
+  p { font-size: 15px; line-height: 2.2; color: #5a4a30; margin: 14px 0; }
+  .dim { color: #8a7a60; font-size: 13px; margin-top: 30px; }
+  .names { margin-top: 28px; font-size: 13px; color: #a08040; letter-spacing: 2px; }
+  .thanks { margin-top: 48px; font-size: 16px; color: #c07820; letter-spacing: 3px; font-weight: bold; }
+  @keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="sun">☀</div>
+  <h1>辉光仍在</h1>
+  <div class="hero-line">真正的勇者，是你自己。</div>
+  <p>魔王散去了。那些被篡改的页面、被劫持的声音、被否定的希望——<br/>在你亲手划开的那一道光里，全都碎成了尘埃。</p>
+  <p>法恩、莉亚、小满，还有所有曾相信过「辉光」的人，<br/>他们从未离开。他们只是把最重要的事，交给了你。</p>
+  <p class="dim">光之大陆不会在某一个网站上复活。<br/>它会活在每一个还愿意相信、还愿意前行的人心里。</p>
+  <div class="names">—— 勇者不再 · 好结局 ——</div>
+  <p class="dim" style="margin-top:40px;"><a href="find.html" style="color:#a08040;">返回智搜，重新开始旅程</a></p>
+  <p class="thanks">感谢您的游玩！</p>
+</div>
+<script>
+  localStorage.setItem("game_completed", "true");
+  localStorage.setItem("game_ending", "good");
+  (function () {
+    var resume = parseFloat(sessionStorage.getItem("goodend_bgm_resume") || "0");
+    sessionStorage.removeItem("goodend_bgm_resume");
+    var bgm = new Audio("audio/辉光仍在.wav");
+    bgm.loop = false;
+    if (resume > 0 && !isNaN(resume)) bgm.currentTime = resume;
+    bgm.play().catch(function () {});
+  })();
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

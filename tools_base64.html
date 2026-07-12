@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="在线 Base64 解码工具：将 Base64 编码字符串解码为可读文本。" />
+<title>Base64 解码工具 - 智搜工具</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI","Microsoft YaHei",Arial,sans-serif; background: #12151c; color: #d7dde3; padding: 28px 16px; }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { color: #a78bfa; font-size: 22px; margin-bottom: 6px; }
+  .sub { color: #8a949e; font-size: 13px; margin-bottom: 22px; }
+  .card { background: #191f26; border: 1px solid #2a333d; border-radius: 10px; padding: 20px; margin-bottom: 18px; }
+  label { display: block; font-size: 13px; color: #9fb2cc; margin-bottom: 8px; }
+  textarea { width: 100%; min-height: 120px; padding: 12px; background: #0f141a; border: 1px solid #2a333d; border-radius: 6px; color: #eaf2ff; font-family: Consolas, monospace; font-size: 14px; resize: vertical; }
+  textarea:focus { outline: none; border-color: #a78bfa; }
+  .btn { cursor: pointer; border: none; border-radius: 6px; padding: 11px 18px; font-size: 14px; font-weight: 600; background: #7c5ce0; color: #fff; margin-top: 14px; }
+  .result { background: #0d1a12; border: 1px solid #1f4a2e; border-radius: 8px; padding: 16px; margin-top: 16px; display: none; }
+  .result .k { color: #7d8ba3; font-size: 12px; margin-bottom: 6px; }
+  .result .txt { font-family: Consolas, monospace; color: #6effa0; font-size: 15px; word-break: break-all; line-height: 1.7; white-space: pre-wrap; }
+  .err { color: #ff7676; font-size: 13px; margin-top: 12px; display: none; }
+  .tip { background: #141a20; border-left: 3px solid #7c5ce0; padding: 12px 14px; border-radius: 0 6px 6px 0; color: #8a949e; font-size: 12px; line-height: 1.8; margin-top: 8px; }
+  a { color: #a78bfa; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔤 Base64 解码工具</h1>
+  <div class="sub">将 Base64 编码字符串解码为 UTF-8 文本。</div>
+  <div class="card">
+    <label>Base64 输入</label>
+    <textarea id="input" placeholder="粘贴 Base64 编码内容" autocomplete="off"></textarea>
+    <button class="btn" onclick="decode()">解 码</button>
+    <div class="err" id="err"></div>
+    <div class="result" id="result">
+      <div class="k">解码结果：</div>
+      <div class="txt" id="out"></div>
+    </div>
+  </div>
+  <p style="margin-top:18px;"><a href="tools_hub.html">&larr; 返回工具中心</a> · <a href="find.html">智搜首页</a></p>
+</div>
+<script>
+  function decode() {
+    var raw = document.getElementById("input").value.replace(/\s+/g, "");
+    var err = document.getElementById("err");
+    var res = document.getElementById("result");
+    err.style.display = "none";
+    res.style.display = "none";
+    if (!raw) { err.textContent = "✖ 请输入 Base64 内容。"; err.style.display = "block"; return; }
+    try {
+      var bin = atob(raw);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+      document.getElementById("out").textContent = text;
+      res.style.display = "block";
+    } catch (e) {
+      err.textContent = "✖ 解码失败，请检查 Base64 格式是否正确。";
+      err.style.display = "block";
+    }
+  }
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

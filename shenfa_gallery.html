@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="沈法的个人作品集 —— 星空、光与影的私人画廊。" />
+<title>沈法的私人画廊 · Studio SF</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Songti SC","宋体",Georgia,serif; background: #0b0d14; color: #cbd2e0; }
+  a { color: #8ab4ff; text-decoration: none; }
+  /* 锁定层 */
+  #lock { position: fixed; inset: 0; background: radial-gradient(circle at 50% 30%, #1a2036, #05060a); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .lock-box { width: 380px; background: #11151f; border: 1px solid #2a3350; border-radius: 12px; padding: 34px 30px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .lock-box .ico { font-size: 42px; }
+  .lock-box h2 { font-size: 18px; margin: 14px 0 6px; color: #dfe6f5; font-family: "Microsoft YaHei",sans-serif; }
+  .lock-box p { font-size: 12px; color: #7d879c; margin-bottom: 20px; line-height: 1.6; }
+  .lock-box input { width: 100%; padding: 11px; background: #0b0e16; border: 1px solid #2a3350; border-radius: 6px; color: #fff; text-align: center; letter-spacing: 4px; font-size: 16px; }
+  .lock-box button { width: 100%; margin-top: 14px; padding: 11px; background: linear-gradient(180deg,#4a6cf7,#2f4bc0); color: #fff; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; letter-spacing: 2px; }
+  .lock-err { color: #ff7676; font-size: 12px; margin-top: 12px; display: none; }
+  /* 画廊 */
+  header { padding: 40px 20px 24px; text-align: center; }
+  header h1 { font-family: "Microsoft YaHei",sans-serif; font-size: 30px; letter-spacing: 4px; color: #e8eefc; }
+  header .tag { color: #6d7793; font-size: 13px; margin-top: 8px; font-style: italic; }
+  .gallery { max-width: 980px; margin: 20px auto 16px; display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; padding: 0 20px; }
+  .pager { max-width: 980px; margin: 0 auto 60px; padding: 0 20px; text-align: center; }
+  .pager span, .pager a { display: inline-block; min-width: 32px; height: 32px; line-height: 32px; margin: 0 4px; border: 1px solid #2a3350; border-radius: 4px; font-size: 13px; color: #6d7793; background: #11151f; }
+  .pager .cur { background: #2f4bc0; color: #fff; border-color: #4a6cf7; }
+  .pager .off { opacity: .45; cursor: not-allowed; pointer-events: none; }
+  .art { background: #11151f; border: 1px solid #222a40; border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform .2s, border-color .2s; }
+  .art:hover { transform: translateY(-4px); border-color: #4a6cf7; }
+  .art .thumb { height: 180px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
+  .art .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+  .art .thumb .thumb-title { position: relative; z-index: 1; font-family: Microsoft YaHei, sans-serif; font-size: 18px; color: #cdd6ea; opacity: .92; text-shadow: 0 1px 8px rgba(0,0,0,.85); }
+  .modal-body img.modal-art { width: 100%; max-width: 480px; height: 300px; object-fit: cover; object-position: center; border-radius: 4px; }
+  .art .meta { padding: 12px 14px; }
+  .art .meta .t { font-size: 15px; color: #e8eefc; font-family: "Microsoft YaHei",sans-serif; }
+  .art .meta .d { font-size: 11px; color: #6d7793; margin-top: 4px; }
+  /* 详情弹层 */
+  #modal { position: fixed; inset: 0; background: rgba(3,4,8,.9); display: none; align-items: center; justify-content: center; z-index: 80; padding: 20px; }
+  .modal-card { max-width: 640px; width: 100%; background: #0d1019; border: 1px solid #2a3350; border-radius: 12px; overflow: hidden; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid #222a40; }
+  .modal-head .x { cursor: pointer; color: #7d879c; font-size: 20px; }
+  .modal-body { padding: 22px; text-align: center; }
+  .modal-body canvas, .modal-body img { max-width: 100%; border-radius: 8px; background:#000; }
+  .desc { margin-top: 16px; color: #aeb7cc; font-size: 14px; line-height: 1.9; text-align: left; }
+  .chan-btns button, .small-btn { background: #223052; color: #b9d4ff; border: 1px solid #34406090; border-radius: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; margin: 4px; }
+  .lie-line { font-family: Consolas,monospace; font-size: 22px; letter-spacing: 3px; margin: 10px 0; user-select: none; }
+  .lie-line span { cursor: pointer; padding: 0 1px; transition: color .15s; }
+  .lie-line span.red { color: #ff3b3b; text-shadow: 0 0 8px #ff0000; }
+  .secret { color: #ffe36c; font-family: Consolas,monospace; font-size: 18px; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<!-- 密码锁 -->
+<div id="lock">
+  <div class="lock-box">
+    <div class="ico">🔒</div>
+    <h2>作品站已关闭</h2>
+    <p>本站已停止对外开放。<br/>如需访问，请输入访问密码。</p>
+    <input type="password" id="pwd" placeholder="请输入密码" autocomplete="off" />
+    <button onclick="tryUnlock()">进 入</button>
+    <div class="lock-err" id="lock-err">✖ 密码错误。</div>
+  </div>
+</div>
+
+<header>
+  <h1>S T U D I O &nbsp; S F</h1>
+  <div class="tag">"我把说不出口的话，都画进了星空里。" —— 沈法</div>
+</header>
+
+<div class="gallery" id="gallery"></div>
+<div class="pager" id="pager"></div>
+
+<div id="modal"><div class="modal-card">
+  <div class="modal-head"><span id="m-title"></span><span class="x" onclick="closeModal()">×</span></div>
+  <div class="modal-body" id="m-body"></div>
+</div></div>
+
+<script src="js/placeholder.js"></script>
+<script src="js/keys.js"></script>
+<script>
+  localStorage.setItem('phase2_seen', '1');
+  var PWD = "19800214";
+  function tryUnlock() {
+    var v = document.getElementById("pwd").value.trim();
+    if (v === PWD) {
+      localStorage.setItem("shenfa_unlocked", "true");
+      document.getElementById("lock").style.display = "none";
+    } else {
+      document.getElementById("lock-err").style.display = "block";
+      document.getElementById("pwd").value = "";
+    }
+  }
+  document.getElementById("pwd").addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
+  if (localStorage.getItem("shenfa_unlocked") === "true") { document.getElementById("lock").style.display = "none"; }
+  if (localStorage.getItem("key1_found") === "true" && localStorage.getItem("sky_lit") !== "true") {
+    localStorage.setItem("sky_lit", "true");
+  }
+
+  var ART_SRC = {
+    star: "art_1.png", lies: "art_lies.png", night: "art_3.png", silence: "art_4.png",
+    faraway: "art_5.png", dawn: "art_6.png", whisper: "art_7.png", ember: "art_8.png", window: "art_9.png"
+  };
+  function liesThumbSrc() {
+    return localStorage.getItem("sky_lit") === "true" ? "images/art_faen_message.png" : "images/art_lies.png";
+  }
+  function artThumbSrc(id) {
+    if (id === "lies") return liesThumbSrc();
+    return "images/" + (ART_SRC[id] || "art_1.png");
+  }
+  function updateLiesThumb() {
+    var img = document.querySelector('#gallery .art[data-art-id="lies"] .thumb img');
+    if (img) img.src = liesThumbSrc();
+  }
+
+  // 作品数据（第 1 页 9 幅）
+  var arts = [
+    { id: "star",    title: "星之印",     year: "2006", color: "#20305a", note: "★ 特别收藏", desc: "深蓝夜空里藏着只有分开看才能读出的秘密。沈法说这是他为某个人留的谜。" },
+    { id: "lies",    title: "虚幻·谎言", year: "2009", color: "#3a2140", note: "布面丙烯", desc: "破碎镜面倒映的天空——仰望是一种奢侈。画框底部刻着一行英文，像一句不愿承认的真话。" },
+    { id: "night",   title: "无眠夜",     year: "2005", color: "#12233a", note: "布面丙烯", desc: "工作室凌晨三点的台灯，光圈落在未上色的分镜稿上。那是他第一次为别人的梦熬夜。" },
+    { id: "silence", title: "寂静回声",   year: "2007", color: "#1c2b26", note: "布面丙烯", desc: "河边山谷里，喊出去的话会一圈圈弹回来。人走远了，回声还在水面上荡——像有谁在很远的地方，应了你一声。" },
+    { id: "faraway", title: "远方",       year: "2008", color: "#2a2436", note: "布面丙烯", desc: "公路尽头的地平线被画得过分明亮。他在说明年要去更远的地方取景，后来那张车票始终没有撕下。" },
+    { id: "dawn",    title: "破晓之前",   year: "2004", color: "#3a2a1a", note: "布面丙烯", desc: "天边一线鱼肚白，城市还在睡。我习惯在这个时间起稿，说颜色最诚实。" },
+    { id: "whisper", title: "星尘低语",   year: "2006", color: "#1a2848", note: "布面丙烯", desc: "细密星点用刮刀一点点堆上去。近看凌乱，远看像在听什么看不见的东西说话。" },
+    { id: "ember",   title: "余烬",       year: "2010", color: "#3a1818", note: "布面丙烯", desc: "熄灭篝火后剩下的暗红。画面中央空着一块，像故意没画完——又像被谁擦掉了。" },
+    { id: "window",  title: "窗前",       year: "2007", color: "#243048", note: "布面丙烯", desc: "下雨窗台前的花。" }
+  ];
+  var gal = document.getElementById("gallery");
+  arts.forEach(function (a) {
+    var el = document.createElement("div"); el.className = "art"; el.dataset.artId = a.id; el.onclick = function () { openArt(a.id); };
+    el.innerHTML =
+      '<div class="thumb" style="background:linear-gradient(160deg,' + a.color + ',#05060a)">' +
+        '<img src="' + artThumbSrc(a.id) + '" alt="" />' +
+        '<span class="thumb-title">' + a.title + '</span></div>' +
+      '<div class="meta"><div class="t">' + a.title + '</div><div class="d">' + a.year + '　' + (a.note || '布面丙烯') + '</div></div>';
+    gal.appendChild(el);
+  });
+  // 分页：共 8 页，仅第 1 页可浏览，其余不可点击
+  var pager = document.getElementById("pager");
+  for (var p = 1; p <= 8; p++) {
+    var sp = document.createElement("span");
+    sp.textContent = p;
+    if (p === 1) { sp.className = "cur"; }
+    else { sp.className = "off"; sp.title = "该页作品尚未归档"; }
+    pager.appendChild(sp);
+  }
+  var next = document.createElement("span");
+  next.textContent = "下一页 ›";
+  next.className = "off";
+  pager.appendChild(next);
+
+  var modal = document.getElementById("modal");
+  function closeModal() { modal.style.display = "none"; }
+  modal.addEventListener("click", function (e) { if (e.target === modal) closeModal(); });
+
+  function openArt(id) {
+    var title = document.getElementById("m-title");
+    var body = document.getElementById("m-body");
+    if (id === "star") {
+      title.textContent = "星之印 (2006)";
+      body.innerHTML =
+        '<img class="modal-art" src="images/art_1.png" alt="星之印" />' +
+        '<div style="margin-top:12px;"><button class="small-btn" onclick="exportStar()">保存画作图片</button></div>' +
+        '<div class="desc">介绍：璀璨的星空隐藏着秘密。</div>';
+      modal.style.display = "flex";
+    } else if (id === "lies") {
+      title.textContent = "虚幻·谎言 (2009)";
+      renderLies(body);
+      modal.style.display = "flex";
+    } else {
+      var art = arts.find(function (x) { return x.id === id; });
+      title.textContent = art.title + " (" + art.year + ")";
+      body.innerHTML = '<img class="modal-art" src="' + artThumbSrc(id) + '" alt="沈法画作 ' + id + '" /><div class="desc">' + (art.desc || '一幅安静的画。') + '</div>';
+      modal.style.display = "flex";
+    }
+  }
+
+  function exportStar() {
+    var a = document.createElement("a");
+    a.download = "art_star_seal.png";
+    a.href = "images/art_1.png";
+    a.click();
+  }
+
+  /* ===== 虚幻·谎言：把 S K Y 三个字母点红 ===== */
+  function renderFaenReveal() {
+    localStorage.setItem("key1_found", "true");
+    var name = localStorage.getItem("player_name") || "勇者";
+    var key1 = ARGKeys.computeKey1(name);
+    var body = document.getElementById("m-body");
+    document.getElementById("m-title").textContent = "……？";
+    body.style.background = "#000";
+    body.innerHTML =
+      '<div style="padding:10px 4px;">' +
+      '<div style="color:#8ab4ff;font-size:15px;line-height:2;text-align:left;">' +
+        '<b>—— 是我，法恩。</b><br/><br/>' +
+        '如果你看到这段话，说明你已经走得很深了。听好：<br/>' +
+        '<span style="color:#cdd6ea;">不要让魔王的思想，侵染你自己的思想。</span>他最擅长的，就是把绝望说得像真理。<br/><br/>' +
+        '（牢记 <span class="secret">' + key1 + '</span>，这是密钥的一部分，关键时刻能祝你一臂之力。）' +
+        '把它和另外两位留下的东西合在一起，你就能唤回那个名字。<br/><br/>' +
+      '</div>' +
+      '<img class="modal-art" src="images/art_faen_message.png" alt="法恩留言画作" />' +
+      '</div>';
+  }
+
+  function renderLies(body) {
+    if (localStorage.getItem("sky_lit") === "true" || localStorage.getItem("key1_found") === "true") {
+      renderFaenReveal();
+      return;
+    }
+    // 一行英文，其中 SKY 三个字母是"答案位"（data-ans）
+    var phrase = "THE  SKY  IS  A  LIE";
+    var ansTargets = { S: false, K: false, Y: false };
+    var html = '<img class="modal-art" src="images/art_lies.png" alt="虚幻·谎言 破碎镜面画作" id="lies-img" />' +
+      '<div class="desc">介绍：他们说，仰望天空是一种奢侈。点一点下面这行字吧——把该亮起来的，亮起来。</div>' +
+      '<div class="lie-line" id="lie-line"></div>';
+    body.innerHTML = html;
+    var line = document.getElementById("lie-line");
+    // 记录每个字母的答案身份：SKY 各取第一次出现
+    var used = { S: false, K: false, Y: false };
+    for (var i = 0; i < phrase.length; i++) {
+      var ch = phrase[i];
+      if (ch === " ") { line.appendChild(document.createTextNode("\u00A0")); continue; }
+      var sp = document.createElement("span"); sp.textContent = ch;
+      if ((ch === "S" || ch === "K" || ch === "Y") && !used[ch]) { sp.dataset.ans = ch; used[ch] = true; }
+      sp.onclick = function () {
+        this.classList.toggle("red");
+        checkLies();
+      };
+      line.appendChild(sp);
+    }
+    function checkLies() {
+      var ansSpans = line.querySelectorAll("span[data-ans]");
+      var allSpans = line.querySelectorAll("span");
+      if (ansSpans.length !== 3) return;
+      var skyOk = true;
+      ansSpans.forEach(function (s) { if (!s.classList.contains("red")) skyOk = false; });
+      var extraRed = false;
+      allSpans.forEach(function (s) {
+        if (s.classList.contains("red") && !s.dataset.ans) extraRed = true;
+      });
+      if (!skyOk || extraRed) return;
+      localStorage.setItem("sky_lit", "true");
+      updateLiesThumb();
+      var img = document.getElementById("lies-img");
+      if (img) {
+        img.src = "images/art_faen_message.png";
+        img.alt = "法恩留言画作";
+        img.onerror = function () {
+          this.style.background = "linear-gradient(180deg,#0a1030,#1a2040)";
+          this.style.minHeight = "260px";
+        };
+      }
+      setTimeout(renderFaenReveal, 800);
+    }
+  }
+
+  function revealFaen() { renderFaenReveal(); }
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>

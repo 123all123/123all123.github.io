@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="零宽字符隐写提取工具：从看似普通的文本中读出不可见的隐藏信息。" />
+<title>零宽隐写提取工具 - 智搜工具</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI","Microsoft YaHei",Arial,sans-serif; background: #12151c; color: #d7dde3; padding: 28px 16px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { color: #7ec8e3; font-size: 22px; margin-bottom: 6px; }
+  h1 .title-en { font-size: 14px; font-weight: normal; color: #5a8fa8; margin-left: 10px; letter-spacing: 0.5px; }
+  h1 .title-en .mark-r { color: #ff6eb4; font-weight: bold; }
+  .sub { color: #8a949e; font-size: 13px; margin-bottom: 22px; line-height: 1.7; }
+  .card { background: #191f26; border: 1px solid #2a333d; border-radius: 10px; padding: 20px; margin-bottom: 18px; }
+  label { display: block; font-size: 13px; color: #9fb2cc; margin-bottom: 8px; }
+  textarea { width: 100%; min-height: 140px; padding: 12px; background: #0f141a; border: 1px solid #2a333d; border-radius: 6px; color: #eaf2ff; font-family: Consolas, "Microsoft YaHei", monospace; font-size: 14px; line-height: 1.8; resize: vertical; }
+  textarea:focus { outline: none; border-color: #7ec8e3; }
+  .btn { cursor: pointer; border: none; border-radius: 6px; padding: 11px 18px; font-size: 14px; font-weight: 600; background: #2a7a9b; color: #fff; margin-top: 14px; margin-right: 8px; }
+  .btn.ghost { background: #232c36; color: #bcd; border: 1px solid #35404c; }
+  .result { background: #0d1a12; border: 1px solid #1f4a2e; border-radius: 8px; padding: 16px; margin-top: 16px; display: none; }
+  .result .k { color: #7d8ba3; font-size: 12px; margin-bottom: 6px; }
+  .result .txt { font-family: Consolas, monospace; color: #6effa0; font-size: 15px; word-break: break-all; line-height: 1.7; white-space: pre-wrap; }
+  .meta { color: #8a949e; font-size: 12px; margin-top: 8px; }
+  .err { color: #ff7676; font-size: 13px; margin-top: 12px; display: none; }
+  .tip { background: #141a20; border-left: 3px solid #7ec8e3; padding: 12px 14px; border-radius: 0 6px 6px 0; color: #8a949e; font-size: 12px; line-height: 1.8; margin-top: 8px; }
+  a { color: #7ec8e3; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>👁 零宽隐写提取工具<span class="title-en">Zero-Width Extracto<span class="mark-r">r</span></span></h1>
+  <div class="sub">有些文字看起来平平无奇，却夹着肉眼看不见的「影」——零宽字符（Zero-Width）把秘密藏在字与字的缝隙里。复制全文粘贴到下方，即可尝试提取。</div>
+
+  <div class="card">
+    <label>待检测文本（请完整复制粘贴，勿手打）</label>
+    <textarea id="input" placeholder="粘贴可能含有零宽隐写的文本" autocomplete="off"></textarea>
+    <button class="btn" onclick="extract()">提取隐藏内容</button>
+    <button class="btn ghost" onclick="clearAll()">清空</button>
+    <div class="err" id="err"></div>
+    <div class="result" id="result">
+      <div class="k">提取结果：</div>
+      <div class="txt" id="out"></div>
+      <div class="meta" id="meta"></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    零宽隐写常使用不可见字符（如零宽空格、零宽非连接符等）按二进制编码隐藏信息。肉眼与听感都无法察觉，只有完整复制文本并用工具扫描才能读出。<br/>
+    <a href="tools_hub.html">&larr; 返回工具中心</a> · <a href="find.html">智搜首页</a>
+  </div>
+</div>
+<script>
+  var ZW_ZERO = "\u200b"; // 0
+  var ZW_ONE  = "\u200c"; // 1
+  var ZW_EXTRA = /[\u200d\u2060\ufeff\u00ad]/g;
+
+  function extract() {
+    var raw = document.getElementById("input").value;
+    var err = document.getElementById("err");
+    var res = document.getElementById("result");
+    err.style.display = "none";
+    res.style.display = "none";
+    if (!raw.trim()) {
+      err.textContent = "✖ 请先粘贴待检测文本。";
+      err.style.display = "block";
+      return;
+    }
+    var bits = "";
+    var count = 0;
+    for (var i = 0; i < raw.length; i++) {
+      var ch = raw[i];
+      if (ch === ZW_ZERO) { bits += "0"; count++; }
+      else if (ch === ZW_ONE) { bits += "1"; count++; }
+    }
+    if (!count) {
+      err.textContent = "✖ 未检测到零宽隐写字符。请确认已完整复制原文。";
+      err.style.display = "block";
+      return;
+    }
+    if (bits.length % 8 !== 0) {
+      err.textContent = "✖ 零宽比特流长度不是 8 的倍数，可能复制不完整。";
+      err.style.display = "block";
+      return;
+    }
+    var bytes = [];
+    for (var j = 0; j < bits.length; j += 8) {
+      bytes.push(parseInt(bits.substr(j, 8), 2));
+    }
+    var text = "";
+    try {
+      text = new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes));
+    } catch (e) {
+      err.textContent = "✖ 解码失败，隐藏内容可能不是 UTF-8 文本。";
+      err.style.display = "block";
+      return;
+    }
+    document.getElementById("out").textContent = text;
+    document.getElementById("meta").textContent = "共检出 " + count + " 个零宽字符 · " + bytes.length + " 字节";
+    res.style.display = "block";
+  }
+
+  function clearAll() {
+    document.getElementById("input").value = "";
+    document.getElementById("err").style.display = "none";
+    document.getElementById("result").style.display = "none";
+  }
+</script>
+<script src="js/disclaimer.js"></script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>
