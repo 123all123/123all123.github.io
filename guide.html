@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="js/storage-guard.js"></script>
+<script src="js/source-guard.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>攻略指引</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #ffffff;
+    color: #222;
+    min-height: 100vh;
+    line-height: 1.8;
+  }
+  a { text-decoration: none; color: #3385ff; }
+  a:hover { text-decoration: underline; }
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ebebeb;
+    background-color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #3385ff;
+    margin-right: 24px;
+    user-select: none;
+  }
+  .header-title {
+    font-size: 15px;
+    color: #666;
+    letter-spacing: 1px;
+  }
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+  }
+  .page-hd {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .page-hd h1 {
+    font-size: 26px;
+    font-weight: bold;
+    color: #222;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .page-hd .sub {
+    font-size: 13px;
+    color: #666;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+    .stages { position: static; }
+  }
+  .stages {
+    background: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+    padding: 10px 0;
+    position: sticky;
+    top: 72px;
+  }
+  .stages-title {
+    font-size: 12px;
+    color: #999;
+    padding: 6px 14px 10px;
+    border-bottom: 1px solid #ebebeb;
+  }
+  .stage-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    color: #444;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s;
+  }
+  .stage-btn:hover { background: #f0f4ff; color: #0000cc; }
+  .stage-btn.active {
+    background: #eef4ff;
+    color: #3385ff;
+    border-left-color: #3385ff;
+    font-weight: bold;
+  }
+  .panel {
+    background: #fff;
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #ebebeb;
+    background: #fafafa;
+  }
+  .tab {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    background: transparent;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab:hover { color: #555; }
+  .tab.active {
+    color: #3385ff;
+    background: #fff;
+    font-weight: bold;
+    box-shadow: inset 0 -2px 0 #3385ff;
+  }
+  .content {
+    padding: 22px 24px 28px;
+    min-height: 360px;
+  }
+  .content h2 {
+    font-size: 18px;
+    color: #222;
+    margin-bottom: 14px;
+  }
+  .content h3 {
+    font-size: 14px;
+    color: #3385ff;
+    margin: 18px 0 8px;
+    font-weight: bold;
+  }
+  .content p, .content li {
+    font-size: 14px;
+    color: #444;
+  }
+  .content ul, .content ol {
+    padding-left: 1.3em;
+    margin: 10px 0;
+  }
+  .content li { margin: 6px 0; }
+  .content b, .content strong { color: #222; }
+  .content code {
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+    color: #c7254e;
+    border: 1px solid #ebebeb;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .tag.simple { background: #eef4ff; color: #3385ff; border: 1px solid #c5d9ff; }
+  .tag.full { background: #fff5f0; color: #e04a28; border: 1px solid #ffd8c8; }
+  .warn {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #fff8f6;
+    border-left: 3px solid #ff5c38;
+    border-radius: 0 4px 4px 0;
+    font-size: 13px;
+    color: #a04030;
+  }
+  .foot-links {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 13px;
+    color: #999;
+  }
+  .foot-links a { margin: 0 10px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <a class="header-logo" href="find.html">智搜</a>
+  <span class="header-title">攻略指引</span>
+  <div class="header-right">
+    <a href="index.html">返回首页</a>
+    <a href="find.html">进入智搜</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-hd">
+    <h1>攻略指引</h1>
+    <p class="sub">选择你当前游玩到的部分，查看对应提示 · 完整提示含具体操作，请谨慎展开</p>
+  </div>
+
+  <div class="layout">
+    <nav class="stages">
+      <div class="stages-title">选择进度</div>
+      <button type="button" class="stage-btn active" data-id="0">0 · 开局与智搜</button>
+      <button type="button" class="stage-btn" data-id="1">1 · 贴吧与资源站</button>
+      <button type="button" class="stage-btn" data-id="2">2 · 官网与性格测试</button>
+      <button type="button" class="stage-btn" data-id="3">3 · 邮件与官网崩溃</button>
+      <button type="button" class="stage-btn" data-id="4">4 · 后台与备份站</button>
+      <button type="button" class="stage-btn" data-id="5">5 · 法恩线（密钥一）</button>
+      <button type="button" class="stage-btn" data-id="6">6 · 莉亚线（密钥二）</button>
+      <button type="button" class="stage-btn" data-id="7">7 · 冯骅线（密钥三）</button>
+      <button type="button" class="stage-btn" data-id="8">8 · 三钥验证</button>
+      <button type="button" class="stage-btn" data-id="9">9 · 七七聊天决战</button>
+      <button type="button" class="stage-btn" data-id="10">10 · 终章与结局</button>
+    </nav>
+
+    <div class="panel">
+      <div class="tabs">
+        <button type="button" class="tab active" data-mode="simple">简易提示</button>
+        <button type="button" class="tab" data-mode="full">完整提示</button>
+      </div>
+      <div class="content" id="guide-content"></div>
+    </div>
+  </div>
+
+  <div class="foot-links">
+    <a href="index.html">返回首页</a>
+    <a href="find.html">进入智搜</a>
+  </div>
+</div>
+
+<script>
+var GUIDE = {
+  0: {
+    title: "开局与智搜",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>熟悉智搜操作，找到与《辉光勇者》相关的第一条有效线索。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>从首页进入智搜，尝试搜索<b>动画全名</b>，不要只搜「勇者」「辉光」——常见词会出现无法点击的外链诱饵。</li>" +
+        "<li>没有头绪时，可去智搜首页的<b>工具中心</b>看看有哪些分析工具；部分工具需搜索关键词才能找到。</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li><code>index.html</code> → 点击「进入智搜」→ <code>find.html</code></li>" +
+        "<li>在搜索框输入 <code>辉光勇者</code>（须完全匹配）</li>" +
+        "<li>进入贴吧讨论帖，继续下一阶段</li>" +
+        "</ol>" +
+        "<p>若搜「辉光」「勇者」只有百度等外链，属正常设计，请换 <code>辉光勇者</code> 再搜。</p>"
+    }
+  },
+  1: {
+    title: "贴吧与资源站",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>在社区帖子中找到隐藏的观看/资源链接。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>不必读完所有楼层，重点找<b>编号特殊的一楼</b>及其<b>楼中楼回复</b>。</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>在 <code>tieba.html</code> 找到 <b>11 楼</b></li>" +
+        "<li>展开楼中楼「资源分享小能手」，点击链接进入飞碟动漫网</li>" +
+        "<li>地址为 <code>feidie.html?play=huiguang</code>，仅 <b>OP（第 1 集）</b> 可播放</li>" +
+        "</ol>"
+    }
+  },
+  2: {
+    title: "官网与性格测试",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>进入《辉光勇者》官网，完成互动测试，触发网站异常。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>测试页的<b>邮箱</b>可能输入要求；<b>勇士姓名</b>可自定义。</li>" +
+        "<li>做完测试一定要<b>回到官网首页</b>，对比页面、图标、横幅是否变化。</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>打开 <code>test.html</code> 性格测试</li>" +
+        "<li>勇士姓名：任意；邮箱通过智搜搜索oo邮箱，搜索到邮箱为 <code>qwer1234@oo.com</code></li>" +
+        "<li>完成测试后返回 <code>guanwang.html</code>，页面下会出现闪烁异常提示</li>" +
+        "</ol>"
+    }
+  },
+  3: {
+    title: "邮件与官网崩溃",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>按官网异常提示操作邮箱，使官网进入关闭状态，并找到后台入口。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>智搜搜索<b>邮箱</b>相关词进入 oo 邮箱。</li>" +
+        "<li>邮件收件人、主题/正文须与页脚提示<b>完全一致</b>。</li>" +
+        "<li>发送后等待自动回复；网页崩溃后可看到网页模版来源</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>智搜搜 <code>oo邮箱</code> 或 <code>邮箱</code> → <code>youxiang.html</code></li>" +
+        "<li>写信：收件人 <code>hgyz0715@oo.com</code>；主题或正文填 <code>+99</code></li>" +
+        "<li>约 10 秒后收到回复，官网崩溃（再访官网会跳转错误页）</li>" +
+        "<li>搜 <code>dreamcms</code> 读文档 → url拼接<code>admin.html</code> 进入后台</li>" +
+        "<li>运维账号 <code>hgyz0715@oo.com</code>，密码 <code>dreamCMS</code></li>" +
+        "</ol>"
+    }
+  },
+  4: {
+    title: "后台与备份站",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>恢复备份站，了解「勇者已死」，收到七七聊天引导邮件。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>后台「恢复物理备份」的密钥在<b>日志</b>中有所体现</li>" +
+        "<li>进入备份站后点击<b>勇者</b>相关入口，再回邮箱查新邮件。</li>" +
+        "<li>邮件中的英文句暗示<b>聊天房间号</b>，注意大写的字母和数字是否有关联。</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li><code>admin.html</code> 运维面板 → 恢复物理备份 → 密钥在日志页面中可发现为base64的加密代码，解密后为<code>linming0715</code></li>" +
+        "<li>进入 <code>backup_guanwang.html</code> → 点击「勇者 · 阿光」→ <code>backup_hero.html</code>，之后触发备份站崩溃，右下跳出邮箱收到信息，可查看邮箱内容</li>" +
+        "<li>打开邮箱，阅读「别在邮箱里说了」</li>" +
+        "<li><code>I Wait For You</code> →可考虑九键对应 I=4 W=9 F=3 Y=9 → 房间号 <code>4939</code></li>" +
+        "</ol>"
+    }
+  },
+  5: {
+    title: "法恩线（密钥一）",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>完成沈法/法恩线，获得第一段密钥。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>搜索沈法，可在百科界面进入沈法的个人画廊。</li>" +
+        "<li>画廊密码线索在<b>林光明的快聊评论中</b>，快聊的部分用户名是可以进行点击的。</li>" +
+        "<li>智搜工具是不是有个工具是和图像有关的</li>" +
+        "<li>某幅画英文标题中只有<b>部分字母</b>可点击，不要多选。</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>搜 <code>沈法</code> → <code>baike_shenfa.html</code></code></li>" +
+        "<li>画廊密码 <code>19800214</code>，来源于沈法的快聊页面中，是沈法的出生日期。由林光明提到的密码设计记录和沈法的评论可得。</li>" +
+        "<li>画作「星之印」→ 下载画作利用智搜工具进行RGB通道分离，可看到画作的三个通道星空排列为了S、K、Y</li>" +
+        "<li>画作「虚幻·谎言」→ 仅点击 <code>THE SKY IS A LIE</code> 中的 <b>S、K、Y</b></li>" +
+        "<li>法恩留言会显示 key1 十六进制串</li>" +
+        "</ol>"
+    }
+  },
+  6: {
+    title: "莉亚线（密钥二）",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>完成李林晔/莉亚线，获得第二段密钥。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>李林晔百科可链到博客「林间微风」；加密日志密码在博客中提到是<b>某首歌的日期</b>。</li>" +
+        "<li>网页后台通过输入不同的账号可进入不同的页面。对应的账号密码在林光明的快聊中有所体现</li>" +
+        "<li>日期线索在后台<b>回收站/企划案</b>。</li>" +
+        "<li>智搜工具是不是有个工具是和音频有关的</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>搜 <code>李林晔</code> → 百科；搜 <code>林间微风</code> → <code>blog_lilinye.html</code></li>" +
+        "<li>linguangming@oo.com / 19720606（林光明生日，快聊动态有提示），可进入管理员后台</li>" +
+        "<li>加密文密码 <code>20070203</code>（回收站企划案主题曲完成日 2007-02-03）</li>" +
+        "<li>下载 <code>audio/辉光仍在.wav</code>；进行频谱分析</li>" +
+        "<li>频谱读出 key2为<code>667269656e64</code> </li>" +
+        "</ol>"
+    }
+  },
+  7: {
+    title: "冯骅线（密钥三）",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>完成冯骅/小满线，获得第三段密钥。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>后台有提到过冯骅的网名，可以尝试进行搜索</li>" +
+        "<li>有些文字就像影子一样是藏在黑暗中的</li>"+
+        "<li>智搜工具中能够搜索到解密的工具</li>"+
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>搜 <code>一纸江湖</code>，可以进入冯骅的小说站</li>" +
+        "<li>在《隐》的小说页面全选，可以发现<code>零宽</code>线索字体是和背景一样的</li>" +
+        "<li>搜索零宽得到零宽隐写工具，将《影》中加粗的那句话进行解密，可以得到key3为<code>4845415254</code></li>" +
+        "</ol>"
+    }
+  },
+  8: {
+    title: "三钥验证",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>确认三段密钥收集正确，再进入终局更稳妥。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>确认收集到了三段密钥，可进入下一阶段</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>确认收集到了三段密钥，在七七聊天中输入确定，进入最终决战</li>" +
+        "</ol>"
+    }
+  },
+  9: {
+    title: "最终决战",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>最终决战</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>关卡1、在沈法线部分得到密钥的时候是不是有图片发生了变化</li>" +
+        "<li>关卡2、出现不同颜色的字的时候可以进行点击</li>" +
+        "<li>关卡3、黑框的出现存在规律，智搜工具还有工具没有使用过</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>回复含「确定」或「确认」→ 选择<b>不，我拒绝！</b>（选愿意进坏结局）</li>" +
+        "<li>关1 画廊睁眼顺序：<code>1 → 4 → 7 → 5 → 3</code></li>" +
+        "<li>关2 点击没有被侵蚀的鼓励语，累计 3 次</li>" +
+        "<li>关3 黑框的出现存在规律代表摩斯密码，解密得到 <code>LOVE</code>，输入搜索框提交</li>" +
+        "</ol>"
+    }
+  },
+  10: {
+    title: "终章与结局",
+    simple: {
+      body: "<span class=\"tag simple\">不剧透 · 给思路</span>" +
+        "<h2>目标</h2><p>呼唤名字，达成结局。</p>" +
+        "<h3>思路</h3><ul>" +
+        "<li>黑屏后要输入<b>你要互换的名字</b>。</li>" +
+        "<li>呼唤失败的时候，提示是有用的</li>" +
+        "<li>重新回到智搜工具，看看工具的名字是否存在不一样的地方</li>" +
+        "</ul>"
+    },
+    full: {
+      body: "<span class=\"tag full\">完整提示 · 含操作</span>" +
+        "<h2>具体操作</h2><ol>" +
+        "<li>图片、文字、音频的解密工具名字中有单词是高亮的，拼接可得<code>xor</code></li>" +
+        "<li>搜索<code>xor</code>，将三段密钥进行异或运算，得到<code>xor</code>运算结果，之后再将这串16进制文本解码为字符串</li>" +
+        "<li>呼唤最终的结果，达成结局" +
+        "</ol>" +
+        "<p><b>坏结局</b>：洗脑时选「我……愿意」→ <code>badend.html</code>，可回智搜重开。</p>"
+    }
+  }
+};
+
+(function () {
+  var stageId = 0;
+  var mode = "simple";
+  var contentEl = document.getElementById("guide-content");
+  var stageBtns = document.querySelectorAll(".stage-btn");
+  var tabBtns = document.querySelectorAll(".tab");
+
+  function render() {
+    var data = GUIDE[stageId];
+    if (!data) return;
+    var block = data[mode];
+    contentEl.innerHTML = "<h2>" + data.title + "</h2>" + block.body;
+  }
+
+  stageBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      stageId = parseInt(btn.getAttribute("data-id"), 10);
+      stageBtns.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      render();
+    });
+  });
+
+  tabBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      mode = btn.getAttribute("data-mode");
+      tabBtns.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      render();
+    });
+  });
+
+  var params = new URLSearchParams(location.search);
+  var qStage = parseInt(params.get("stage"), 10);
+  if (!isNaN(qStage) && GUIDE[qStage]) {
+    stageId = qStage;
+    stageBtns.forEach(function (b) {
+      b.classList.toggle("active", parseInt(b.getAttribute("data-id"), 10) === stageId);
+    });
+  }
+  if (params.get("mode") === "full") {
+    mode = "full";
+    tabBtns.forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-mode") === "full");
+    });
+  }
+
+  render();
+})();
+</script>
+<script src="js/browse-history.js"></script>
+<script src="js/link-new-tab.js"></script>
+</body>
+</html>
