@@ -9,14 +9,34 @@
 <title>勇者不再 · ARG</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: "Microsoft YaHei",serif; background: radial-gradient(circle at 50% 30%, #1a2036, #05060a); color: #cdd6ea; height: 100vh; display: flex; align-items: center; justify-content: center; }
-  .box { max-width: 620px; padding: 40px; text-align: center; }
+  body { font-family: "Microsoft YaHei",serif; background: radial-gradient(circle at 50% 30%, #1a2036, #05060a); color: #cdd6ea; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 20px; }
+  .box { max-width: 620px; padding: 40px 32px; text-align: center; }
   h1 { font-size: 42px; letter-spacing: 10px; color: #e8eefc; margin-bottom: 8px; text-shadow: 0 0 24px rgba(120,160,255,.35); }
   .en { color: #6d7793; letter-spacing: 6px; font-size: 14px; margin-bottom: 30px; }
   .lead { line-height: 2; color: #aeb7cc; font-size: 15px; margin-bottom: 34px; }
   .lead b { color: #ffd36c; }
   .start { display: inline-block; padding: 13px 40px; background: linear-gradient(180deg,#4a6cf7,#2f4bc0); color: #fff; border-radius: 8px; text-decoration: none; font-size: 16px; letter-spacing: 3px; box-shadow: 0 8px 30px rgba(74,108,247,.35); }
   .start:hover { filter: brightness(1.1); }
+  .guide-corner {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #3385ff;
+    background-color: #eef4ff;
+    border: 1px solid #c5d9ff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    transition: all 0.2s;
+  }
+  .guide-corner:hover {
+    color: #fff;
+    background-color: #3385ff;
+    border-color: #3385ff;
+  }
   .tips { margin-top: 30px; color: #56607a; font-size: 12px; line-height: 1.9; }
   .tips a { color: #8ab4ff; }
   .disclaimer {
@@ -58,6 +78,7 @@
 </style>
 </head>
 <body>
+<a class="guide-corner" href="guide.html">攻略指引</a>
 <div class="box">
   <h1>勇者不再</h1>
   <div class="en">THE HERO IS GONE</div>
@@ -73,11 +94,12 @@
     建议使用桌面端 Chrome / Edge 浏览器游玩。
   </div>
   <div class="disclaimer">
-    <h2>温馨提示</h2>
+    <h2>内容说明</h2>
     <ol>
       <li>有部分微恐内容，但不会有强烈的语音和突脸惊吓。</li>
       <li>网页和图片、视频、音频部分由 AI 制作。</li>
       <li>该游戏内容纯属虚构，请和现实做区分。</li>
+      <li>游玩中若卡关、不知道下一步如何进行，可随时回到本页面，点击右上角的<b style="color:#8ab4ff;">「攻略指引」</b>，根据自己当前的进度选择对应提示（简易提示不剧透，完整提示含具体操作）。</li>
     </ol>
     <div class="wish">游戏愉快</div>
   </div>
